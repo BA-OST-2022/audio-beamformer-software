@@ -20,9 +20,7 @@ class ImpedanceCSV:
         self.magnitudes =  []
         self.angle =  []
         
-    
     def setup_folders(self):
-        
         if not os.path.exists(self.newpath_angle):
             os.makedirs(self.newpath_angle)
         if not os.path.exists(self.newpath_mag):
@@ -89,4 +87,4 @@ impedanceCSV = ImpedanceCSV(path_magnitude, path_angle)
 #impedanceCSV.setup_folders()
 impedanceCSV.loadValues()
 #impedanceCSV.plot_single(25000, 50000)
-impedanceCSV.plot_all(25000, 50000)
+#impedanceCSV.plot_all(25000, 50000)
