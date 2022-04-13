@@ -6,3 +6,4 @@ This is a temporary script file.
 """
 
 print("Test")
+print("New")
