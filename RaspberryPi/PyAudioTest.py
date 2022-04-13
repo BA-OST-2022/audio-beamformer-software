@@ -12,6 +12,10 @@ few samples and play them back immediately).
 This is the callback (non-blocking) version.
 """
 
+
+# https://www.tutonaut.de/raspberry-pi-als-bluetooth-airplay-empfaenger-kombi/
+
+
 import pyaudio
 import time
 
