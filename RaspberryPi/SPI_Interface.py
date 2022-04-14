@@ -73,7 +73,6 @@ class SPIInterface():
                 spi_data.append(int(gains[channel * 2 + 1]))
 
         self.spi.writebytes(spi_data[::-1])
-        print(spi_data)
        
        
 s = SPIInterface(channel_count=6, channel_per_fpga=10)
