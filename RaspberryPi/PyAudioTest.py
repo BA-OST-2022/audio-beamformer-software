@@ -15,9 +15,17 @@ This is the callback (non-blocking) version.
 
 # https://www.tutonaut.de/raspberry-pi-als-bluetooth-airplay-empfaenger-kombi/
 
+# Test Thierry
+
 
 import pyaudio
 import time
+
+def print_avaiable_channels(p):
+    for i in range(p.get_device_count()):
+        dev = p.get_device_info_by_index(i)
+        print((i,dev['name'],dev['maxInputChannels'],dev['maxOutputChannels']))  
+        
 
 WIDTH = 2
 CHANNELS = 2
@@ -28,8 +36,7 @@ p = pyaudio.PyAudio()
 def callback(in_data, frame_count, time_info, status):
     return (in_data, pyaudio.paContinue)
 
-for i in range(p.get_device_count()):
-    print(p.get_device_info_by_index(i))
+print_avaiable_channels(p)
 
 stream = p.open(format=p.get_format_from_width(WIDTH),
                 channels=CHANNELS,
