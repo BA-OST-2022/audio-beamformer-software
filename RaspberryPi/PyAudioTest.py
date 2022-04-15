@@ -20,6 +20,12 @@ This is the callback (non-blocking) version.
 
 import pyaudio
 import time
+import numpy as np
+
+def modified_amplitude_modulation(data,m):
+    channel_1 = 1/2*(m * data + 1)
+    channel_2 = np.zeros(data)      #1/2*(1 - 1/2*m**4*data**2 - 1/8*m**4*data**4)
+    return np.column_stack((channel_1,channel_2))
 
 def print_avaiable_channels(p):
     for i in range(p.get_device_count()):
@@ -34,6 +40,8 @@ RATE = 44100
 p = pyaudio.PyAudio()
 
 def callback(in_data, frame_count, time_info, status):
+    audio_data = np.fromstring(in_data, dtype=np.float32)
+    
     return (in_data, pyaudio.paContinue)
 
 print_avaiable_channels(p)
@@ -50,7 +58,7 @@ stream.start_stream()
 while stream.is_active():
     time.sleep(0.1)
 
-stream.stop_stream()
+stream.stop_stream()  
 stream.close()
 
 p.terminate()

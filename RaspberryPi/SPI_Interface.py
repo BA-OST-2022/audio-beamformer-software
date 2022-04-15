@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+impo#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Thu Apr 14 09:45:38 2022
@@ -31,6 +31,7 @@ class SPIInterface():
        # Sigma_delta_coeff value: 2^0 ... 2^15  
        self.sigma_delta_coeff = sigma_delta_coeff
        self.sigma_delta_freq = 6.25e6
+       self.enable_channel = [True] *  self.channel_count
        
     def updateSPI(self):
         modulation_types = {"MAM": 0, "DSB": 1}
@@ -53,6 +54,7 @@ class SPIInterface():
         settings |= (int(modulation_types[self.modulation_type]) & 0x01) << 3
         
         sigma_delta = np.array([i for i in (self.sigma_delta_coeff).to_bytes(2, "big")])
+        enable = sum([2**i*int(value) for i,value in enumerate(self.enable_channel)]).to_bytes(2, "big")
         
         gain_int = (self.gain * 32767).astype(int)
         gains = np.array([i for gain in gain_int for i in int(gain).to_bytes(2, "big", signed=True)])
@@ -64,6 +66,8 @@ class SPIInterface():
             spi_data.append(settings)
             spi_data.append(int(sigma_delta[0]))
             spi_data.append(int(sigma_delta[1]))
+            spi_data.append(int(enable[0]))
+            spi_data.append(int(enable[1]))
             for channel in range(self.channel_per_fpga):
                 if((channel + 1) * (fpga + 1) > self.channel_count):
                     break
@@ -73,7 +77,9 @@ class SPIInterface():
                 spi_data.append(int(gains[channel * 2 + 1]))
 
         self.spi.writebytes(spi_data[::-1])
-       
+        print(spi_data)
        
 s = SPIInterface(channel_count=6, channel_per_fpga=10)
+s.enable_channel = [False] * 6
+s.enable_channel[3] = True
 s.updateSPI()

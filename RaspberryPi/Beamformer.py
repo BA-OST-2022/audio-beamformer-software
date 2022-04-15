@@ -7,6 +7,7 @@ Created on Thu Apr 14 15:13:15 2022
 """
 from SPI_Interface import SPIInterface
 import numpy as np
+import time
 
 class Beamformer():
     def __init__(self,
@@ -26,11 +27,18 @@ class Beamformer():
         self.spi_interface.delay = delay
         print(delay)
         self.spi_interface.updateSPI()
-
+    
+    def steerAngleBetween(self, min_angle, max_angle, steps, hold_time, loop = 1):
+        for i in range(loop):
+            for angle in np.linspace(min_angle,max_angle,steps):
+                self.steerAngle(angle)
+                time.sleep(hold_time)
 
 spi = SPIInterface(channel_count=6, channel_per_fpga=10)
 b = Beamformer(spi)
 
-b.steerAngle(-45)
+
+
+b.steerAngleBetween(-45, 45, 10, 0.5, 3)
 
         
