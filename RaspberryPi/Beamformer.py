@@ -21,6 +21,54 @@ class Beamformer():
         self.speed_of_sound = 331.5 + 0.607*temperature
         self.row_count = row_count
         self.distance = distance
+        self.window_types = {"rect": self.rectWindow(),
+                             "cosine": self.cosineWindow(),
+                             "hann": self.hannWindow(),
+                             "hamming": self.hammingWindow(),
+                             "blackman": self.blackmanWindow(),
+                             "cheby": 5}
+
+    def rectWindow(self):
+        gains = [1] * self.row_count
+        return gains
+
+    def cosineWindow(self):
+        gains = np.sin(np.arange(self.row_count)*np.pi/(self.row_count-1))
+        gains /= max(gains)
+        return gains
+
+    def hannWindow(self):
+        gains = np.sin(np.arange(self.row_count)*np.pi/(self.row_count-1))**2
+        gains /= max(gains)
+        return gains
+
+    def hammingWindow(self):
+        gains = 0.54 - 0.46 * np.cos(2*np.arange(self.row_count)*np.pi/(self.row_count-1))
+        gains /= max(gains)
+        return gains
+
+    def blackmanWindow(self):
+        gains = 0.42 - 0.5 * np.cos(2*np.arange(self.row_count)*np.pi/(self.row_count-1)) + 0.08 * np.cos(4*np.arange(self.row_count)*np.pi/(self.row_count-1))
+        gains /= max(gains)
+        return gains
+
+    def chebyWindow(self):
+        alpha = 5
+        beta = np.cosh(1/self.row_count*np.arccosh(10**alpha))
+        freq_dom = np.array([self.chebyPol(beta*np.cos(np.pi * val /(self.row_count+1)))/self.chebyPol(beta) for val in np.arange(self.row_count)])
+        print(freq_dom)
+        gains = np.fft.fftshift(np.fft.ifft(freq_dom))
+        gains /= max(gains)
+        return gains
+
+    def chebyPol(self, val):
+        N = self.row_count
+        if val <= -1:
+            return (-1)**N*np.cosh(N*np.arccosh(-val))
+        elif val >= 1:
+            return np.cosh(N*np.arccosh(val))
+        else:
+            return np.cos(N*np.arccos(val))
 
     def steerAngle(self, angle):
         delay = np.arange(self.row_count) * self.distance / self.speed_of_sound * np.sin(angle/180*np.pi)
@@ -39,6 +87,11 @@ class Beamformer():
     def beamFocusing(self, focal_length):
         delay = np.arange(self.row_count) * (self.row_count - np.arange(self.row_count)) * self.distance**2 / (focal_length * 2 *self.speed_of_sound)
         print(delay)
+
+    def setWindow(self, window_type):
+        gain = self.window_types[window_type]
+        self.spi_interface.gains = gain
+        self.spi_interface.updateSPI()
 
 spi = SPIInterface(channel_count=6, channel_per_fpga=10)
 b = Beamformer(spi)
