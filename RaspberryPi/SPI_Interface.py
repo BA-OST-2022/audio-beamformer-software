@@ -78,8 +78,8 @@ class SPIInterface():
 
         self.spi.writebytes(spi_data[::-1])
         print(spi_data)
-       
-s = SPIInterface(channel_count=6, channel_per_fpga=10)
-s.enable_channel = [False] * 6
-s.enable_channel[3] = True
-s.updateSPI()
+if __name__ == '__main__':   
+    s = SPIInterface(channel_count=6, channel_per_fpga=10)
+    s.enable_channel = [False] * 6
+    s.enable_channel[3] = True
+    s.updateSPI()
