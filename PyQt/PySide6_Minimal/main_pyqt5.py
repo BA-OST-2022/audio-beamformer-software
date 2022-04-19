@@ -37,8 +37,8 @@ class MainWindow(QObject):
 
 
 if __name__ == "__main__":
-    # sys_argv = sys.argv
-    # sys_argv += ['--style', 'material']
+    sys_argv = sys.argv
+    sys_argv += ['--style', 'Material']
     app = QGuiApplication.instance()
     if app == None:
         app = QGuiApplication(sys.argv)
