@@ -9,7 +9,6 @@ from SPI_Interface import SPIInterface
 import numpy as np
 import time
 
-
 class Beamformer():
     def __init__(self,
                  spi_interface,
@@ -26,7 +25,7 @@ class Beamformer():
                              "hann": self.hannWindow(),
                              "hamming": self.hammingWindow(),
                              "blackman": self.blackmanWindow(),
-                             "cheby": 5}
+                             "cheby": self.chebyWindow()}
 
     def rectWindow(self):
         gains = [1] * self.row_count
@@ -56,8 +55,7 @@ class Beamformer():
         alpha = 5
         beta = np.cosh(1/self.row_count*np.arccosh(10**alpha))
         freq_dom = np.array([self.chebyPol(beta*np.cos(np.pi * val /(self.row_count+1)))/self.chebyPol(beta) for val in np.arange(self.row_count)])
-        print(freq_dom)
-        gains = np.fft.fftshift(np.fft.ifft(freq_dom))
+        gains = np.real(np.fft.fftshift(np.fft.ifft(freq_dom)))
         gains /= max(gains)
         return gains
 
@@ -75,7 +73,6 @@ class Beamformer():
         if (np.sin(angle/180*np.pi) < 0):
             delay = delay[::-1] * -1
         self.spi_interface.delay = delay
-        print(delay)
         self.spi_interface.updateSPI()
 
     def steerAngleBetween(self, min_angle, max_angle, steps, hold_time, loop = 1):
@@ -90,10 +87,12 @@ class Beamformer():
 
     def setWindow(self, window_type):
         gain = self.window_types[window_type]
+        print(gain)
         self.spi_interface.gains = gain
         self.spi_interface.updateSPI()
 
-spi = SPIInterface(channel_count=6, channel_per_fpga=10)
-b = Beamformer(spi)
+spi = SPIInterface(channel_count=7, channel_per_fpga=10)
+b = Beamformer(spi,row_count=7)
 # b.steerAngleBetween(-45, 45, 10, 0.5, 3)
-b.beamFocusing(0.15)
+# b.beamFocusing(0.15)
+b.setWindow("cheby")
