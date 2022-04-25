@@ -19,7 +19,7 @@ class Thread(QThread):
     def run(self):
         global runThreads
         faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         while runThreads:
             ret, frame = cap.read()
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

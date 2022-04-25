@@ -78,9 +78,9 @@ ApplicationWindow{
     }
     
     Image{
-        id: image 
-        width: 300
-        height: 120
+        id: cameraImage 
+        width: 640
+        height: 480
         source: "../images/logo.png"        
         //anchors.horizontalRight: parent.horizontalCenter
         //anchors.top: sliderTest.right
