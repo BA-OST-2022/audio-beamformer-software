@@ -17,7 +17,7 @@ This is the callback (non-blocking) version.
 
 # Test Thierry
 
-
+from scipy.signal import kaiserord, lfilter, firwin, freqz, firwin2
 import pyaudio
 import time
 import numpy as np
@@ -28,7 +28,7 @@ class AudioProcessing():
                  channel_count,
                  input_device,
                  output_device,
-                 fir_window_size = 100,
+                 fir_window_size = 101,
                  chunk_size = 4096,
                  sampling_rate = 44100,
                  byte_width = 4):
@@ -71,21 +71,13 @@ class AudioProcessing():
         
     def kaiserBandpass(self, 
                        window_size,
-                       w_c_hp = 0.0904977375565611 * np.pi, # 200 Hz
-                       w_c_lp = 0.6787330316742082 * np.pi, # 15 kHz
-                       beta_hp = 5,
-                       beta_lp = 5):
-        k = np.linspace(-window_size//2, window_size//2,window_size)
-        kaiser_window_hp = np.kaiser(window_size,beta_hp)
-        kaiser_window_lp = np.kaiser(window_size,beta_lp)
-        sinc_fun_hp = np.sin(w_c_hp*k)/(np.pi*k) * kaiser_window_hp
-        sinc_fun_lp = np.sin(w_c_lp*k)/(np.pi*k) * kaiser_window_lp
-            
-        dirac = np.zeros(window_size)
-        dirac[window_size//2] = 1
-            
-        highpass = dirac - sinc_fun_hp
-        lowpass = sinc_fun_lp
+                       f_c_hp = 200, # 200 Hz
+                       f_c_lp = 15000,
+                       beta_hp = 2,
+                       beta_lp = 50):
+        
+        highpass = firwin(window_size, f_c_hp/2/self.sampling_rate, window=("kaiser",beta_hp),pass_zero=False)
+        lowpass = firwin(window_size, f_c_lp/2/self.sampling_rate, window=("kaiser",beta_lp),pass_zero=True)
             
         # print(np.sum(lowpass))
         # print(np.sum(highpass))
