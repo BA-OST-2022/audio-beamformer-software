@@ -61,20 +61,7 @@ class AudioProcessing():
     def endStream(self):
         self.stream.stop_stream()
         self.stream.close()
-        self.pyaudio.terminate()
-        
-    def setupStream(self):
-        stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
-                                   channels=self.channel_count,
-                                   rate=self.sampling_rate, 
-                                   frames_per_buffer=self.chunk_size,
-                                   input_device_index=self.input_device,
-                                   output_device_index=self.output_device,
-                                   input=True,
-                                   output=True,
-                                   stream_callback=self.callback)
-        return stream
-                
+        self.pyaudio.terminate()              
         
     def print_avaiable_channels(self):
         for i in range(self.pyaudio.get_device_count()):
@@ -119,10 +106,10 @@ class AudioProcessing():
         full_callback = np.hstack((self.previousWindow,callback_output))
         full_callback_lp = np.convolve(full_callback,self.low_pass,"valid")
         self.previousWindow = callback_output[-self.window_size:]
-        return (full_callback_lp, pyaudio.paContinue)
+        return (full_callback, pyaudio.paContinue)
 
 
-audioPro = AudioProcessing(1,input_device=4,output_device=1)
+audioPro = AudioProcessing(1,input_device=3,output_device=0)
 try:
     while audioPro.stream.is_active():
         time.sleep(0.1)
