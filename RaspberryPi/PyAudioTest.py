@@ -21,6 +21,8 @@ This is the callback (non-blocking) version.
 import pyaudio
 import time
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 def modified_amplitude_modulation(data,m):
     channel_1 = 1/2*(m * data + 1)
@@ -33,32 +35,50 @@ def print_avaiable_channels(p):
         print((i,dev['name'],dev['maxInputChannels'],dev['maxOutputChannels']))  
         
 
-WIDTH = 2
-CHANNELS = 2
+WIDTH = 4
+CHANNELS = 1
 RATE = 44100
-
+CHUNK = 1024
 p = pyaudio.PyAudio()
 
+fig, ax = plt.subplots()
+xdata, ydata = [], []
+ln, = ax.plot([], [], 'ro-')
+
 def callback(in_data, frame_count, time_info, status):
-    audio_data = np.fromstring(in_data, dtype=np.float32)
+    if status:
+        print("Playback Error: %i" % status)
+    callback_output = np.fromstring(in_data, dtype=np.int32)
+    print(len(callback_output))
+    fft = np.fft.rfft(callback_output)
+    print(len(fft))
+    #Limiter
+    #Equalizer
+    #Bandpass
+    # Kaiser Window
     
     return (in_data, pyaudio.paContinue)
+
+
 
 print_avaiable_channels(p)
 
 stream = p.open(format=p.get_format_from_width(WIDTH),
                 channels=CHANNELS,
-                rate=RATE,
+                rate=RATE, 
+                frames_per_buffer=CHUNK,
+                input_device_index=1,
+                output_device_index=5,
                 input=True,
                 output=True,
                 stream_callback=callback)
 
 stream.start_stream()
-
-while stream.is_active():
-    time.sleep(0.1)
-
-stream.stop_stream()  
-stream.close()
-
-p.terminate()
+try:
+    while stream.is_active():
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    stream.stop_stream()  
+    stream.close()
+    
+    p.terminate()
