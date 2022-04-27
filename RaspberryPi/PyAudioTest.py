@@ -41,19 +41,19 @@ class AudioProcessing():
         self.input_device = input_device
         self.output_device = output_device
         self.previousWindow = np.zeros(self.window_size)
-        
-        self.pyaudio = pyaudio.PyAudio()
-        
         self.low_pass, self.high_pass = self.kaiserBandpass(self.window_size)
+        
+    def startStream(self):
+        self.pyaudio = pyaudio.PyAudio()
         self.print_avaiable_channels()
         self.stream = self.setupStream()
         self.stream.start_stream()
         
-    def __del__(self):
+    def endStream(self):
         self.stream.stop_stream()
         self.stream.close()
         self.pyaudio.terminate()
-
+        
     def setupStream(self):
         stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
                                    channels=self.channel_count,
@@ -117,14 +117,20 @@ class AudioProcessing():
             print("Playback Error: %i" % status)
         callback_output = np.fromstring(in_data, dtype=np.int32)
         
-        self.previousWindow = callback_output
+        full_callback = np.row_stack((self.previousWindow,callback_output))
+        folded = np.convolve(full_callback,self.low_pass,"valid")
+        print(len(folded))
+        self.previousWindow = callback_output[-self.window_size:]
         callback_output.tobytes()
         return (callback_output, pyaudio.paContinue)
 
 
-audioPro = AudioProcessing(1, 6, 6)
+audioPro = AudioProcessing(1,input_device=10,output_device=5)
+audioPro.startStream()
+
 try:
     while audioPro.stream.is_active():
         time.sleep(0.1)
 except KeyboardInterrupt:
-    pass
+    audioPro.endStream()
+audioPro.endStream()
