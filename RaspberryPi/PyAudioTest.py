@@ -21,7 +21,7 @@ This is the callback (non-blocking) version.
 import pyaudio
 import time
 import numpy as np
-# import matplotlib.pyplot as 
+#import matplotlib.pyplot as plt
 
 class AudioProcessing():
     def __init__(self ,
@@ -75,7 +75,7 @@ class AudioProcessing():
         
     def kaiserBandpass(self, 
                        window_size,
-                       w_c_l = 0.00904977375565611 * np.pi, # 200 Hz
+                       w_c_l = 0.0904977375565611 * np.pi, # 200 Hz
                        w_c_h = 0.6787330316742082 * np.pi,
                        beta_l = 5,
                        beta_h = 5):
@@ -112,20 +112,17 @@ class AudioProcessing():
                  in_data,
                  frame_count,
                  time_info, status):
-        
         if status:
             print("Playback Error: %i" % status)
-        callback_output = np.fromstring(in_data, dtype=np.int32)
+        callback_output = np.frombuffer(in_data, dtype=np.int32)
         
-        full_callback = np.row_stack((self.previousWindow,callback_output))
-        folded = np.convolve(full_callback,self.low_pass,"valid")
-        print(len(folded))
+        full_callback = np.hstack((self.previousWindow,callback_output))
+        full_callback_lp = np.convolve(full_callback,self.low_pass,"valid")
         self.previousWindow = callback_output[-self.window_size:]
-        callback_output.tobytes()
-        return (callback_output, pyaudio.paContinue)
+        return (full_callback_lp, pyaudio.paContinue)
 
 
-audioPro = AudioProcessing(1,input_device=10,output_device=5)
+audioPro = AudioProcessing(1,input_device=4,output_device=1)
 audioPro.startStream()
 
 try:
