@@ -31,10 +31,10 @@ class AudioProcessing():
                  fir_window_size = 101,
                  chunk_size = 4096,
                  sampling_rate = 44100,
-                 byte_width = 4):
+                 byte_width = 2):
         
         self.byte_width = byte_width
-        self.channel_count = 1
+        self.channel_count = 2
         self.sampling_rate = sampling_rate
         self.chunk_size = chunk_size
         self.window_size = fir_window_size
@@ -102,11 +102,22 @@ class AudioProcessing():
                  time_info, status):
         if status:
             print("Playback Error: %i" % status)
-        callback_output = np.frombuffer(in_data, dtype=np.int32)
-        full_callback = np.hstack((self.previousWindow,callback_output))
-        full_callback_lp = np.convolve(full_callback,self.low_pass,"valid")
-        self.previousWindow = callback_output[-self.window_size:]
-        return (full_callback, pyaudio.paContinue)
+        callback_output = np.frombuffer(in_data, dtype=np.float32)
+        left_channel = callback_output[::2]
+        # right_channel = callback_output[1::2]
+        
+        callback_output = left_channel
+        
+        
+        # full_callback = np.hstack((self.previousWindow,callback_output))
+        # full_callback_lp = np.convolve(full_callback,self.low_pass,"valid")
+        # self.previousWindow = callback_output[-self.window_size+1:]
+        
+        full_callback_lp = callback_output * 2.0
+        
+        
+        full_callback_lp = np.repeat(full_callback_lp, 2)
+        return (full_callback_lp, pyaudio.paContinue)
 
 
 audioPro = AudioProcessing(1,input_device=3,output_device=0)
