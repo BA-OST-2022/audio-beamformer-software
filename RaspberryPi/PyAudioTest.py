@@ -42,11 +42,20 @@ class AudioProcessing():
         self.output_device = output_device
         self.previousWindow = np.zeros(self.window_size)
         self.low_pass, self.high_pass = self.kaiserBandpass(self.window_size)
+        self.startStream()
         
     def startStream(self):
         self.pyaudio = pyaudio.PyAudio()
         self.print_avaiable_channels()
-        self.stream = self.setupStream()
+        self.stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
+                                        channels=self.channel_count,
+                                        rate=self.sampling_rate, 
+                                        frames_per_buffer=self.chunk_size,
+                                        input_device_index=self.input_device,
+                                        output_device_index=self.output_device,
+                                        input=True,
+                                        output=True,
+                                        stream_callback=self.callback)
         self.stream.start_stream()
         
     def endStream(self):
@@ -115,7 +124,6 @@ class AudioProcessing():
         if status:
             print("Playback Error: %i" % status)
         callback_output = np.frombuffer(in_data, dtype=np.int32)
-        
         full_callback = np.hstack((self.previousWindow,callback_output))
         full_callback_lp = np.convolve(full_callback,self.low_pass,"valid")
         self.previousWindow = callback_output[-self.window_size:]
@@ -123,8 +131,6 @@ class AudioProcessing():
 
 
 audioPro = AudioProcessing(1,input_device=4,output_device=1)
-audioPro.startStream()
-
 try:
     while audioPro.stream.is_active():
         time.sleep(0.1)
