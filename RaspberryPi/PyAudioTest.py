@@ -21,7 +21,7 @@ This is the callback (non-blocking) version.
 import pyaudio
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def modified_amplitude_modulation(data,m):
@@ -38,20 +38,20 @@ def print_avaiable_channels(p):
 WIDTH = 4
 CHANNELS = 1
 RATE = 44100
-CHUNK = 1024
+CHUNK = 4096
 p = pyaudio.PyAudio()
 
-fig, ax = plt.subplots()
-xdata, ydata = [], []
-ln, = ax.plot([], [], 'ro-')
+# fig, ax = plt.subplots()
+# xdata, ydata = [], []
+# ln, = ax.plot([], [], 'ro-')
 
 def callback(in_data, frame_count, time_info, status):
     if status:
         print("Playback Error: %i" % status)
     callback_output = np.fromstring(in_data, dtype=np.int32)
-    print(len(callback_output))
-    fft = np.fft.rfft(callback_output)
-    print(len(fft))
+    #print(len(callback_output))
+    #fft = np.fft.rfft(callback_output)
+    #print(len(fft))
     #Limiter
     #Equalizer
     #Bandpass
@@ -67,8 +67,8 @@ stream = p.open(format=p.get_format_from_width(WIDTH),
                 channels=CHANNELS,
                 rate=RATE, 
                 frames_per_buffer=CHUNK,
-                input_device_index=1,
-                output_device_index=5,
+                input_device_index=4,
+                output_device_index=0,
                 input=True,
                 output=True,
                 stream_callback=callback)
