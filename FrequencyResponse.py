@@ -84,7 +84,4 @@ path_magnitude = "Messungen_FB_TS_BA/02_Meas/Mag_Z"
 
 
 impedanceCSV = ImpedanceCSV(path_magnitude, path_angle)
-#impedanceCSV.setup_folders()
 impedanceCSV.loadValues()
-#impedanceCSV.plot_single(25000, 50000)
-#impedanceCSV.plot_all(25000, 50000)
