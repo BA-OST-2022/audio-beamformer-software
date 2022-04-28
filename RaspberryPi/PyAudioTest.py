@@ -25,9 +25,9 @@ import matplotlib.pyplot as plt
 
 class AudioProcessing():
     def __init__(self ,
-                 channel_count,
-                 input_device,
-                 output_device,
+                 channel_count = 2,     # Default Stereo
+                 input_device = 3,      # Dummy Input
+                 output_device = 0,     # Dummy Output
                  fir_window_size = 255,
                  chunk_size = 4096,
                  sampling_rate = 44100,
@@ -52,7 +52,10 @@ class AudioProcessing():
                                                 (16000,20000):0},
                                                "hamming")
         self.pyaudio = pyaudio.PyAudio()
-        self.print_avaiable_channels()
+        # print(self.getChannels())
+        
+        
+    def startStream(self):
         self.stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
                                         channels=self.channel_count,
                                         rate=self.sampling_rate, 
@@ -69,14 +72,17 @@ class AudioProcessing():
         self.stream.close()
         self.pyaudio.terminate()              
         
-    def print_avaiable_channels(self):
+    def getChannels(self):
+        channelInfo = []
         for i in range(self.pyaudio.get_device_count()):
             dev = self.pyaudio.get_device_info_by_index(i)
-            print((i,dev['name'],
+            channelInfo.append((i,dev['name'],
                    dev['maxInputChannels'],
                    dev['maxOutputChannels'],
-                   dev["defaultSampleRate"]))  
-                
+                   dev["defaultSampleRate"]))
+        return channelInfo
+
+         
     def equalizer(self, gain_dict, filter_type, **kwargs):
         taps = np.zeros(self.window_size,dtype=np.float32)
         for freq in gain_dict:
@@ -158,14 +164,18 @@ class AudioProcessing():
         return (full_callback_lp, pyaudio.paContinue)
 
 
-audioPro = AudioProcessing(channel_count = 2,
-                           input_device=1,
-                           output_device=5)
 
-try:
-    while audioPro.stream.is_active():
-        time.sleep(0.1)
-except KeyboardInterrupt: 
-    audioPro.endStream()
+if __name__ == "__main__":
+    audioPro = AudioProcessing(channel_count=2,
+                               input_device=3,
+                               output_device=0)
+    
+    audioPro.startStream()
+    
+    try:
+        while audioPro.stream.is_active():
+            time.sleep(0.1)
+    except KeyboardInterrupt: 
+        audioPro.endStream()
     
 
