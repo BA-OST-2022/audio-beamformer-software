@@ -22,6 +22,7 @@ import pyaudio
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 class AudioProcessing():
     def __init__(self ,
@@ -88,7 +89,7 @@ class AudioProcessing():
         return channelInfo
 
          
-    def equalizer(self, gain_dict, filter_type, **kwargs):
+    def equalizer(self, gain_dict, **kwargs):
         taps = np.zeros(self.window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -170,10 +171,14 @@ class AudioProcessing():
 
 
 if __name__ == "__main__":
-    audioPro = AudioProcessing(channel_count=2,
-                               input_device=3,
-                               output_device=0)
+    audioPro = AudioProcessing()
+    channels = audioPro.getChannels()
     
+    if(sys.platform == 'linux'):
+        audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
+        audioPro.input_device = [i[1] for i in channels].index('Loopback: PCM (hw:1,1)')
+    
+    print(f"Output Index: {audioPro.output_device}, Input Index: {audioPro.input_device}")
     audioPro.startStream()
     
     try:
