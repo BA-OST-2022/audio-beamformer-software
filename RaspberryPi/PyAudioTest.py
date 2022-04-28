@@ -28,7 +28,7 @@ class AudioProcessing():
                  channel_count,
                  input_device,
                  output_device,
-                 fir_window_size = 251,
+                 fir_window_size = 255,
                  chunk_size = 4096,
                  sampling_rate = 44100,
                  byte_width = 4):
@@ -40,16 +40,17 @@ class AudioProcessing():
         self.window_size = fir_window_size
         self.input_device = input_device
         self.output_device = output_device
+        
         self.previousWindow = np.zeros(self.window_size,dtype=np.float32)
-        self.bandpass = self.kaiserBandpass(self.window_size)
+        
+        #self.bandpass = self.kaiserBandpass(self.window_size)
         self.equalizer_filter = self.equalizer({(0,200): 0,
-                                                (200,1000): 0,
-                                                (1000,2000):1,
+                                                (200,2000): 1,
                                                 (2000,4000):1,
-                                                (4000,8000):1,
-                                                (8000,16000):0,
-                                                (16000,20000):0}
-                                               , "hamming")
+                                                (4000,8000):0,
+                                                (8000,16000):1,
+                                                (16000,20000):0},
+                                               "hamming")
         self.pyaudio = pyaudio.PyAudio()
         self.print_avaiable_channels()
         self.stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
@@ -76,19 +77,18 @@ class AudioProcessing():
                    dev['maxOutputChannels'],
                    dev["defaultSampleRate"]))  
                 
-    def equalizer(self,
-                  gain_dict,
-                  filter_type,
-                  **kwargs):
+    def equalizer(self, gain_dict, filter_type, **kwargs):
         taps = np.zeros(self.window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
+                print(freq[1])
                 taps += firwin(self.window_size,
-                               freq[1]/22100,
-                               window=filter_type)
+                               freq[1]/self.sampling_rate*2,
+                               window=filter_type,
+                               pass_zero=True) * gain_dict[freq]
             else:
                 taps += firwin(self.window_size,
-                               [v/22100 for v in freq],
+                               [v/self.sampling_rate*2 for v in freq],
                                window=filter_type,
                                pass_zero=False) * gain_dict[freq]
         fig, ax = plt.subplots()
@@ -96,7 +96,7 @@ class AudioProcessing():
         
         w,h = freqz(taps)
         fig, ax =plt.subplots()
-        ax.plot(w / np.pi * 22100,20*np.log10(np.abs(h)))
+        ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
         return taps
             
     def kaiserBandpass(self, 
@@ -158,7 +158,10 @@ class AudioProcessing():
         return (full_callback_lp, pyaudio.paContinue)
 
 
-audioPro = AudioProcessing(2,input_device=1,output_device=5)
+audioPro = AudioProcessing(channel_count = 2,
+                           input_device=1,
+                           output_device=5)
+
 try:
     while audioPro.stream.is_active():
         time.sleep(0.1)
