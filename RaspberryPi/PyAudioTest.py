@@ -44,13 +44,18 @@ class AudioProcessing():
         self.previousWindow = np.zeros(self.window_size,dtype=np.float32)
         
         #self.bandpass = self.kaiserBandpass(self.window_size)
-        self.equalizer_filter = self.equalizer({(0,200): 0,
-                                                (200,2000): 1,
-                                                (2000,4000):1,
-                                                (4000,8000):0,
-                                                (8000,16000):1,
-                                                (16000,20000):0},
-                                               "hamming")
+        self.equalizer_filter = self.equalizer({(0,200): {"band_gain": 0,
+                                                          "f_type":("blackman")},
+                                                (200,2000): {"band_gain": 1,
+                                                             "f_type": ("kaiser",5)},
+                                                (2000,4000): {"band_gain": 0,
+                                                              "f_type":("hamming")},
+                                                (4000,8000): {"band_gain": 1,
+                                                              "f_type":("hamming")},
+                                                (8000,16000): {"band_gain": 1,
+                                                               "f_type":("hamming")},
+                                                (16000,20000): {"band_gain": 0,
+                                                                "f_type":("hamming")}})
         self.pyaudio = pyaudio.PyAudio()
         # print(self.getChannels())
         
@@ -87,16 +92,15 @@ class AudioProcessing():
         taps = np.zeros(self.window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
-                print(freq[1])
                 taps += firwin(self.window_size,
                                freq[1]/self.sampling_rate*2,
-                               window=filter_type,
-                               pass_zero=True) * gain_dict[freq]
+                               window=gain_dict[freq]["f_type"],
+                               pass_zero=True) * gain_dict[freq]["band_gain"]
             else:
                 taps += firwin(self.window_size,
                                [v/self.sampling_rate*2 for v in freq],
-                               window=filter_type,
-                               pass_zero=False) * gain_dict[freq]
+                               window=gain_dict[freq]["f_type"],
+                               pass_zero=False) * gain_dict[freq]["band_gain"]
         fig, ax = plt.subplots()
         ax.stem(taps)
         
