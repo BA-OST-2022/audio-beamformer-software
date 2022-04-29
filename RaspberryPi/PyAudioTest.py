@@ -47,8 +47,8 @@ class AudioProcessing():
         model_transducer = np.column_stack((frq.T,200**(2/3)/(frq.T)**(2/3)))
         self.gain_dict = self.equalizeModell(model_transducer,
                                              "1/w^2",
-                                             10,
-                                             spacing="log")
+                                             20,
+                                             spacing="lin")
         # self.equalizer_filter = self.equalizer({(0,200): {"band_gain": 0,
         #                                                   "f_type":("kaiser",8.6)},
         #                                         (200,2000): {"band_gain": 1,
