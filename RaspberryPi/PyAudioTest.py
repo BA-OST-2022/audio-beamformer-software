@@ -14,9 +14,9 @@ This is the callback (non-blocking) version.
 
 
 # https://www.tutonaut.de/raspberry-pi-als-bluetooth-airplay-empfaenger-kombi/
-
 # Test Thierry
 
+from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 import pyaudio
 import time
@@ -29,7 +29,7 @@ class AudioProcessing():
                  channel_count = 2,     # Default Stereo
                  input_device = 3,      # Dummy Input
                  output_device = 0,     # Dummy Output
-                 fir_window_size = 255,
+                 fir_window_size = 555,
                  chunk_size = 4096,
                  sampling_rate = 44100,
                  byte_width = 4):
@@ -43,20 +43,25 @@ class AudioProcessing():
         self.output_device = output_device
         
         self.previousWindow = np.zeros(self.window_size,dtype=np.float32)
-        
-        #self.bandpass = self.kaiserBandpass(self.window_size)
-        self.equalizer_filter = self.equalizer({(0,200): {"band_gain": 0,
-                                                          "f_type":("blackman")},
-                                                (200,2000): {"band_gain": 1,
-                                                             "f_type": ("kaiser",5)},
-                                                (2000,4000): {"band_gain": 0,
-                                                              "f_type":("hamming")},
-                                                (4000,8000): {"band_gain": 1,
-                                                              "f_type":("hamming")},
-                                                (8000,16000): {"band_gain": 1,
-                                                               "f_type":("hamming")},
-                                                (16000,20000): {"band_gain": 0,
-                                                                "f_type":("hamming")}})
+        frq = np.linspace(200,20000)
+        model_transducer = np.column_stack((frq.T,200**(2/3)/(frq.T)**(2/3)))
+        self.gain_dict = self.equalizeModell(model_transducer,
+                                             "1/w^2",
+                                             10,
+                                             spacing="log")
+        # self.equalizer_filter = self.equalizer({(0,200): {"band_gain": 0,
+        #                                                   "f_type":("kaiser",8.6)},
+        #                                         (200,2000): {"band_gain": 1,
+        #                                                      "f_type": ("kaiser",5)},
+        #                                         (2000,4000): {"band_gain": 0,
+        #                                                       "f_type":("kaiser",5)},
+        #                                         (4000,8000): {"band_gain": 1,
+        #                                                       "f_type":("kaiser",5)},
+        #                                         (8000,16000): {"band_gain": 1,
+        #                                                        "f_type":("kaiser",5)},
+        #                                         (16000,20000): {"band_gain": 0,
+        #                                                         "f_type":("kaiser",5)}})
+        self.equalizer_filter = self.equalizer(self.gain_dict)
         self.pyaudio = pyaudio.PyAudio()
         # print(self.getChannels())
         
@@ -89,7 +94,7 @@ class AudioProcessing():
         return channelInfo
 
          
-    def equalizer(self, gain_dict, **kwargs):
+    def equalizer(self, gain_dict):
         taps = np.zeros(self.window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -109,46 +114,51 @@ class AudioProcessing():
         fig, ax =plt.subplots()
         ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
         return taps
+    
+    def equalizeModell(self, 
+                       model_is,
+                       model_should,
+                       nr_of_tabs,
+                       spacing="lin",
+                       start_frq=200,
+                       stop_frq=20000):
+        if spacing=="log":
+            taps_pos = np.geomspace(start_frq, stop_frq, num=nr_of_tabs)
+        elif spacing=="lin":
+            taps_pos = np.linspace(start_frq, stop_frq, nr_of_tabs)
+        else:
+            raise Exception(f"Spacing has to be 'log' or 'lin' and not {spacing}")
             
-    def kaiserBandpass(self, 
-                       window_size,
-                       f_c_hp = 200, # 200 Hz
-                       f_c_lp = 15000,
-                       beta_lp = 3):
+        func_model_is = interp1d(model_is[:,0],model_is[:,1])
         
-        lowpass = firwin(window_size //2 ,
-                          cutoff = f_c_lp/self.sampling_rate*2,
-                          window=("kaiser",beta_lp),
-                          pass_zero=True)
-        highpass = firwin(window_size //2,
-                         cutoff = f_c_hp/self.sampling_rate*2,
-                         window="blackman",
-                         pass_zero=False)
+        if model_should == "equal":
+            func_model_should = interp1d([start_frq,stop_frq],[1,1])
+        elif model_should == "1/w":
+            func_model_should = interp1d(taps_pos, start_frq/taps_pos)
+        elif model_should == "1/w^2":
+            func_model_should = interp1d(taps_pos, start_frq**2/taps_pos**2)
+        else:
+            raise Exception(f"model_should has to be 'equal','1/w' or '1/w^2' and not {model_should}")
+            
+        taps_pos_between = np.convolve(taps_pos,[0.5,0.5],"valid")
+        val_is = func_model_is(taps_pos_between)
+        val_should = func_model_should(taps_pos_between) 
+        gain = val_should/val_is
+        gain_norm = gain / max(gain)
         
-        bandpass = np.convolve(lowpass, highpass)
-        # fig, ax = plt.subplots()
-        # ax.stem(lowpass)
+        gain_dict = {(taps_pos[i], taps_pos[i+1]): {"band_gain": g
+                                                    , "f_type":("kaiser",5)} for i,g in enumerate(gain_norm)}
+        fig, ax = plt.subplots()
+        ax.plot(model_is[:,0],model_is[:,1])
+        ax.vlines(taps_pos,0,1,colors="red",linestyles="dashed")
         
-        # fig, ax = plt.subplots()
-        # w,h = freqz(lowpass)
-        # ax.plot(w/np.pi*self.sampling_rate/2,20*np.log10(np.abs(h)))
+        fig, ax = plt.subplots()
+        ax.plot(taps_pos, func_model_should(taps_pos)) 
         
-        # fig, ax = plt.subplots()
-        # ax.stem(highpass)
-        
-        # fig, ax = plt.subplots()
-        # w,h = freqz(highpass)
-        # ax.plot(w/np.pi*self.sampling_rate/2,20*np.log10(np.abs(h)))
-        
-        # bandpass = np.convolve(lowpass, highpass)
-        # fig, ax = plt.subplots()
-        # ax.stem(bandpass)
-        
-        # fig, ax = plt.subplots()
-        # w, h = freqz(bandpass)
-        # ax.plot(w/np.pi*self.sampling_rate/2,20*np.log10(np.abs(h)))
-        
-        return bandpass
+        return gain_dict
+    
+    def MAMPreprocessing(self):
+        pass
     
     def callback(self, 
                  in_data,

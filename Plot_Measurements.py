@@ -18,4 +18,10 @@ for i,p in enumerate(c["Mag_dB"]):
 
 
 fig, ax = plt.subplots()
-ax.plot(f,c["Mag_dB"])
+lin_y = 10**(c["Mag_dB"]/20)
+lin_y = lin_y / max(lin_y)
+ax.plot(f,lin_y)
+f = np.arange(40.2,55,0.1)
+t = 1/(f-40)**(2/3)
+t = t/max(t)
+ax.plot(f, t)
