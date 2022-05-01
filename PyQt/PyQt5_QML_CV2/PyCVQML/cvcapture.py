@@ -65,6 +65,12 @@ class CVCapture(QtCore.QObject):
         for f in self.m_filters:
             frame = f.process_image(frame)
         image = CVCapture.ToQImage(frame)
+        
+        # TODO: Scale image here!
+        
+        # image = image.scaled(self._width, self._height, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+        
+        
         self.m_busy = False
         QtCore.QMetaObject.invokeMethod(self,
                                         "setImage",
@@ -73,7 +79,6 @@ class CVCapture(QtCore.QObject):
 
     @staticmethod
     def ToQImage(im):
-        # TODO: Scale image here!
         if im is None:
             return QtGui.QImage()
         if im.dtype == np.uint8:
