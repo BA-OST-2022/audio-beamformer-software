@@ -2,14 +2,16 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import QtQuick.Controls.Styles 1.4
+import QtQuick.Extras 1.4
 
 ApplicationWindow{
     id: window 
     width: 1480
     height: 320
     visible: true
-    Material.theme: Material.Light
-    Material.accent: Material.LightBlue
+    Material.theme: Material.Light  // Material.Dark
+    Material.accent: Material.LightBlue // Material.LightBlue
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
@@ -115,7 +117,7 @@ ApplicationWindow{
         }
     }
     
-     Item {
+    Item {
             id: audio_processing_state
             visible: audio_processing_button.checked
             anchors.left: parent.left
@@ -866,4 +868,15 @@ ApplicationWindow{
                 }
             }
         }
+        
+        // This is just a reference how to use Gauges (VU-Meter)
+        /*
+        Gauge {
+            id: gauge 
+            minimumValue: 0
+            value: 50
+            maximumValue: 100
+            //anchors.centerIn: parent
+        }
+        */
 }

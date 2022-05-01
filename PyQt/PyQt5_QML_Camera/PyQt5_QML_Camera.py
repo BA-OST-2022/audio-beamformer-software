@@ -52,9 +52,9 @@ class MainWindow(QObject):
     def __init__(self):
         QObject.__init__(self)
         
-        th = Thread(self)
-        th.changePixmap.connect(self.setImage)
-        th.start()
+        # th = Thread(self)
+        # th.changePixmap.connect(self.setImage)
+        # th.start()
 
     # Static Info
     staticUser = "wanderson"
@@ -79,11 +79,12 @@ class MainWindow(QObject):
         else:
             self.signalLogin.emit(False)
             print("Login error!")
+    
             
-    @pyqtSlot(QImage)
-    def setImage(self, image):
-        # self.label.setPixmap(QPixmap.fromImage(image))
-        print(f"Update image: {image.width()} x {image.height()}")
+    # @pyqtSlot(QImage)
+    # def setImage(self, image):
+    #     # self.label.setPixmap(QPixmap.fromImage(image))
+    #     print(f"Update image: {image.width()} x {image.height()}")
         
         
     def terminate(self):
