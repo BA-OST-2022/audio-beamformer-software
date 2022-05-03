@@ -18,16 +18,22 @@ class CVCapture(QtCore.QObject):
     started = QtCore.pyqtSignal()
     imageReady = QtCore.pyqtSignal()
     indexChanged = QtCore.pyqtSignal()
+    widthChanged = QtCore.pyqtSignal()
+    heightChanged = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(CVCapture, self).__init__(parent)
         self._image = QtGui.QImage()
         self._index = 0
+        self._width = 0
+        self._height = 0
 
         self.m_videoCapture = cv2.VideoCapture()
         self.m_timer = QtCore.QBasicTimer()
         self.m_filters = []
         self.m_busy = False
+        
+        
 
     @QtCore.pyqtSlot()
     @QtCore.pyqtSlot(int)
@@ -59,6 +65,12 @@ class CVCapture(QtCore.QObject):
         for f in self.m_filters:
             frame = f.process_image(frame)
         image = CVCapture.ToQImage(frame)
+        
+        # TODO: Scale image here!
+        
+        # image = image.scaled(self._width, self._height, QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
+        
+        
         self.m_busy = False
         QtCore.QMetaObject.invokeMethod(self,
                                         "setImage",
@@ -100,10 +112,29 @@ class CVCapture(QtCore.QObject):
         if self._index == index: return
         self._index = index
         self.indexChanged.emit()
+        
+    def width(self):
+        return self._width
+    
+    def setWidth(self, width):
+        if self._width == width: return
+        self._width = width
+        self.widthChanged.emit()
+        
+    def height(self):
+        return self._height
+    
+    def setHeight(self, height):
+        if self._height == height: return
+        self._height = height
+        self.heightChanged.emit()
 
     @QtCore.pyqtProperty(QtQml.QQmlListProperty)
     def filters(self):
         return QtQml.QQmlListProperty(CVAbstractFilter, self, self.m_filters)
 
+
     image = QtCore.pyqtProperty(QtGui.QImage, fget=image, notify=imageReady)
     index = QtCore.pyqtProperty(int, fget=index, fset=setIndex, notify=indexChanged)
+    width = QtCore.pyqtProperty(int, fget=width, fset=setWidth, notify=widthChanged)
+    height = QtCore.pyqtProperty(int, fget=height, fset=setHeight, notify=heightChanged)

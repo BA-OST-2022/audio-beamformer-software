@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May  3 13:51:20 2022
+
+@author: thierry.schwaller
+"""
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -18,7 +25,7 @@ This is the callback (non-blocking) version.
 
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
-import pyaudio
+import sounddevice as sd
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,16 +33,18 @@ import sys
 
 class AudioProcessing():
     def __init__(self ,
-                 channel_count = 2,     # Default Stereo
-                 input_device = 3,      # Dummy Input
-                 output_device = 0,     # Dummy Output
+                 channel_count_input = 2,   # Default Stereo
+                 channel_count_output = 2,  # Default Stereo
+                 input_device = 9,      # Dummy Input
+                 output_device = 11,     # Dummy Output
                  fir_window_size = 555,
                  chunk_size = 4096,
                  sampling_rate = 44100,
                  byte_width = 4):
         
         self.byte_width = byte_width
-        self.channel_count = channel_count
+        self.channel_count_input = channel_count_input
+        self.channel_count_output = channel_count_output
         self.sampling_rate = sampling_rate
         self.chunk_size = chunk_size
         self.window_size = fir_window_size
@@ -62,35 +71,25 @@ class AudioProcessing():
         #                                         (16000,20000): {"band_gain": 0,
         #                                                         "f_type":("kaiser",5)}})
         self.equalizer_filter = self.equalizer(self.gain_dict)
-        self.pyaudio = pyaudio.PyAudio()
-        # print(self.getChannels())
+        self.getChannels()
         
-        
-    def startStream(self):
-        self.stream = self.pyaudio.open(format=self.pyaudio.get_format_from_width(self.byte_width),
-                                        channels=self.channel_count,
-                                        rate=self.sampling_rate, 
-                                        frames_per_buffer=self.chunk_size,
-                                        input_device_index=self.input_device,
-                                        output_device_index=self.output_device,
-                                        input=True,
-                                        output=True,
-                                        stream_callback=self.callback)
-        self.stream.start_stream()
-        
-    def endStream(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.pyaudio.terminate()              
-        
+    def setupStream(self):
+        self.stream = sd.Stream(samplerate=self.sampling_rate,
+                                blocksize=self.chunk_size,
+                                device=(self.input_device, self.output_device), 
+                                channels=(self.channel_count_input,
+                                          self.channel_count_output),
+                                dtype=np.int32,
+                                callback=self.callback)
+                                
     def getChannels(self):
         channelInfo = []
-        for i in range(self.pyaudio.get_device_count()):
-            dev = self.pyaudio.get_device_info_by_index(i)
-            channelInfo.append((i,dev['name'],
-                   dev['maxInputChannels'],
-                   dev['maxOutputChannels'],
-                   dev["defaultSampleRate"]))
+        for p,i in enumerate(sd.query_devices()):
+            print(f"{p} Name: {i['name']}, In {i['max_input_channels']}, Out {i['max_output_channels']}") 
+            channelInfo.append((p,
+                                i['name'],
+                                i['max_input_channels'],
+                                i['max_output_channels']))
         return channelInfo
 
          
@@ -160,24 +159,29 @@ class AudioProcessing():
     def MAMPreprocessing(self):
         pass
     
-    def callback(self, 
-                 in_data,
-                 frame_count,
-                 time_info, status):
+    # def callback(self, 
+    #              in_data,
+    #              frame_count,
+    #              time_info, status):
+    #     if status:
+    #         print("Playback Error: %i" % status)
+    #     callback_output = np.frombuffer(in_data, dtype=np.float32)
+    #     # Only process left channel and then duplicate at the end
+    #     left_channel = callback_output[::2]
+    #     # Overlap
+    #     left_channel_long = np.hstack((self.previousWindow,
+    #                                     left_channel))
+    #     output = np.convolve(left_channel_long,self.equalizer_filter,"valid")
+    #     output = np.float32(output)
+    #     full_callback_lp = np.repeat(output, 2)
+    #     self.previousWindow = left_channel[-self.window_size:]
+    #     return (full_callback_lp, pyaudio.paContinue)
+    
+    def callback(self, indata, outdata, frames, time, status):
         if status:
-            print("Playback Error: %i" % status)
-        callback_output = np.frombuffer(in_data, dtype=np.float32)
-        # Only process left channel and then duplicate at the end
-        left_channel = callback_output[::2]
-        # Overlap
-        left_channel_long = np.hstack((self.previousWindow,
-                                        left_channel))
-        output = np.convolve(left_channel_long,self.equalizer_filter,"valid")
-        output = np.float32(output)
-        full_callback_lp = np.repeat(output, 2)
-        self.previousWindow = left_channel[-self.window_size:]
-        return (full_callback_lp, pyaudio.paContinue)
-
+            print(status)
+        print(indata)
+        outdata[:] = indata
 
 
 if __name__ == "__main__":
@@ -189,12 +193,15 @@ if __name__ == "__main__":
         audioPro.input_device = [i[1] for i in channels].index('Loopback: PCM (hw:1,1)')
     
     print(f"Output Index: {audioPro.output_device}, Input Index: {audioPro.input_device}")
-    audioPro.startStream()
     
+    audioPro.setupStream()
     try:
-        while audioPro.stream.is_active():
-            time.sleep(0.1)
+        with audioPro.stream:
+            print('#' * 80)
+            print('press Return to quit')
+            print('#' * 80)
+            input()
     except KeyboardInterrupt: 
-        audioPro.endStream()
+        print("Stream terminated")
     
 

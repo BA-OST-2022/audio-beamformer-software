@@ -11,7 +11,8 @@ class CVItem(QtQuick.QQuickPaintedItem):
 
     def paint(self, painter):
         if self.m_image.isNull(): return
-        image = self.m_image.scaled(self.size().toSize())
+        # image = self.m_image.scaled(self.size().toSize())
+        image = self.m_image
         painter.drawImage(QtCore.QPoint(), image)
 
     def image(self):

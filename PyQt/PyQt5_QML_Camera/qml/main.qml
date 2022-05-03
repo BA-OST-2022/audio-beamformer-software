@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+import PyCVQML 1.0
 
 ApplicationWindow{
     id: window 
@@ -26,25 +27,11 @@ ApplicationWindow{
         anchors.topMargin: 60
     }
 
-    // TEXT FIELD USERNAME
-    TextField{
-        id: passwordField
-        width: 300
-        text: qsTr("")
-        selectByMouse: true
-        placeholderText: qsTr("Your password")
-        verticalAlignment: Text.AlignVCenter        
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: usernameField.bottom
-        anchors.topMargin: 10
-        echoMode: TextInput.Password
-    }
-
     // CHECKBOX SAVE PASS
     CheckBox{
         id: checkBox
         text: qsTr("Save password")
-        anchors.top: passwordField.bottom
+        anchors.top: usernameField.bottom
         anchors.topMargin: 10        
         anchors.horizontalCenter: parent.horizontalCenter   
     }
@@ -77,6 +64,7 @@ ApplicationWindow{
         anchors.horizontalCenter: parent.horizontalCenter
     }
     
+    /*
     Image{
         id: cameraImage 
         width: 640
@@ -85,6 +73,15 @@ ApplicationWindow{
         //anchors.horizontalRight: parent.horizontalCenter
         //anchors.top: sliderTest.right
         //anchors.topMargin: 60
+    }
+    */
+    
+
+    Gauge {
+        minimumValue: 0
+        value: 50
+        maximumValue: 100
+        anchors.centerIn: parent
     }
     
 
