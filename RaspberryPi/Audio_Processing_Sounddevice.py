@@ -33,12 +33,12 @@ import sys
 
 class AudioProcessing():
     def __init__(self ,
-                 channel_count_input = 2,   # Default Stereo
+                 channel_count_input = 1,   # Default Stereo
                  channel_count_output = 2,  # Default Stereo
                  input_device = 9,      # Dummy Input
                  output_device = 11,     # Dummy Output
                  fir_window_size = 555,
-                 chunk_size = 4096,
+                 chunk_size = 1024,
                  sampling_rate = 44100,
                  byte_width = 4):
         
@@ -51,7 +51,7 @@ class AudioProcessing():
         self.input_device = input_device
         self.output_device = output_device
         
-        self.previousWindow = np.zeros(self.window_size,dtype=np.float32)
+        self.previousWindow = np.zeros(self.window_size - 1,dtype=np.float32)
         frq = np.linspace(200,20000)
         model_transducer = np.column_stack((frq.T,200**(2/3)/(frq.T)**(2/3)))
         self.gain_dict = self.equalizeModell(model_transducer,
@@ -71,7 +71,6 @@ class AudioProcessing():
         #                                         (16000,20000): {"band_gain": 0,
         #                                                         "f_type":("kaiser",5)}})
         self.equalizer_filter = self.equalizer(self.gain_dict)
-        self.getChannels()
         
     def setupStream(self):
         self.stream = sd.Stream(samplerate=self.sampling_rate,
@@ -159,29 +158,23 @@ class AudioProcessing():
     def MAMPreprocessing(self):
         pass
     
-    # def callback(self, 
-    #              in_data,
-    #              frame_count,
-    #              time_info, status):
-    #     if status:
-    #         print("Playback Error: %i" % status)
-    #     callback_output = np.frombuffer(in_data, dtype=np.float32)
-    #     # Only process left channel and then duplicate at the end
-    #     left_channel = callback_output[::2]
-    #     # Overlap
-    #     left_channel_long = np.hstack((self.previousWindow,
-    #                                     left_channel))
-    #     output = np.convolve(left_channel_long,self.equalizer_filter,"valid")
-    #     output = np.float32(output)
-    #     full_callback_lp = np.repeat(output, 2)
-    #     self.previousWindow = left_channel[-self.window_size:]
-    #     return (full_callback_lp, pyaudio.paContinue)
-    
     def callback(self, indata, outdata, frames, time, status):
         if status:
             print(status)
-        print(indata)
-        outdata[:] = indata
+
+        indata_oneCh = indata[:,0]
+        print(indata_oneCh.shape)
+        indata_oneCh = np.hstack((self.previousWindow,
+                                  indata_oneCh))
+        
+        outdata_oneCh = np.convolve(indata_oneCh,
+                                    self.equalizer_filter,
+                                    "valid")
+        outdata_oneCh = np.float32(outdata_oneCh)
+        self.previousWindow = indata_oneCh[-self.window_size+1:]
+        
+        outdata[:] = np.column_stack((outdata_oneCh, outdata_oneCh))
+
 
 
 if __name__ == "__main__":
@@ -189,8 +182,9 @@ if __name__ == "__main__":
     channels = audioPro.getChannels()
     
     if(sys.platform == 'linux'):
-        audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
-        audioPro.input_device = [i[1] for i in channels].index('Loopback: PCM (hw:1,1)')
+        #audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
+        audioPro.output_device = [i[1] for i in channels].index('USB Audio Device: - (hw:5,0)')
+        audioPro.input_device = [i[1] for i in channels].index('Samson RXD wireless receiver: USB Audio (hw:4,0)')
     
     print(f"Output Index: {audioPro.output_device}, Input Index: {audioPro.input_device}")
     

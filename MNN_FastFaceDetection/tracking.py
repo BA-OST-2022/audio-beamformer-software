@@ -13,7 +13,7 @@ cap = cv2.VideoCapture(0)#f"{dir_path}/{filename}")
 
 fd = FaceDetector()
 
-Ts = 1/30
+Ts = 1/10
 R = 50
 Qp = 10
 Qv = 0.01
