@@ -183,6 +183,7 @@ class AudioProcessing():
 if __name__ == "__main__":
     audioPro = AudioProcessing()
     channels = audioPro.getChannels()
+    print(channels)
     
     if(sys.platform == 'linux'):
         audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')

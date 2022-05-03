@@ -7,9 +7,6 @@ import Filters 1.0
 
 ApplicationWindow
 {
-    //width: 800
-    //height: 600
-    
     id: window 
     width: 1480
     height: 320
@@ -23,19 +20,20 @@ ApplicationWindow
     CVItem 
     {
         id: imageWriter
-        width: 400
-        height: 300
+        x: 540
+        y: 10
         anchors.fill: parent
         image: capture.image
     }
-    
     CVCapture
     {
         id: capture
+        width: 400
+        height: 300
         index: 0
         filters: capture_image
         Component.onCompleted: capture.start()
-        //anchors.topMargin: 10
+        Component.onDestruction: capture.stop()
     }
     
     
