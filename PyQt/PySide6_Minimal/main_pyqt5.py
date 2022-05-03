@@ -47,7 +47,7 @@ if __name__ == "__main__":
     else:
         app = QGuiApplication.instance()
     engine = QQmlApplicationEngine()
-    
+
     main = MainWindow()
     engine.rootContext().setContextProperty("backend", main)
     engine.load(os.path.join(os.path.dirname(__file__), "qml/main_qt5.qml"))

@@ -10,18 +10,19 @@ ApplicationWindow{
     width: 1480
     height: 320
     visible: true
-    Material.theme: Material.Light  // Material.Dark
+    // visibility: "FullScreen"
+    visibility: Window.FullScreen
+    Material.theme: Material.Dark // Material.Dark
     Material.accent: Material.LightBlue // Material.LightBlue
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
     
-    Rectangle {
+    Item {
         id: general_information
         x: 1428
         y: 0
         width: 50
-        color: "#00ffffff"
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -30,10 +31,9 @@ ApplicationWindow{
         anchors.topMargin: 0
     }
 
-    Rectangle {
+    Item {
         id: main_menu
         width: 50
-        color: "#ffffff"
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -141,11 +141,10 @@ ApplicationWindow{
                 anchors.bottomMargin: 0
                 anchors.topMargin: 0
 
-                Rectangle {
+                Item {
                     id: audio_source
                     width: audio_processing_column.width
                     height: audio_processing_column.height/5
-                    color: "#ffffff"
 
                     Row {
                         id: audio_source_row
@@ -195,11 +194,10 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: equalizer
                     width: audio_processing_column.width
                     height: audio_processing_column.height/5
-                    color: "#ffffff"
 
                     Row {
                         id: equalizer_row
@@ -235,11 +233,10 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: interpolation
                     width: audio_processing_column.width
                     height: audio_processing_column.height/5
-                    color: "#ffffff"
 
                     Row {
                         id: interpolation_row
@@ -270,11 +267,10 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: modulation_type
                     width: audio_processing_column.width
                     height: audio_processing_column.height/5
-                    color: "#ffffff"
 
                     Row {
                         id: modulation_type_row
@@ -310,11 +306,10 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: rectangle5
                     width: audio_processing_column.width
                     height: audio_processing_column.height/5
-                    color: "#ffffff"
                 }
             }
         }
@@ -330,10 +325,10 @@ ApplicationWindow{
             anchors.leftMargin: 50
             anchors.bottomMargin: 0
             anchors.topMargin: 0
-            Rectangle {
+
+            Item {
                 id: beamforming_mainwindow
                 y: 0
-                color: "#00ffffff"
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.top: parent.top
@@ -351,11 +346,11 @@ ApplicationWindow{
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.leftMargin: 0
-                    Rectangle {
+
+                    Item {
                         id: window_type
                         width: beamforming_column.width
                         height: beamforming_column.height/5
-                        color: "#ffffff"
                         Row {
                             id: window_type_row
                             width: 200
@@ -408,11 +403,11 @@ ApplicationWindow{
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         id: source_for_direction
                         width: beamforming_column.width
                         height: beamforming_column.height/5
-                        color: "#ffffff"
+
                         Row {
                             id: source_for_direction_row
                             width: 200
@@ -459,12 +454,11 @@ ApplicationWindow{
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         id: source_of_direction_helper
                         x: 0
                         width: beamforming_column.width
                         height: beamforming_column.height/5
-                        color: "#ffffff"
 
                         Slider {
                             id: directional_slider
@@ -518,11 +512,10 @@ ApplicationWindow{
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         id: channel_on_off
                         width: beamforming_column.width
                         height: beamforming_column.height/5
-                        color: "#ffffff"
 
                         Row {
                             id: channel_on_off_row
@@ -722,11 +715,10 @@ ApplicationWindow{
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         id: beamforming_open_2
                         width: beamforming_column.width
                         height: beamforming_column.height/5
-                        color: "#ffffff"
                     }
 
                     anchors.bottomMargin: 0
@@ -761,11 +753,10 @@ ApplicationWindow{
                 anchors.topMargin: 0
                 anchors.leftMargin: 0
                 anchors.rightMargin: 453
-                Rectangle {
+                Item {
                     id: window_type1
                     width: admin_column.width
                     height: admin_column.height / 5
-                    color: "#ffffff"
                     Row {
                         id: tof_row
                         width: 200
@@ -809,11 +800,10 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: max_volume_admin
                     width: admin_column.width
                     height: admin_column.height / 5
-                    color: "#ffffff"
                     Row {
                         id: max_volume_admin_row
                         width: 200
@@ -845,26 +835,23 @@ ApplicationWindow{
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: source_of_direction_helper1
                     x: 0
                     width: admin_column.width
                     height: admin_column.height / 5
-                    color: "#ffffff"
                 }
 
-                Rectangle {
+                Item {
                     id: channel_on_off1
                     width: admin_column.width
                     height: admin_column.height / 5
-                    color: "#ffffff"
                 }
 
-                Rectangle {
+                Item {
                     id: beamforming_open_3
                     width: admin_column.width
                     height: admin_column.height / 5
-                    color: "#ffffff"
                 }
             }
         }
