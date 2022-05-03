@@ -26,6 +26,10 @@ class Beamformer():
                              "hamming": self.hammingWindow(),
                              "blackman": self.blackmanWindow(),
                              "cheby": self.chebyWindow()}
+    @temperature.setter
+    def temperature(self, value):
+        self.temperature = value
+        self.speed_of_sound = 331.5 + 0.607*value
 
     def rectWindow(self):
         gains = [1] * self.row_count
