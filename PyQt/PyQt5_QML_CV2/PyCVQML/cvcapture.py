@@ -2,10 +2,13 @@ import numpy as np
 import threading
 
 import cv2
+import time
 
 from PyQt5 import QtCore, QtGui, QtQml
 
 gray_color_table = [QtGui.qRgb(i, i, i) for i in range(256)]
+
+runCameraThread = True
 
 
 class CVAbstractFilter(QtCore.QObject):
@@ -33,7 +36,12 @@ class CVCapture(QtCore.QObject):
         self.m_filters = []
         self.m_busy = False
         
+        self.mainThread = None
         
+    def __del__(self):
+        self.stop()
+        if(self.m_videoCapture):
+            self.m_videoCapture.release()
 
     @QtCore.pyqtSlot()
     @QtCore.pyqtSlot(int)
@@ -45,10 +53,24 @@ class CVCapture(QtCore.QObject):
         if self.m_videoCapture.isOpened():
             self.m_timer.start(0, self)
             self.started.emit()
+        
+        self.mainThread = threading.Thread(target=self.runThread)
+        self.mainThread.start()
 
     @QtCore.pyqtSlot()
     def stop(self):
         self.m_timer.stop()
+        self.m_videoCapture.release()
+        
+    def stopCamera():
+        global runCameraThread
+        runCameraThread = False
+    
+    def runThread(self):
+        while(runCameraThread):
+            time.sleep(0.1) 
+        self.m_videoCapture.release()
+        
 
     def timerEvent(self, e):
         if e.timerId() != self.m_timer.timerId(): return
@@ -57,13 +79,29 @@ class CVCapture(QtCore.QObject):
             self.m_timer.stop()
             return
         if not self.m_busy:
-            threading.Thread(target=self.process_image, args=(np.copy(frame),)).start()
+            self.thread = threading.Thread(target=self.process_image, args=(np.copy(frame),))
+            self.thread.start()
 
     @QtCore.pyqtSlot(np.ndarray)
     def process_image(self, frame):
         self.m_busy = True
+    
+        # TODO: Mmaybe rotate image here
         for f in self.m_filters:
             frame = f.process_image(frame)
+        
+        
+        # print('Original Dimensions : ',img.shape)
+         
+        # scale_percent = 60 # percent of original size
+        # width = int(img.shape[1] * scale_percent / 100)
+        # height = int(img.shape[0] * scale_percent / 100)
+        # dim = (width, height)
+          
+        # resize image
+        frame = cv2.resize(frame, (self._width, self._height), interpolation = cv2.INTER_AREA)
+        
+        
         image = CVCapture.ToQImage(frame)
         
         # TODO: Scale image here!
