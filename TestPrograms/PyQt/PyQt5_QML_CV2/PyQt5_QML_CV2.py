@@ -50,9 +50,9 @@ class MainWindow(QObject):
                   
         
     def terminate(self):
-        global runThreads
+        global runThreads, runCameraThread
         runThreads = False
-
+        PyCVQML.stopCamera()
 
 
 if __name__ == '__main__':
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     import sys
 
     sys_argv = sys.argv
-    sys_argv += ['--style', 'Material']
+    sys_argv += ['--style', 'Material', 'QT_DEBUG_PLUGINS=1']
     app = QGuiApplication.instance()
     if app == None:
         app = QGuiApplication(sys.argv)
@@ -68,22 +68,15 @@ if __name__ == '__main__':
         app = QGuiApplication(sys.argv)
     else:
         app = QGuiApplication.instance()
+    engine = QQmlApplicationEngine()
+
 
     PyCVQML.registerTypes()
     QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
-    
-    # view = QtQuick.QQuickView()
-    # view.setTitle("PyCVQML Example")
-    # dir_path = os.path.dirname(os.path.realpath(__file__))
-    # view.setSource(QtCore.QUrl.fromLocalFile(QtCore.QDir(dir_path).absoluteFilePath("main.qml")))
-    # view.show()
-    # sys.exit(app.exec_())
-    
-    engine = QQmlApplicationEngine()
+
     
     main = MainWindow()
     engine.rootContext().setContextProperty("backend", main)
     engine.load(os.path.join(os.path.dirname(__file__), "main.qml"))
-
     app.lastWindowClosed.connect(main.terminate)   
     sys.exit(app.exec())

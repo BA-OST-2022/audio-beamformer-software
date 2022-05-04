@@ -183,10 +183,12 @@ class AudioProcessing():
 if __name__ == "__main__":
     audioPro = AudioProcessing()
     channels = audioPro.getChannels()
+    print(channels)
     
     if(sys.platform == 'linux'):
         audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
-        audioPro.input_device = [i[1] for i in channels].index('Loopback: PCM (hw:1,1)')
+        inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
+        audioPro.input_device = [i[1] for i in channels].index(inputDeviceName)
     
     print(f"Output Index: {audioPro.output_device}, Input Index: {audioPro.input_device}")
     audioPro.startStream()
