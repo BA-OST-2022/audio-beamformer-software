@@ -11,7 +11,7 @@ ApplicationWindow{
     height: 320
     visible: true
     // visibility: "FullScreen"
-    visibility: Window.FullScreen
+    //visibility: Window.FullScreen
     Material.theme: Material.Dark // Material.Dark
     Material.accent: Material.LightBlue // Material.LightBlue
     title: qsTr("Audio Beamformer")
