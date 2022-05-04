@@ -163,7 +163,6 @@ class AudioProcessing():
             print(status)
 
         indata_oneCh = indata[:,0]
-        print(indata_oneCh.shape)
         indata_oneCh = np.hstack((self.previousWindow,
                                   indata_oneCh))
         
@@ -171,8 +170,9 @@ class AudioProcessing():
                                     self.equalizer_filter,
                                     "valid")
         outdata_oneCh = np.float32(outdata_oneCh)
+        outdata_oneCh = indata[:,0]
         self.previousWindow = indata_oneCh[-self.window_size+1:]
-        
+        # print(indata_oneCh)
         outdata[:] = np.column_stack((outdata_oneCh, outdata_oneCh))
 
 
@@ -182,10 +182,9 @@ if __name__ == "__main__":
     channels = audioPro.getChannels()
     
     if(sys.platform == 'linux'):
-        #audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
-        audioPro.output_device = [i[1] for i in channels].index('USB Audio Device: - (hw:5,0)')
-        audioPro.input_device = [i[1] for i in channels].index('Samson RXD wireless receiver: USB Audio (hw:4,0)')
-    
+        audioPro.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
+        inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
+        audioPro.input_device = [i[1] for i in channels].index(inputDeviceName)
     print(f"Output Index: {audioPro.output_device}, Input Index: {audioPro.input_device}")
     
     audioPro.setupStream()
