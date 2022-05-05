@@ -32,12 +32,12 @@
 
 import os
 import sys
-
+import datetime
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtQuick, QtQml
 from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -93,6 +93,73 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 class MainWindow(QObject):
     def __init__(self):
         QObject.__init__(self)
+        self.source_list = ["1","2","3"]
+        self.equalizer_list = ["1","2"]
+        self.source_gain_value = 20
+
+    # Audio processing Source
+    @pyqtProperty(list, constant=True)
+    def sourceList(self):
+        return self.source_list
+
+    @pyqtProperty(int)
+    def sourceGainValue(self):
+        print("Call")
+        return self.source_gain_value
+
+    @pyqtSlot(str)
+    def getSource(self, name):
+        print(f"Source: {name}")
+        pass
+
+    @pyqtSlot(float)
+    def getSourceGain(self, gain):
+        print(f"Gain: {gain}")
+        pass
+    
+    # Audio processing Equalizer
+    @pyqtProperty(list, constant=True)
+    def equalizerList(self):
+        return self.equalizer_list
+
+    @pyqtSlot(int)
+    def getEnableEqualizer(self, enable):
+        print(f"Equalizer: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getEqualizerProfile(self, profile):
+        print(f"Equalizer profile: {profile}")
+        pass
+
+    # Audio processing interpolation
+    @pyqtSlot(int)
+    def getEnableInterpolation(self, enable):
+        print(f"Interpolation enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getInterpolationLevel(self, level):
+        print(f"Interpolation level: {level}")
+        pass
+
+    # Audio processing modulation type
+
+    @pyqtSlot(int)
+    def getModulationType(self, type):
+        print(f"Modulation type: {type}")
+        pass
+
+    @pyqtSlot(int)
+    def getInterpolationLevel(self, level):
+        print(f"Interpolation level: {level}")
+        pass
+
+
+    
+
+
+
 
         
                   

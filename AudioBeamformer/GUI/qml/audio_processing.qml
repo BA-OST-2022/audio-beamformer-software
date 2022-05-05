@@ -52,25 +52,39 @@ Item{
 
                 ComboBox {
                     id: ap_source_combobox
-                    model: ["First", "Second", "Third"]
+                    model: backend.sourceList
+                    onCurrentIndexChanged: {
+                        backend.getSource(ap_source_combobox.currentIndex)
+                    }
                 }
 
             }
-            Gauge {
-                id: ap_source_gauge
-                value: 0.5
+
+            // Slider
+            Row{
+                id: ap_source_row_gain_source
                 anchors.right: parent.right
                 anchors.topMargin: 5
                 anchors.bottomMargin: 5 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
+                spacing: 10
+
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Volume")
+                }
+
+                 Slider {
+                    id: ap_source_slider
+                    anchors.verticalCenter: parent.verticalCenter
+                    onValueChanged: {
+                        backend.getSourceGain(ap_source_slider.value)
+                    }
+                }
+
             }
-            Dial{
-                id: ap_source_dial
-                anchors.top: ap_source_row_input_source.bottom
-                anchors.topMargin: 10   
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+           
         }
 
         // Equalizer
@@ -78,6 +92,7 @@ Item{
             id: audio_processing_equalizer_item
             height: audio_processing_settings_row.height
             width: audio_processing_settings_row.width/4
+            // Title
             Label{
                 id: ap_equalizer_label
                 anchors.top: parent.top
@@ -86,14 +101,49 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Equalizer")
             }
-            Switch{
-                id: ap_equalizer_switch
-                text: qsTr("Enable")
+            // Enable
+            Row{
+                id: ap_equalizer_row_enable
                 anchors.top: ap_equalizer_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10
+                anchors.topMargin: 10       
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Enable")
+                }
+
+                 Switch{
+                    id: ap_equalizer_switch
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: {
+                        backend.getEnableEqualizer(ap_equalizer_switch.position)
+                }
             }
 
+            }
+            // Equalizer Profile
+            Row{
+                id: ap_equalizer_row_equalizer_profile
+                visible: ap_equalizer_switch.position
+                anchors.top: ap_equalizer_row_enable.bottom
+                anchors.topMargin: 10       
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Equalizer Profile")
+                }
+
+                ComboBox {
+                    id: ap_equalizer_combobox
+                    model: backend.equalizerList
+                    onCurrentIndexChanged: {
+                        backend.getEqualizerProfile(ap_equalizer_combobox.currentIndex)
+                    }
+                }
+
+            }
 
         }
 
@@ -103,12 +153,58 @@ Item{
             height: audio_processing_settings_row.height
             width: audio_processing_settings_row.width/4
             Label{
+                id: ap_interpolation_label
                 anchors.top: parent.top
                 anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Interpolation")
             }
+
+            // Enable
+            Row{
+                id: ap_interpolation_row_enable
+                anchors.top: ap_interpolation_label.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10       
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Enable")
+                }
+
+                 Switch{
+                    id: ap_interpolation_switch
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: {
+                        backend.getEnableInterpolation(ap_interpolation_switch.position)
+                }
+            }
+
+            }
+            // Interpolation level
+            Row{
+                id: ap_interpolation_row_level
+                visible: ap_interpolation_switch.position
+                anchors.top: ap_interpolation_row_enable.bottom
+                anchors.topMargin: 10       
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Interpolation levels")
+                }
+
+                ComboBox {
+                    id: ap_interpolation_combobox
+                    model: [2,4,8,16,32,64]
+                    onCurrentIndexChanged: {
+                        backend.getInterpolationLevel(ap_interpolation_combobox.currentIndex)
+                    }
+                }
+
+            }
+
         }
 
         // Modulation

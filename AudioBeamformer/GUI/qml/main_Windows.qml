@@ -16,7 +16,10 @@ ApplicationWindow{
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
     Loader{
-                anchors.fill: parent
-                source: "main.qml"
+        anchors.fill: parent
+        source: "main.qml"
+    }
+    Loader{
+        source: "backend.qml"
     }
 }
