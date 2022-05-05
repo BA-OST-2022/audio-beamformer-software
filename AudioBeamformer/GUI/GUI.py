@@ -104,7 +104,6 @@ class MainWindow(QObject):
 
     @pyqtProperty(int)
     def sourceGainValue(self):
-        print("Call")
         return self.source_gain_value
 
     @pyqtSlot(str)
@@ -150,11 +149,24 @@ class MainWindow(QObject):
         print(f"Modulation type: {type}")
         pass
 
-    @pyqtSlot(int)
+    @pyqtSlot(float)
     def getMAMGain(self, gain):
-        print(f"Interpolation level: {gain}")
+        print(f"MAM gain: {gain}")
         pass
 
+    # General information
+    @pyqtProperty(int)
+    def mainGainValue(self):
+        return self.source_gain_value
+
+    @pyqtSlot(float)
+    def getMainGain(self, gain):
+        print(f"Main gain: {gain}")
+        pass
+    @pyqtSlot(int)
+    def getMuteEnable(self, enable):
+        print(f"Mute enable: {enable}")
+        pass
 
     
 

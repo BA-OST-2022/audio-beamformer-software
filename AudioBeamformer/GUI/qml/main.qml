@@ -65,9 +65,15 @@ Item{
     // General information
     Item{
         id: general_information_item
+        anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: main_window.left
+        width: 100
+        Loader{
+            anchors.fill: parent
+            source: "general_information.qml"
+        }
+        
     }
 }
 

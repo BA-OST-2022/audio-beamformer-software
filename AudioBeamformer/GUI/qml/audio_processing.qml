@@ -37,6 +37,15 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Source")
             }
+            
+            // Timer for Input Source
+            Timer {
+                // Every 500ms
+                interval: 500
+                running: true
+                repeat: true
+                onTriggered: ap_source_combobox.model = backend.sourceList
+            }
 
             // ComboBox
             Row{
@@ -63,19 +72,20 @@ Item{
             // Slider
             Row{
                 id: ap_source_row_gain_source
-                anchors.right: parent.right
                 anchors.topMargin: 5
                 anchors.bottomMargin: 5 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                spacing: 10
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                spacing: 5
 
                 Label{
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr("Volume")
                 }
 
-                 Slider {
+                Slider {
                     id: ap_source_slider
                     anchors.verticalCenter: parent.verticalCenter
                     onValueChanged: {
@@ -84,9 +94,27 @@ Item{
                 }
 
             }
-           
-        }
+            // Timer for Gauge
+            Timer {
+                // Every 50ms
+                interval: 50
+                running: true
+                repeat: true
+                onTriggered: ap_source_gauge.value = backend.sourceGainValue
+                }
 
+           Gauge {
+                id: ap_source_gauge
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.topMargin: 5
+                minimumValue: 0
+                value: 50
+                maximumValue: 100
+            }
+        }
+        
         // Equalizer
         Item{
             id: audio_processing_equalizer_item
@@ -213,11 +241,66 @@ Item{
             height: audio_processing_settings_row.height
             width: audio_processing_settings_row.width/4
             Label{
+                id: ap_modulation_label
                 anchors.top: parent.top
                 anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Modulation")
+            }
+            // ModulationType
+            Row{
+                id: ap_modulation_row_type
+                anchors.top: ap_modulation_label.bottom
+                anchors.topMargin: 10       
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Modulation type")
+                }
+                RadioButton{
+                    id: ad_modulation_am
+                    text: qsTr("AM")
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked:{
+                        backend.getModulationType(0)
+                    }
+                }
+                RadioButton{
+                    id: ad_modulation_mam
+                    text: qsTr("MAM")
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked:{
+                        backend.getModulationType(1)
+                    }
+                }
+
+            }
+            // MAM Distortion term
+            Row{
+                id: ap_modulation_row_gain_distortion
+                visible: ad_modulation_mam.checked
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 5
+                anchors.bottomMargin: 5 
+                anchors.top: ap_modulation_row_type.bottom
+                spacing: 10
+
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("MAM Distortion")
+                }
+
+                Slider {
+                    id: ap_modulation_slider
+                    anchors.verticalCenter: parent.verticalCenter
+                    onValueChanged: {
+                        backend.getMAMGain(ap_modulation_slider.value)
+                    }
+                }
+
             }
         }
     }
