@@ -9,7 +9,7 @@
 ###############################################################################
 # MIT License
 #
-# Copyright (c) 2021 Institute for Networked Solutions OST
+# Copyright (c) 2022 ICAI Interdisciplinary Center for Artificial Intelligence
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,7 @@ if(LINUX or DEBUG):
 
 class LEDs():
     def __init__(self):
+        self._initialized = False
         self._runThread = False
         self._updateRate = 30
         
@@ -71,32 +72,48 @@ class LEDs():
         self.end()
     
     def begin(self, framerate = 30):
-        self._updateRate = framerate
-        self._runThread = True
-        self.update()
-        pass
+        if not self._initialized:
+            self._initialized = True
+            self._updateRate = framerate
+            
+            if(LINUX or DEBUG):
+                self.strip = apa102.APA102(num_led=2*19 + 20)
+                self.strip.clear_strip()
+            
+                # Prepare a few individual pixels
+                self.strip.set_pixel_rgb(0, 0xFF0000)  # Red
+                self.strip.set_pixel_rgb(1, 0xFFFFFF)  # White
+                self.strip.set_pixel_rgb(2, 0x00FF00)  # Green
+                
+                self._runThread = True
+                self.update()
+
     
     def end(self):
+        if(self._initialized):
+            if(LINUX or DEBUG):
+                self.strip.clear_strip()
+                self.strip.cleanup()
+
         self._runThread = False
-        pass
+        self._initialized = False
     
     
     def update(self):
-        if(self._runThread):
-            threading.Timer(1.0 / self._updateRate, self.update).start()
-        else:
-            self.end()
-        
-        print("Update")
-        pass
+        if(self._initialized):
+            if(self._runThread):
+                threading.Timer(1.0 / self._updateRate, self.update).start()            
+            
+            self.strip.show()
+            print("Update")
 
 
+
+leds = LEDs()
 
 if __name__ == '__main__':
     import time
-    
-    leds = LEDs()
     leds.begin()
     
-    time.sleep(5)
+    time.sleep(3)
     leds.end()
