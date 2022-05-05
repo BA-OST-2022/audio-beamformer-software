@@ -52,7 +52,7 @@ Item{
                 value: 50
                 maximumValue: 100
                 anchors.right: parent.right
-                anchors.right.margin = 
+                anchors.right.margin: 10 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
             }
