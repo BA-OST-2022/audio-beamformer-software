@@ -31,10 +31,16 @@
 ###############################################################################
 
 from Modules.LEDs import leds
+from GUI.GUI import GUI
 
 import time
 leds.begin()
 
 time.sleep(2)
 leds.end()
+
+
+
+gui = GUI()
+gui.run()   # This function call is blocking and must be at the end
 
