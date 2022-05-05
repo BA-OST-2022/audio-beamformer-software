@@ -18,12 +18,9 @@ ApplicationWindow{
     flags: Qt.FramelessWindowHint | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
     // Divide everythin in Buttons|Main_Window|General_information
-    Row{
+    Item{
         id: main_row
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
 
         // Buttons
         Column{
@@ -31,7 +28,7 @@ ApplicationWindow{
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            width: 200
+            width: 150
 
             Button{
                 id: audio_processing_button
@@ -68,35 +65,22 @@ ApplicationWindow{
         Item{
             id: main_window 
             anchors.left: menu_buttons.right
-            anchors.right: parent.right
             anchors.top: parent.top
             anchors.bottom: parent.bottom
+            width: 1200
 
-            // Audio processing
-            Column{
-                id: audio_processing_main_row
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                visibility: audio_processing_button.checked
-                // Audio processing settings
-                Row{
-                    id: audio_processing_settings_row
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    height: height/3*2
-                }
-                // Flow-Chart
-                Item{
-                    id: flow_chart_item
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.top = 
-                }
+            Loader{
+                anchors.fill: parent
+                source: "audio_processing.qml"
             }
+           
+        }
+        // General information
+        Item{
+            id: general_information_item
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: main_window.left
         }
     }
 }
