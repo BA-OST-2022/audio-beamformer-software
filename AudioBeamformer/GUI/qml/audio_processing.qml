@@ -58,6 +58,12 @@ Item{
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
             }
+
+            Dial{
+                anchors.top: ap_source_combobox.bottom
+                anchors.topMargin: 10   
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
         }
 
         // Equalizer
