@@ -30,6 +30,7 @@
 # SOFTWARE.
 ###############################################################################
 # For Equalizer and Filter
+from importlib.abc import SourceLoader
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
@@ -69,7 +70,6 @@ def AudioProcessing():
 
         self.__previousWindow = np.zeros(self.window_size - 1,dtype=np.float32)
         
-
     def getChannels(self):
         channelInfo = []
         for p,i in enumerate(sd.query_devices()):
@@ -79,3 +79,9 @@ def AudioProcessing():
                                 i['max_input_channels'],
                                 i['max_output_channels']))
         return channelInfo
+
+    def getSourceList(self):
+        sourceList = []
+        for i in sd.query_devices():
+            sourceList.append(i['name'])
+        return sourceList
