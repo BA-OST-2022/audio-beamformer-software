@@ -39,6 +39,7 @@ from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
 
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python path
 
@@ -58,18 +59,29 @@ import cv2
 import PyCVQML
 
 class GUI: 
+    def __init__(self):
+        self._callback = None
+        
     def run(self):
         PyCVQML.registerTypes()
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
         main = MainWindow()
         engine.rootContext().setContextProperty("backend", main)
-        if LINUX:
+        if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
         else:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Windows.qml"))
-        app.lastWindowClosed.connect(main.terminate)   
+        app.lastWindowClosed.connect(self.terminate)   
         sys.exit(app.exec())
+    
+    def registerTerminateCallback(self, callback):
+        self._callback = callback
+        
+    def terminate(self):
+        PyCVQML.stopCamera()
+        if(self._callback):
+            self._callback()
     
 
 class ImageProcessing(PyCVQML.CVAbstractFilter):
@@ -106,10 +118,6 @@ class MainWindow(QObject):
             self.signalLogin.emit(False)
             print("Login error!")
                   
-        
-    def terminate(self):
-        PyCVQML.stopCamera()
-
 
 if __name__ == "__main__":
     gui = GUI()

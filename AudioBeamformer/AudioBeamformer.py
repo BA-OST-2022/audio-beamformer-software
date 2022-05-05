@@ -33,14 +33,21 @@
 from Modules.LEDs import leds
 from GUI.GUI import GUI
 
-import time
-leds.begin()
+class AudioBeamformer():
+    def __init__(self):
+        # Initialize objects here
+        self.gui = GUI()
+    
+    def begin(self):
+        leds.begin()
+        self.gui.registerTerminateCallback(self.end)
+        self.gui.run()   # This function call is blocking and must be at the end
+        
+    def end(self):
+        print("Main Application terminating...")
+        leds.end()
 
-time.sleep(2)
-leds.end()
 
-
-
-gui = GUI()
-gui.run()   # This function call is blocking and must be at the end
-
+if __name__ == '__main__':
+    audioBeamformer = AudioBeamformer()
+    audioBeamformer.begin()
