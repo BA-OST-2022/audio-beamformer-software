@@ -69,4 +69,14 @@ Item{
         anchors.bottom: parent.bottom
         anchors.left: main_window.left
     }
+
+    Connections {
+        target: backend
+
+        // CUSTOM PROPERTIES
+        property string username: ""
+        property string password: ""
+        function onSignalUser(myUser){ username = myUser }
+        function onSignalPass(myPass){ password = myPass }
+    }
 }

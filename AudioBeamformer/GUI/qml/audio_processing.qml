@@ -39,28 +39,35 @@ Item{
             }
 
             // ComboBox
-            ComboBox {
-                id: ap_source_combobox
-                model: ["First", "Second", "Third"]
+            Row{
+                id: ap_source_row_input_source
                 anchors.top: ap_source_label.bottom
                 anchors.topMargin: 10       
                 anchors.horizontalCenter: parent.horizontalCenter
-            }
+                spacing: 10
+                Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Input Source")
+                }
 
+                ComboBox {
+                    id: ap_source_combobox
+                    model: ["First", "Second", "Third"]
+                }
+
+            }
             Gauge {
-                minimumValue: 0
-                value: 50
-                maximumValue: 100
+                id: ap_source_gauge
+                value: 0.5
                 anchors.right: parent.right
-                anchors.rightMargin: 10 
                 anchors.topMargin: 5
                 anchors.bottomMargin: 5 
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
             }
-
             Dial{
-                anchors.top: ap_source_combobox.bottom
+                id: ap_source_dial
+                anchors.top: ap_source_row_input_source.bottom
                 anchors.topMargin: 10   
                 anchors.horizontalCenter: parent.horizontalCenter
             }
@@ -72,12 +79,22 @@ Item{
             height: audio_processing_settings_row.height
             width: audio_processing_settings_row.width/4
             Label{
+                id: ap_equalizer_label
                 anchors.top: parent.top
                 anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Equalizer")
             }
+            Switch{
+                id: ap_equalizer_switch
+                text: qsTr("Enable")
+                anchors.top: ap_equalizer_label.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10
+            }
+
+
         }
 
         // Interpolation
