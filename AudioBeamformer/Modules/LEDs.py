@@ -45,28 +45,6 @@ class LEDs():
         self._initialized = False
         self._runThread = False
         self._updateRate = 30
-        
-        if(LINUX or DEBUG):
-            self.strip = apa102.APA102(num_led=10, spi_bus=5)  # num_led=2*19 + 20
-            self.strip.clear_strip()
-        
-            # Prepare a few individual pixels
-            self.strip.set_pixel_rgb(0, 0xFF0000)  # Red
-            self.strip.set_pixel_rgb(1, 0x00FF00)  # Green
-            self.strip.set_pixel_rgb(2, 0x0000FF)  # Blue
-            self.strip.set_pixel_rgb(3, 0xFFFFFF)  # White
-        
-            # Copy the buffer to the Strip (i.e. show the prepared pixels)
-            self.strip.show()
-        
-            # Wait a few Seconds, to check the result
-            time.sleep(5)
-        
-            # Clear the strip and shut down
-            self.strip.clear_strip()
-            self.strip.cleanup()
-        
-        pass
     
     def __del__(self):
         self.end()
@@ -77,7 +55,7 @@ class LEDs():
             self._updateRate = framerate
             
             if(LINUX or DEBUG):
-                self.strip = apa102.APA102(num_led=2*19 + 20)
+                self.strip = apa102.APA102(num_led=10, spi_bus=5)  # num_led=2*19 + 20
                 self.strip.clear_strip()
             
                 # Prepare a few individual pixels
@@ -105,7 +83,7 @@ class LEDs():
                 threading.Timer(1.0 / self._updateRate, self.update).start()            
             
             self.strip.show()
-            print("Update")
+            # print("Update")
 
 
 
