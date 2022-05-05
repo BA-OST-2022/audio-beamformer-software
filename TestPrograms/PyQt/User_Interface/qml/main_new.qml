@@ -11,11 +11,11 @@ ApplicationWindow{
     height: 320
     visible: true
     // visibility: "FullScreen"
-    visibility: Window.FullScreen
+    // visibility: Window.FullScreen
     Material.theme: Material.Dark // Material.Dark
     Material.accent: Material.LightBlue // Material.LightBlue
     title: qsTr("Audio Beamformer")
-    flags:  Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
+    flags:  Qt.FramelessWindowHint | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     //Qt.FramelessWindowHint |
     // Divide everythin in Buttons|Main_Window|General_information
     Item{
