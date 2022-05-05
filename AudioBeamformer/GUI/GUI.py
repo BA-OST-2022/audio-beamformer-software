@@ -151,8 +151,8 @@ class MainWindow(QObject):
         pass
 
     @pyqtSlot(int)
-    def getInterpolationLevel(self, level):
-        print(f"Interpolation level: {level}")
+    def getMAMGain(self, gain):
+        print(f"Interpolation level: {gain}")
         pass
 
 
