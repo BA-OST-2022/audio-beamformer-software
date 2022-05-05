@@ -46,6 +46,16 @@ Item{
                 anchors.topMargin: 10       
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
+            Gauge {
+                minimumValue: 0
+                value: 50
+                maximumValue: 100
+                anchors.right: parent.right
+                anchors.right.margin = 
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+            }
         }
 
         // Equalizer
@@ -93,6 +103,6 @@ Item{
     // Flow-Chart
     Item{
         id: flow_chart_item
-        
+
     }
 }
