@@ -26,7 +26,7 @@ Item{
         Item{
             id: channels_beamsteering_item
             height: channel_settings_row.height
-            width: channel_settings_row.width/4
+            width: channel_settings_row.width/4.5
             Label{
                 id: ch_beamsteering_label
                 anchors.top: parent.top
@@ -135,7 +135,7 @@ Item{
         Item{
             id: channel_window_item
             height: channel_settings_row.height
-            width: channel_settings_row.width/4
+            width: channel_settings_row.width/4.5
             // Title
             Label{
                 id: ch_window_label
@@ -193,24 +193,23 @@ Item{
 
     }
 
-    // Image
-    CVItem 
-    {
-        id: imageWriter
-        x: 800
-        y: 10
-        anchors.fill: parent
-        image: capture.image
-    }
-    CVCapture
-    {
-        id: capture
-        width: 400
-        height: 300
-        index: 0
-        filters: capture_image
-        Component.onCompleted: capture.start()
-        Component.onDestruction: capture.stop()
-    }
+        CVItem 
+        {
+            id: imageWriter
+            x: 800
+            y: 10
+            anchors.fill: parent
+            image: capture.image
+        }
+        CVCapture
+        {
+            id: capture
+            width: 400
+            height: 300
+            index: 0
+            filters: capture_image
+            Component.onCompleted: capture.start()
+            Component.onDestruction: capture.stop()
+        }
     
 }
