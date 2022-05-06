@@ -45,6 +45,7 @@ sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python pat
 
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 app = QGuiApplication.instance()
 if app == None:
     app = QGuiApplication(sys.argv)
