@@ -41,8 +41,10 @@ if(LINUX or DEBUG):
     from apa102_pi.driver import apa102
 
 
-class LEDs():
+class LEDs():    
     def __init__(self):
+        self.OFF = 0
+        
         self._initialized = False
         self._runThread = False
         self._updateRate = 30
@@ -51,6 +53,9 @@ class LEDs():
         self._brightness = 1
         self._enableChannels = True
         self._enableCamera = True
+        self._ringColors = np.zeros((self._ringCount, 3))
+        self._channelColors = np.zeros((self._channelCount, 3))
+        self._cameraAnimation = self.OFF
     
     def __del__(self):
         self.end()
@@ -80,21 +85,21 @@ class LEDs():
         self._initialized = False
     
     def enableCamera(self, state):
-        pass
+        self._enableCamera = state
     
     def enableChannels(self, state):
-        pass
-    
+        self._enableChannels = state
+      
     def setBrightness(self, brightness):
         self._brightness = np.clip(brightness * 31, 0, 31)
         self.strip.set_global_brightness(self._brightness)
         self.strip.show()
     
     def setChannelColors(self, colors):
-        pass
+        self._channelColors = colors
     
     def setCameraAnimation(self, animation):
-        pass
+        self._cameraAnimation = animation
     
     
     def update(self):
