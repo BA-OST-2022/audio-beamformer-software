@@ -38,14 +38,14 @@ Item{
         onTriggered: gi_main_gauge.value = backend.mainGainValue
     }
 
-           Gauge {
-                id: gi_main_gauge
-                anchors.top: parent.top
-                anchors.bottom: main_mute_button.top
-                anchors.left: parent.left
-                anchors.topMargin: 5
-                minimumValue: 0
-                value: 50
-                maximumValue: 100
-            }
+    Gauge {
+        id: gi_main_gauge
+        anchors.top: parent.top
+        anchors.bottom: main_mute_button.top
+        anchors.left: parent.left
+        anchors.topMargin: 5
+        minimumValue: 0
+        value: 50
+        maximumValue: 100
+    }
 }

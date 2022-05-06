@@ -192,24 +192,33 @@ Item{
         }
 
     }
+    // Channel select
+    Row{
+        id: channel_select_row
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
 
-        CVItem 
-        {
-            id: imageWriter
-            x: 800
-            y: 10
-            anchors.fill: parent
-            image: capture.image
-        }
-        CVCapture
-        {
-            id: capture
-            width: 400
-            height: 300
-            index: 0
-            filters: capture_image
-            Component.onCompleted: capture.start()
-            Component.onDestruction: capture.stop()
-        }
+    }
+    
+
+    CVItem 
+    {
+        id: imageWriter
+        x: 800
+        y: 10
+        anchors.fill: parent
+        image: capture.image
+    }
+    CVCapture
+    {
+        id: capture
+        width: 400
+        height: 300
+        index: 0
+        filters: capture_image
+        Component.onCompleted: capture.start()
+        Component.onDestruction: capture.stop()
+    }
     
 }
