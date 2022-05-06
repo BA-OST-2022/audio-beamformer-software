@@ -96,6 +96,8 @@ class MainWindow(QObject):
         self.source_list = ["1","2","3"]
         self.equalizer_list = ["1","2"]
         self.source_gain_value = 20
+        self.beamsteering_pattern_list = ["Pattern 1", "Pattern 2"]
+        self.window_list = ["Window 1", "Window 2"]
 
     # Audio processing Source
     @pyqtProperty(list, constant=True)
@@ -152,6 +154,47 @@ class MainWindow(QObject):
     @pyqtSlot(float)
     def getMAMGain(self, gain):
         print(f"MAM gain: {gain}")
+        pass
+
+    # Channels Beamsteering
+
+    @pyqtProperty(list, constant=True)
+    def beamsteeringPatternList(self):
+        return self.beamsteering_pattern_list
+
+    @pyqtSlot(int)
+    def getEnableBeamsteering(self, enable):
+        print(f"Beamsteering enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getBeamsteeringSource(self, source):
+        print(f"Beamsteering source: {source}")
+        pass
+
+    @pyqtSlot(float)
+    def getBeamsteeringManualAngle(self, angle):
+        print(f"Beamsteering angle: {angle}")
+        pass
+    
+    @pyqtSlot(int)
+    def getBeamsteeringPattern(self, pattern):
+        print(f"Beamsteering pattern: {pattern}")
+        pass
+
+    # Channels Window
+    @pyqtProperty(list, constant=True)
+    def windowList(self):
+        return self.beamsteering_pattern_list
+
+    @pyqtSlot(int)
+    def getEnableWindow(self, enable):
+        print(f"Window enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getWindowType(self, type):
+        print(f"window type: {type}")
         pass
 
     # General information

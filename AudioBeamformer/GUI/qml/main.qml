@@ -25,6 +25,7 @@ Item{
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
+            checked: true
         }
 
         Button{
@@ -60,6 +61,11 @@ Item{
             anchors.fill: parent
             source: "audio_processing.qml"
         }
+
+        Loader{
+            anchors.fill: parent
+            source: "channels.qml"
+        }
         
     }
     // General information
@@ -73,7 +79,7 @@ Item{
             anchors.fill: parent
             source: "general_information.qml"
         }
-        
+
     }
 }
 
