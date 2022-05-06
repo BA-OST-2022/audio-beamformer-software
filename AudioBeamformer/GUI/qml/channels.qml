@@ -197,11 +197,209 @@ Item{
         id: channel_select_row
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: parent.top
+        anchors.top: channel_settings_row.bottom
+        anchors.topMargin: 10
+        spacing: 0
+        CheckBox{ id: ch_radio_channel_1
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "1" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_2
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "2" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_3
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "3" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_4
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "4" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_5
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "5" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_6
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "6" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_7
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "7" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_8
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "8" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_9
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "9" 
+                x: ch_radio_channel_1.width / 2 - 3  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_10
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "10" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_11
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "11" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_12
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "12" 
+                x: ch_radio_channel_1.width / 2 - 7 // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_13
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "13" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_14
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "14" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_15
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "15" 
+                x: ch_radio_channel_1.width / 2 - 7 // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_16
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "16" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_17
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "17" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_18
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "18" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
+         CheckBox{ id: ch_radio_channel_19
+            anchors.verticalCenter: parent.verticalCenter
+            checked: true
+            Text { text: "19" 
+                x: ch_radio_channel_1.width / 2 - 7  // Relative text position to the radio button
+                y: 0      
+                font.pointSize: 8
+                color: "white"
+            }
+        }
 
     }
     
+    Image{
+        x: 800
+        y: 10
+        source: "images/camera_placeholder.jpg"
+    }
 
+    /*
     CVItem 
     {
         id: imageWriter
@@ -220,5 +418,6 @@ Item{
         Component.onCompleted: capture.start()
         Component.onDestruction: capture.stop()
     }
-    
+    */
+
 }

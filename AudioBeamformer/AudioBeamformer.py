@@ -32,10 +32,12 @@
 
 from Modules.LEDs import leds
 from GUI.GUI import GUI
+from Modules.AudioProcessing import AudioProcessing
 
 class AudioBeamformer():
     def __init__(self):
         # Initialize objects here
+        self.audio_processing = AudioProcessing()
         self.gui = GUI()
     
     def begin(self):

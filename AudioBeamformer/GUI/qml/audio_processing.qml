@@ -44,7 +44,7 @@ Item{
                 interval: 500
                 running: true
                 repeat: true
-                onTriggered: ap_source_combobox.model = backend.sourceList
+                onTriggered: ap_source_combobox.model = backend.sourceGainValue
             }
 
             // ComboBox

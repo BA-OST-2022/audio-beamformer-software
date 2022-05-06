@@ -48,9 +48,9 @@ def AudioProcessing():
                 chunk_size=1024,
                 equalizer_window_size=123):
 
-        self.chunk_size = chunk_size
-        self.samplerate = samplerate
-        self.equalizer_profiles = {"First equalizer": {}}
+        self._chunk_size = chunk_size
+        self._samplerate = samplerate
+        self._equalizer_profiles = {"First equalizer": {}}
         # Window size can not be even
         if (equalizer_window_size % 2):
             print(f"FIR window size was made uneven. Length: {equalizer_window_size-1}")
@@ -69,7 +69,10 @@ def AudioProcessing():
             self.output_device_index = output_device_index
 
         self.__previousWindow = np.zeros(self.window_size - 1,dtype=np.float32)
-        
+    
+    def setupSteam():
+        pass
+
     def getChannels(self):
         channelInfo = []
         for p,i in enumerate(sd.query_devices()):
@@ -84,4 +87,11 @@ def AudioProcessing():
         sourceList = []
         for i in sd.query_devices():
             sourceList.append(i['name'])
+        # Filter source list
         return sourceList
+
+    def setSource(self, source_index):
+        # Stream terminate
+        # Stream setup
+        # Stream start
+        pass
