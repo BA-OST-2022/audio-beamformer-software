@@ -25,6 +25,7 @@ Item{
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
+            checked: true
         }
 
         Button{
@@ -60,23 +61,25 @@ Item{
             anchors.fill: parent
             source: "audio_processing.qml"
         }
+
+        Loader{
+            anchors.fill: parent
+            source: "channels.qml"
+        }
         
     }
     // General information
     Item{
         id: general_information_item
+        anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: main_window.left
-    }
+        width: 100
+        Loader{
+            anchors.fill: parent
+            source: "general_information.qml"
+        }
 
-    Connections {
-        target: backend
-
-        // CUSTOM PROPERTIES
-        property string username: ""
-        property string password: ""
-        function onSignalUser(myUser){ username = myUser }
-        function onSignalPass(myPass){ password = myPass }
     }
 }
+

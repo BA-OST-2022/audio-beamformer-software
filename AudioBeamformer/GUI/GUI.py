@@ -32,12 +32,12 @@
 
 import os
 import sys
-
+import datetime
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtQuick, QtQml
 from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -93,6 +93,128 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 class MainWindow(QObject):
     def __init__(self):
         QObject.__init__(self)
+        self.source_list = ["1","2","3"]
+        self.equalizer_list = ["1","2"]
+        self.source_gain_value = 20
+        self.beamsteering_pattern_list = ["Pattern 1", "Pattern 2"]
+        self.window_list = ["Window 1", "Window 2"]
+
+    # Audio processing Source
+    @pyqtProperty(list, constant=True)
+    def sourceList(self):
+        return self.source_list
+
+    @pyqtProperty(int)
+    def sourceGainValue(self):
+        return self.source_gain_value
+
+    @pyqtSlot(str)
+    def getSource(self, name):
+        print(f"Source: {name}")
+        pass
+
+    @pyqtSlot(float)
+    def getSourceGain(self, gain):
+        print(f"Gain: {gain}")
+        pass
+    
+    # Audio processing Equalizer
+    @pyqtProperty(list, constant=True)
+    def equalizerList(self):
+        return self.equalizer_list
+
+    @pyqtSlot(int)
+    def getEnableEqualizer(self, enable):
+        print(f"Equalizer: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getEqualizerProfile(self, profile):
+        print(f"Equalizer profile: {profile}")
+        pass
+
+    # Audio processing interpolation
+    @pyqtSlot(int)
+    def getEnableInterpolation(self, enable):
+        print(f"Interpolation enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getInterpolationLevel(self, level):
+        print(f"Interpolation level: {level}")
+        pass
+
+    # Audio processing modulation type
+
+    @pyqtSlot(int)
+    def getModulationType(self, type):
+        print(f"Modulation type: {type}")
+        pass
+
+    @pyqtSlot(float)
+    def getMAMGain(self, gain):
+        print(f"MAM gain: {gain}")
+        pass
+
+    # Channels Beamsteering
+
+    @pyqtProperty(list, constant=True)
+    def beamsteeringPatternList(self):
+        return self.beamsteering_pattern_list
+
+    @pyqtSlot(int)
+    def getEnableBeamsteering(self, enable):
+        print(f"Beamsteering enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getBeamsteeringSource(self, source):
+        print(f"Beamsteering source: {source}")
+        pass
+
+    @pyqtSlot(float)
+    def getBeamsteeringManualAngle(self, angle):
+        print(f"Beamsteering angle: {angle}")
+        pass
+    
+    @pyqtSlot(int)
+    def getBeamsteeringPattern(self, pattern):
+        print(f"Beamsteering pattern: {pattern}")
+        pass
+
+    # Channels Window
+    @pyqtProperty(list, constant=True)
+    def windowList(self):
+        return self.beamsteering_pattern_list
+
+    @pyqtSlot(int)
+    def getEnableWindow(self, enable):
+        print(f"Window enable: {enable}")
+        pass
+
+    @pyqtSlot(int)
+    def getWindowType(self, type):
+        print(f"window type: {type}")
+        pass
+
+    # General information
+    @pyqtProperty(int)
+    def mainGainValue(self):
+        return self.source_gain_value
+
+    @pyqtSlot(float)
+    def getMainGain(self, gain):
+        print(f"Main gain: {gain}")
+        pass
+    @pyqtSlot(int)
+    def getMuteEnable(self, enable):
+        print(f"Mute enable: {enable}")
+        pass
+
+    
+
+
+
 
         
                   

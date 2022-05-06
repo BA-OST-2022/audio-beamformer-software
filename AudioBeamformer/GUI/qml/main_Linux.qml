@@ -20,4 +20,7 @@ ApplicationWindow{
         anchors.fill: parent
         source: "main.qml"
     }
+    Loader{
+        source: "backend.qml"
+    }
 }
