@@ -56,7 +56,7 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         if(sys.platform == 'linux'):
-            channels = getChannels
+            channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
@@ -66,7 +66,7 @@ class AudioProcessing:
         self._channel_count_input = 1 # Get channel count
         self._channel_count_output = 2
         self.getChannels()
-        self.setupStream()
+        # self.setupStream()
 
         # Window size can not be even
         if not (equalizer_window_size % 2):
@@ -195,3 +195,11 @@ class AudioProcessing:
         # Stich output together
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
         self.previousWindow = indata_oneCh[-self.equ_window_size+1:]
+
+
+if __name__ == '__main__':
+    audio_processing = AudioProcessing(input_device_index = 7,
+                                       output_device_index = 8,
+                                       samplerate=48000)
+    print(type(audio_processing))
+    
