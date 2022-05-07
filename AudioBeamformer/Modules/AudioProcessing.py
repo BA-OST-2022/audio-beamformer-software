@@ -44,7 +44,7 @@ class AudioProcessing:
                 input_device_index = 1,
                 output_device_index = 3,
                 samplerate=44100,
-                chunk_size=1024,
+                chunk_size=4096,
                 equalizer_window_size=123):
 
         self._chunk_size = chunk_size
@@ -66,10 +66,10 @@ class AudioProcessing:
         self._channel_count_input = 1 # Get channel count
         self._channel_count_output = 2
         self.getChannels()
-        self.setupSteam()
+        self.setupStream()
 
         # Window size can not be even
-        if (equalizer_window_size % 2):
+        if not (equalizer_window_size % 2):
             print(f"FIR window size was made uneven. Length: {equalizer_window_size-1}")
             self.equ_window_size = equalizer_window_size - 1
         else:
@@ -80,8 +80,9 @@ class AudioProcessing:
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self.__current_source_level = 0
+        self.__source_dict = {}
 
-    def setupSteam(self):
+    def setupStream(self):
         self._stream = sd.Stream(samplerate=self._samplerate,
                                 blocksize=self._chunk_size,
                                 device=(self._input_device, self._output_device), 
@@ -90,25 +91,32 @@ class AudioProcessing:
                                 callback=self.callback)
 
     def startStream(self):
-        pass
+        self._stream.start()
 
     def endStream(self):
-        pass
+        self._stream.close()
 
     def getChannels(self):
         channelInfo = []
         for p,i in enumerate(sd.query_devices()):
-            print(f"{p} Name: {i['name']}, In {i['max_input_channels']}, Out {i['max_output_channels']}") 
+            print(f"{p} Name: {i['name']},API: {i['hostapi']} ,In {i['max_input_channels']}, Out {i['max_output_channels']}") 
             channelInfo.append((p,
                                 i['name'],
                                 i['max_input_channels'],
+                                i['hostapi'],
                                 i['max_output_channels']))
         return channelInfo
 
     def getSourceList(self):
+        sourceDict = {}
         sourceList = []
-        for i in sd.query_devices():
-            sourceList.append(i['name'])
+        counter = 0
+        for i,device in enumerate(sd.query_devices()):
+            if device['max_input_channels'] > 0 and device['hostapi'] == 0:
+                sourceList.append(device["name"])
+                sourceDict[counter] = i
+                counter += 1
+        self.__source_dict = sourceDict
         # Filter source list
         return sourceList
 
@@ -116,13 +124,15 @@ class AudioProcessing:
         # Stream terminate
         self.endStream()
         # Stream setup
-        self._input_device = source_index
+        print(self.__source_dict[source_index])
+        self._input_device = self.__source_dict[source_index]
         # Stream start
         self.setupStream()
         self.startStream()
 
     def setSourceLevel(self, indata):
-        self.__current_source_level = np.sum(indata)
+        indata = indata /32768
+        self.__current_source_level = np.sqrt(np.mean(indata**2)) 
 
     def getSourceLevel(self):
         return self.__current_source_level
@@ -167,7 +177,7 @@ class AudioProcessing:
         return data * self._mam_gain
 
     def callback(self, indata, outdata, frames, time, status):
-        indata_oneCh = indata[:,0] * self.tot_gain
+        indata_oneCh = indata[:,0] * self._tot_gain
         self.setSourceLevel(indata)
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.previousWindow,
@@ -180,7 +190,7 @@ class AudioProcessing:
         else:
             outdata_oneCh = indata[:,0]
         # Modulation
-        second_channel_data = self.__modulation_dict[self._modulation_index]
+        second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
-        self.previousWindow = indata_oneCh[-self.window_size+1:]
+        self.previousWindow = indata_oneCh[-self.equ_window_size+1:]

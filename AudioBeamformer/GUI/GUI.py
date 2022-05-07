@@ -110,11 +110,12 @@ class MainWindow(QObject):
 
     @pyqtProperty(int)
     def sourceGainValue(self):
+        self.source_gain_value = self._audio_processing.getSourceLevel()
         return self.source_gain_value
 
-    @pyqtSlot(str)
-    def getSource(self, name):
-        print(f"Source: {name}")
+    @pyqtSlot(int)
+    def getSource(self, index):
+        self._audio_processing.setSource(index)
         pass
 
     @pyqtSlot(float)
