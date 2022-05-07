@@ -82,7 +82,7 @@ Item{
 
                 Label{
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Volume")
+                    text: qsTr("Gain")
                 }
 
                 Slider {
@@ -100,19 +100,39 @@ Item{
                 interval: 50
                 running: true
                 repeat: true
-                onTriggered: ap_source_gauge.value = backend.sourceGainValue
-                }
+                onTriggered: {ap_source_gauge.height = backend.sourceGainValue * gauge_background.width;ap_source_gauge.color = (backend.sourceGainValue > 0.95) ?  "red": ((backend.sourceGainValue > 0.8) ? "orange" : "#24c5fc")}
+            }
 
-           Gauge {
-                id: ap_source_gauge
+            Item{
+                id: ap_gauge_holder
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
+                width: 20
                 anchors.topMargin: 5
-                minimumValue: 0
-                value: 50
-                maximumValue: 100
+                anchors.bottomMargin: 5
+                // Background Rectangle
+                Rectangle{
+                    id: gauge_background
+                    width: parent.height
+                    height: parent.width
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    rotation: 90
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#424242" }
+                        GradientStop { position: 1.0; color: "#595959" }
+                    }
+                }
+                Rectangle{
+                    id: ap_source_gauge
+                    height: parent.height
+                    width: parent.width
+                    anchors.bottom:ap_gauge_holder.bottom
+                    color: "#24c5fc"
+                }
             }
+        
         }
         
         // Equalizer

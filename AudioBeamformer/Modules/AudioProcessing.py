@@ -83,6 +83,7 @@ class AudioProcessing:
         self.__source_dict = {}
 
     def setupStream(self):
+        print(self._input_device)
         self._stream = sd.Stream(samplerate=self._samplerate,
                                 blocksize=self._chunk_size,
                                 device=(self._input_device, self._output_device), 
@@ -124,17 +125,17 @@ class AudioProcessing:
         # Stream terminate
         self.endStream()
         # Stream setup
-        print(self.__source_dict[source_index])
         self._input_device = self.__source_dict[source_index]
         # Stream start
         self.setupStream()
         self.startStream()
 
     def setSourceLevel(self, indata):
-        indata = indata /32768
-        self.__current_source_level = np.sqrt(np.mean(indata**2)) 
+        indata = indata /2147483648
+        self.__current_source_level = np.sqrt(np.mean(indata**2))
 
     def getSourceLevel(self):
+        print(self.__current_source_level)
         return self.__current_source_level
 
     def setGain(self,gain):
@@ -178,7 +179,7 @@ class AudioProcessing:
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain
-        self.setSourceLevel(indata)
+        self.setSourceLevel(indata_oneCh)
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.previousWindow,
                                     indata_oneCh))

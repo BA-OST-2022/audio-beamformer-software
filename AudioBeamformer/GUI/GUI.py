@@ -108,7 +108,7 @@ class MainWindow(QObject):
         self.source_list = self._audio_processing.getSourceList()
         return self.source_list
 
-    @pyqtProperty(int)
+    @pyqtProperty(float)
     def sourceGainValue(self):
         self.source_gain_value = self._audio_processing.getSourceLevel()
         return self.source_gain_value
@@ -120,8 +120,8 @@ class MainWindow(QObject):
 
     @pyqtSlot(float)
     def getSourceGain(self, gain):
-        print(f"Gain: {gain}")
-        pass
+        print(gain)
+        self._audio_processing.setGain(9*gain + 1)
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
