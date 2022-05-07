@@ -62,7 +62,7 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         if(sys.platform == 'linux'):
-            channels = getChannels
+            channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
@@ -211,3 +211,10 @@ class AudioProcessing:
 
     def createEqualizerPlots(self):
         path = "../GUI/qml/images"
+
+if __name__ == '__main__':
+    audio_processing = AudioProcessing(input_device_index = 7,
+                                       output_device_index = 8,
+                                       samplerate=48000)
+    print(type(audio_processing))
+    
