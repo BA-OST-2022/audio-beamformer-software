@@ -60,14 +60,15 @@ import cv2
 import PyCVQML
 
 class GUI: 
-    def __init__(self):
+    def __init__(self, audio_processing):
         self._callback = None
+        self._audio_processing = audio_processing
         
     def run(self):
         PyCVQML.registerTypes()
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
-        main = MainWindow()
+        main = MainWindow(self._audio_processing)
         engine.rootContext().setContextProperty("backend", main)
         if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
@@ -92,8 +93,9 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 
 # Send and receive data from user interface
 class MainWindow(QObject):
-    def __init__(self):
+    def __init__(self, audio_processing):
         QObject.__init__(self)
+        self._audio_processing = audio_processing
         self.source_list = ["1","2","3"]
         self.equalizer_list = ["1","2"]
         self.source_gain_value = 20
@@ -103,6 +105,7 @@ class MainWindow(QObject):
     # Audio processing Source
     @pyqtProperty(list, constant=True)
     def sourceList(self):
+        self.source_list = self._audio_processing.getSourceList()
         return self.source_list
 
     @pyqtProperty(int)

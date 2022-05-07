@@ -38,19 +38,36 @@ import sounddevice as sd
 # Other
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
-def AudioProcessing():
+class AudioProcessing:
     def __init__(self,
-                input_device_index = 0,
-                output_device_index = 0,
+                input_device_index = 1,
+                output_device_index = 3,
                 samplerate=44100,
                 chunk_size=1024,
                 equalizer_window_size=123):
 
         self._chunk_size = chunk_size
         self._samplerate = samplerate
-        self._equalizer_profiles = {"First equalizer": {}}
+        self._tot_gain = 1
+        self._equalizer_enable = False
+        self._modulation_index = 0
+        self._mam_gain = 1
+        self._enable_interpolation = False
+        self._interpolation_factor = 0
+        if(sys.platform == 'linux'):
+            channels = getChannels
+            self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
+            inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
+            self._input_device = [i[1] for i in channels].index(inputDeviceName)
+        else:
+            self._input_device = input_device_index
+            self._output_device = output_device_index
+        self._channel_count_input = 1 # Get channel count
+        self._channel_count_output = 2
+        self.getChannels()
+        self.setupSteam()
+
         # Window size can not be even
         if (equalizer_window_size % 2):
             print(f"FIR window size was made uneven. Length: {equalizer_window_size-1}")
@@ -59,18 +76,23 @@ def AudioProcessing():
              self.equ_window_size = equalizer_window_size
         # If system is linux then the loopback and the audio beamformer 
         # are the initial input/output devices
-        if(sys.platform == 'linux'):
-            channels = getChannels
-            self.output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
-            inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
-            self.input_device = [i[1] for i in channels].index(inputDeviceName)
-        else:
-            self.input_device_index = input_device_index
-            self.output_device_index = output_device_index
+        self.__equalizer_profile_list = {"First equalizer": {}}
+        self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
+        self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
+        self.__current_source_level = 0
 
-        self.__previousWindow = np.zeros(self.window_size - 1,dtype=np.float32)
-    
-    def setupSteam():
+    def setupSteam(self):
+        self._stream = sd.Stream(samplerate=self._samplerate,
+                                blocksize=self._chunk_size,
+                                device=(self._input_device, self._output_device), 
+                                channels=(self._channel_count_input, self._channel_count_output),
+                                dtype=np.int32,
+                                callback=self.callback)
+
+    def startStream(self):
+        pass
+
+    def endStream(self):
         pass
 
     def getChannels(self):
@@ -92,6 +114,73 @@ def AudioProcessing():
 
     def setSource(self, source_index):
         # Stream terminate
+        self.endStream()
         # Stream setup
+        self._input_device = source_index
         # Stream start
+        self.setupStream()
+        self.startStream()
+
+    def setSourceLevel(self, indata):
+        self.__current_source_level = np.sum(indata)
+
+    def getSourceLevel(self):
+        return self.__current_source_level
+
+    def setGain(self,gain):
+        self._tot_gain = gain
+    
+    def enableEqualizer(self,enable):
+        self._equalizer_enable = enable
+
+    def getEqualizerProfileList(self):
+        return self.__equalizer_profile_list
+
+    def enableInterpolation(self,enable):
+        # Call function from FPGA and enable interpolation
+        # FPGA.Interpolation(self._interpolation_factor)
+        self._enable_interpolation = enable
+        if enable:
+            #FPGA.enableInterpolation()
+            #FPGA.interpolationFactor(self._interpolation_factor)
+            pass
+        else:
+            #FPGA.disableInterpolation()
+            pass
         pass
+
+    def setInterpolationFactor(self,factor):
+        self._interpolation_factor = factor
+
+    def setModulationType(self, type):
+        self._modulation_index = type
+    
+    def setMAMMix(self,gain):
+        self._mam_gain = gain
+
+    def AMModulation(self,data):
+        # Implement logic
+        return data
+
+    def MAMModulation(self,data):
+        # Implement logic
+        return data * self._mam_gain
+
+    def callback(self, indata, outdata, frames, time, status):
+        indata_oneCh = indata[:,0] * self.tot_gain
+        self.setSourceLevel(indata)
+        if self._equalizer_enable:
+            indata_oneCh = np.hstack((self.previousWindow,
+                                    indata_oneCh))
+            
+            outdata_oneCh = np.convolve(indata_oneCh,
+                                        self.equalizer_filter,
+                                        "valid")
+            outdata_oneCh = np.float32(outdata_oneCh)
+        else:
+            outdata_oneCh = indata[:,0]
+        # Modulation
+        second_channel_data = self.__modulation_dict[self._modulation_index]
+        # Stich output together
+        outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
+        self.previousWindow = indata_oneCh[-self.window_size+1:]

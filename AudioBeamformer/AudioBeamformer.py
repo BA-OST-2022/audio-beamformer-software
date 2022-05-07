@@ -38,7 +38,8 @@ class AudioBeamformer():
     def __init__(self):
         # Initialize objects here
         self.audio_processing = AudioProcessing()
-        self.gui = GUI()
+        print(type(self.audio_processing))
+        self.gui = GUI(self.audio_processing)
     
     def begin(self):
         leds.begin()
