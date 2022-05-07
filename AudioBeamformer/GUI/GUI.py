@@ -101,6 +101,7 @@ class MainWindow(QObject):
         self.source_gain_value = 20
         self.beamsteering_pattern_list = ["Pattern 1", "Pattern 2"]
         self.window_list = ["Window 1", "Window 2"]
+        self._gainSourceMax = 10
 
     # Audio processing Source
     @pyqtProperty(list, constant=True)
@@ -116,16 +117,15 @@ class MainWindow(QObject):
     @pyqtSlot(int)
     def getSource(self, index):
         self._audio_processing.setSource(index)
-        pass
 
     @pyqtSlot(float)
     def getSourceGain(self, gain):
-        print(gain)
-        self._audio_processing.setGain(9*gain + 1)
+        self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
     def equalizerList(self):
+        self.equalizer_list = self._audio_processing.getEqualizerProfileList()
         return self.equalizer_list
 
     @pyqtSlot(int)

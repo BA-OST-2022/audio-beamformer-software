@@ -38,6 +38,7 @@ import sounddevice as sd
 # Other
 import sys
 import numpy as np
+import ast
 
 class AudioProcessing:
     def __init__(self,
@@ -46,7 +47,12 @@ class AudioProcessing:
                 samplerate=44100,
                 chunk_size=4096,
                 equalizer_window_size=123):
-
+        self.__equalier_dict_path = "Modules/Files/equalizer_dict.txt"
+        self.__equalizer_profile_list = {}
+        with open(self.__equalier_dict_path) as f:
+            for line in f.readlines():
+                line_tupel = ast.literal_eval(line)
+                self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
         self._chunk_size = chunk_size
         self._samplerate = samplerate
         self._tot_gain = 1
@@ -65,8 +71,6 @@ class AudioProcessing:
             self._output_device = output_device_index
         self._channel_count_input = 1 # Get channel count
         self._channel_count_output = 2
-        self.getChannels()
-        self.setupStream()
 
         # Window size can not be even
         if not (equalizer_window_size % 2):
@@ -76,14 +80,21 @@ class AudioProcessing:
              self.equ_window_size = equalizer_window_size
         # If system is linux then the loopback and the audio beamformer 
         # are the initial input/output devices
-        self.__equalizer_profile_list = {"First equalizer": {}}
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self.__current_source_level = 0
         self.__source_dict = {}
+        self.__stream_running = False
+
+    def begin(self):
+            self.getChannels()
+            self.setupStream()
+            self._stream.start()
+
+    def end(self):
+        self._stream.close()
 
     def setupStream(self):
-        print(self._input_device)
         self._stream = sd.Stream(samplerate=self._samplerate,
                                 blocksize=self._chunk_size,
                                 device=(self._input_device, self._output_device), 
@@ -93,9 +104,11 @@ class AudioProcessing:
 
     def startStream(self):
         self._stream.start()
+        self.__stream_running = True
 
     def endStream(self):
         self._stream.close()
+        self.__stream_running = False
 
     def getChannels(self):
         channelInfo = []
@@ -122,8 +135,9 @@ class AudioProcessing:
         return sourceList
 
     def setSource(self, source_index):
-        # Stream terminate
-        self.endStream()
+        if self.__stream_running:
+            # Stream terminate
+            self.endStream()
         # Stream setup
         self._input_device = self.__source_dict[source_index]
         # Stream start
@@ -135,7 +149,6 @@ class AudioProcessing:
         self.__current_source_level = np.sqrt(np.mean(indata**2))
 
     def getSourceLevel(self):
-        print(self.__current_source_level)
         return self.__current_source_level
 
     def setGain(self,gain):
@@ -145,7 +158,7 @@ class AudioProcessing:
         self._equalizer_enable = enable
 
     def getEqualizerProfileList(self):
-        return self.__equalizer_profile_list
+        return list(self.__equalizer_profile_list.keys())
 
     def enableInterpolation(self,enable):
         # Call function from FPGA and enable interpolation
@@ -195,3 +208,6 @@ class AudioProcessing:
         # Stich output together
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
         self.previousWindow = indata_oneCh[-self.equ_window_size+1:]
+
+    def createEqualizerPlots(self):
+        path = "../GUI/qml/images"
