@@ -130,11 +130,11 @@ class MainWindow(QObject):
 
     @pyqtSlot(int)
     def getEnableEqualizer(self, enable):
-        self._audio_processing.
-        pass
+        self._audio_processing.enableEqualizer(enable)
 
     @pyqtSlot(int)
     def getEqualizerProfile(self, profile):
+        self._audio_processing.setEqualizerProfile(profile)
         print(f"Equalizer profile: {profile}")
         pass
 

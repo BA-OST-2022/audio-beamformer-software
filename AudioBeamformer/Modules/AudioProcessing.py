@@ -49,14 +49,17 @@ class AudioProcessing:
                 equalizer_window_size=123):
         self.__equalier_dict_path = "Modules/Files/equalizer_dict.txt"
         self.__equalizer_profile_list = {}
+        self.__equalizerList = []
         with open(self.__equalier_dict_path) as f:
             for line in f.readlines():
                 line_tupel = ast.literal_eval(line)
+                self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
         self._chunk_size = chunk_size
         self._samplerate = samplerate
         self._tot_gain = 1
         self._equalizer_enable = False
+        self._equalizer_filter = np.ones(equalizer_window_size)
         self._modulation_index = 0
         self._mam_gain = 1
         self._enable_interpolation = False
@@ -160,6 +163,33 @@ class AudioProcessing:
     def getEqualizerProfileList(self):
         return list(self.__equalizer_profile_list.keys())
 
+    def equalizer(self, gain_dict):
+        taps = np.zeros(self.equ_window_size,dtype=np.float32)
+        for freq in gain_dict:
+            if freq[0] == 0:
+                taps += firwin(self.equ_window_size,
+                               freq[1]/self._samplerate*2,
+                               window=gain_dict[freq]["f_type"],
+                               pass_zero=True) * gain_dict[freq]["band_gain"]
+            else:
+                taps += firwin(self.equ_window_size,
+                               [v/self._samplerate*2 for v in freq],
+                               window=gain_dict[freq]["f_type"],
+                               pass_zero=False) * gain_dict[freq]["band_gain"]
+        #fig, ax = plt.subplots()
+        #ax.stem(taps)
+        
+        #w,h = freqz(taps)
+        #fig, ax =plt.subplots()
+        #ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
+
+        return taps
+
+    def setEqualizerProfile(self,profile):
+        taps = self.equalizer(self.__equalizer_profile_list[self.__equalizerList[profile]])
+        print(taps)
+        self._equalizer_filter = taps
+
     def enableInterpolation(self,enable):
         # Call function from FPGA and enable interpolation
         # FPGA.Interpolation(self._interpolation_factor)
@@ -198,7 +228,7 @@ class AudioProcessing:
                                     indata_oneCh))
             
             outdata_oneCh = np.convolve(indata_oneCh,
-                                        self.equalizer_filter,
+                                        self._equalizer_filter,
                                         "valid")
             outdata_oneCh = np.float32(outdata_oneCh)
         else:
