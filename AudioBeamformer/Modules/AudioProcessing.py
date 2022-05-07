@@ -182,12 +182,10 @@ class AudioProcessing:
         #w,h = freqz(taps)
         #fig, ax =plt.subplots()
         #ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
-
         return taps
 
     def setEqualizerProfile(self,profile):
         taps = self.equalizer(self.__equalizer_profile_list[self.__equalizerList[profile]])
-        print(taps)
         self._equalizer_filter = taps
 
     def enableInterpolation(self,enable):
@@ -207,18 +205,21 @@ class AudioProcessing:
         self._interpolation_factor = factor
 
     def setModulationType(self, type):
+        print(type)
         self._modulation_index = type
     
     def setMAMMix(self,gain):
         self._mam_gain = gain
 
     def AMModulation(self,data):
-        # Implement logic
+        print("AM")
         return data
 
     def MAMModulation(self,data):
-        # Implement logic
-        return data * self._mam_gain
+        print("MAM")
+        data = data / 2147483648
+        data = 1 - 1/2*data**2 - 1/8**data**4
+        return data * 2147483648  * self._mam_gain
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain

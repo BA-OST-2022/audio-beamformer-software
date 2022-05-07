@@ -135,31 +135,25 @@ class MainWindow(QObject):
     @pyqtSlot(int)
     def getEqualizerProfile(self, profile):
         self._audio_processing.setEqualizerProfile(profile)
-        print(f"Equalizer profile: {profile}")
-        pass
 
     # Audio processing interpolation
     @pyqtSlot(int)
     def getEnableInterpolation(self, enable):
-        print(f"Interpolation enable: {enable}")
-        pass
+        self._audio_processing.enableInterpolation(enable)
 
     @pyqtSlot(int)
     def getInterpolationLevel(self, level):
-        print(f"Interpolation level: {level}")
-        pass
+        self._audio_processing.setInterpolationFactor(level)
 
     # Audio processing modulation type
 
     @pyqtSlot(int)
     def getModulationType(self, type):
-        print(f"Modulation type: {type}")
-        pass
+        self._audio_processing.setModulationType(type)
 
     @pyqtSlot(float)
     def getMAMGain(self, gain):
-        print(f"MAM gain: {gain}")
-        pass
+        self._audio_processing.setMAMMix(gain)
 
     # Channels Beamsteering
 

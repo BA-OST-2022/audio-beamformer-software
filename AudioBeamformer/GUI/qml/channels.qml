@@ -51,7 +51,7 @@ Item{
                  Switch{
                     id: ch_beamsteering_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableBeamsteering(ch_beamsteering_switch.position)
                 }
             }
@@ -160,7 +160,7 @@ Item{
                  Switch{
                     id: ch_window_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableWindow(ch_window_switch.position)
                 }
             }

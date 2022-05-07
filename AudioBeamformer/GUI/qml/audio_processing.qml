@@ -164,7 +164,7 @@ Item{
                  Switch{
                     id: ap_equalizer_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableEqualizer(ap_equalizer_switch.position)
                 }
             }
@@ -224,7 +224,7 @@ Item{
                  Switch{
                     id: ap_interpolation_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableInterpolation(ap_interpolation_switch.position)
                 }
             }
