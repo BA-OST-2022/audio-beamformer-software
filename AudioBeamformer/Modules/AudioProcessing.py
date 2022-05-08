@@ -50,7 +50,7 @@ class AudioProcessing:
                 samplerate=44100,
                 chunk_size=4096,
                 equalizer_window_size=123):
-        self.__equalier_dict_path = os.getcwd() + "/Files/equalizer_dict.txt"
+        self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
         with open(self.__equalier_dict_path) as f:
