@@ -212,11 +212,9 @@ class AudioProcessing:
         self._mam_gain = gain
 
     def AMModulation(self,data):
-        print("AM")
         return data
 
     def MAMModulation(self,data):
-        print("MAM")
         data = data / 2147483648
         data = 1 - 1/2*data**2 - 1/8**data**4
         return data * 2147483648  * self._mam_gain

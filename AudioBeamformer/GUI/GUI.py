@@ -196,6 +196,52 @@ class MainWindow(QObject):
         print(f"window type: {type}")
         pass
 
+    # Settings LEDS
+    @pyqtSlot(int)
+    def getEnableLED(self, enable):
+        print(f"LEDs enable: {enable}")
+        pass
+
+    @pyqtSlot(float)
+    def getLEDBrightness(self, value):
+        print(f"LED: {value}")
+
+    # Settings ToF
+    @pyqtProperty(float)
+    def ToFDistance(self):
+        return 1.0
+
+    @pyqtSlot(int)
+    def getEnableToF(self, enable):
+        print(f"ToF enable: {enable}")
+
+    @pyqtSlot(float)
+    def getToFDistance(self, value):
+        print(f"ToF distance: {value}")
+
+    # Settings max. volume
+    @pyqtSlot(float)
+    def getMaxVolume(self, value):
+        print(f"Max. volume: {value}")
+
+    # Settings stats
+    
+    @pyqtProperty(str)
+    def AmbientTemperature(self):
+        return "22.5 C"
+
+    @pyqtProperty(str)
+    def SystemTemperature(self):
+        return "32.5 C" 
+
+    @pyqtProperty(str)
+    def CPUTemperature(self):
+        return "42.5 C"
+
+    @pyqtProperty(str)
+    def CPULoad(self):
+        return "50 %"
+
     # General information
     @pyqtProperty(int)
     def mainGainValue(self):
