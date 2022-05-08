@@ -37,28 +37,87 @@ LINUX = (sys.platform == 'linux')
 
 if LINUX:
     import spidev
+    import RPi.GPIO as GPIO 
 
 
 class PowerSupply():
     def __init__(self):
-        pass
+        self._spiBus = 4                      # Physical SPI-Bus Interface
+        self._spiFreq = 8000000               # Interface Frequency in Hz
+        self._spiCs = 1                       # SPI-Device Chip-Select
+        self._hvEnPin = 27                    # Raspberry Pi GPIO Number
+        
+        self._vRef = 1.23                     # Reference Voltage in V
+        self._rTop = 100E3                    # Top Resistor in Ohm
+        self._rBot = 3.01E3                   # Bottom Resistor in Ohm
+        self._rPot = 10E3                     # Dig. Pot. Resistance in Ohm
+        
+        self._initialized = False
+        self._maxVolume = 1.0                 # Default is max volume
+    
+    def __del__(self):
+        self.end()
+    
     
     def begin(self):
-        pass
+        if not self._initialized:
+            self._initialized = True
+            if LINUX:
+                self._spi = spidev.SpiDev()
+                self._spi.open(bus=self._spiBus, device=self._spiCs)
+                self._spi.max_speed_hz = self._spiFreq
+                GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
+                GPIO.setup(self._hvEnPin, GPIO.OUT, initial=GPIO.HIGH)
+                self.enableOutput(False)
+                self.setVolume(0.0)
+                
     
     def end(self):
-        pass
+        self.enableOutput(False)
+        if(self._initialized):
+            self._initialized = False
+            if LINUX:
+                self._spi.close()
+    
     
     def enableOutput(self, state):
-        pass
+        if LINUX:
+            if(state):
+                GPIO.output(self._syncPin, GPIO.LOW)
+            else:
+                GPIO.output(self._syncPin, GPIO.HIGH)
+    
     
     def setVolume(self, volume):
-        pass
+        if not (0 <= volume <= 1.0):
+            raise ValueError("Volume out of bound: 0.0 ... 1.0")
+
+        vMax = (self._vRef / self._rBot) * (self._rBot + self._rTop)
+        vMin = (self._vRef / (self._rBot + self._rPot)) * (self._rBot + self._rPot + self._rTop)
+        vTarget = vMin + (vMax - vMin) * min(volume, self._maxVolume)
+        if DEBUG:
+            print(f"Output Voltage: {vTarget:.01f} V")
+        if LINUX:
+            self._spi.writebytes([0x11, int(volume * 255)]) # TODO: check if potentiometer polarity is correct 
+
+    
+    def setMaxVolume(self, maxVolume):
+        if not (0 <= maxVolume <= 1.0):
+            raise ValueError("Max Volume out of bound: 0.0 ... 1.0")
+        self._maxVolume = maxVolume
+        
 
 
 powerSupply = PowerSupply()
 
 if __name__ == '__main__':
     powerSupply.begin()
+    powerSupply.setVolume(0.5)
+    powerSupply.enableOutput(True)
+    
+    import time
+    time.sleep(3)
+    powerSupply.enableOutput(False)
+    powerSupply.end()
     
     

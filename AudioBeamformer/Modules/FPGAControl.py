@@ -133,45 +133,47 @@ class FPGAControl():
     
         
     def update(self):
-        settings = 0x00                       # Bit [7:4] free 
-        settings |= (int(7 - np.log2(self._interpolation)) & 0x03)
-        settings |= (int(self._modulation_type) & 0x01) << 3
+        if self._initialized:
+            settings = 0x00                       # Bit [7:4] free 
+            settings |= (int(7 - np.log2(self._interpolation)) & 0x03)
+            settings |= (int(self._modulation_type) & 0x01) << 3
+            
+            sigma_delta = np.array([i for i in (self._sigma_delta_coeff).
+                                    to_bytes(2, "big")])
+            enable = sum([2**i*int(value) for i,value in
+                          enumerate(self._enable_channel)]).to_bytes(2, "big")
+            
+            gain_int = (self._gain * 32767).astype(int)
+            gains = np.array([i for gain in gain_int for i in int(gain).
+                              to_bytes(2, "big", signed=True)])
+            delay_count = (self._delay / self._tick_length).astype(int)
+            delay_count = np.array([i for d in delay_count for i in int(d).
+                                    to_bytes(2, "big", signed=True)])
+            
+            spi_data = []
+            for fpga in range(self._fpga_count):
+                spi_data.append(settings)
+                spi_data.append(int(sigma_delta[0]))
+                spi_data.append(int(sigma_delta[1]))
+                spi_data.append(int(enable[0]))
+                spi_data.append(int(enable[1]))
+                for channel in range(self._channel_per_fpga):
+                    if((channel + 1) * (fpga + 1) > self._channel_count):
+                        break
+                    spi_data.append(int(delay_count[channel * 2]))
+                    spi_data.append(int(delay_count[channel * 2 + 1]))
+                    spi_data.append(int(gains[channel * 2 + 0]))
+                    spi_data.append(int(gains[channel * 2 + 1]))
+    
+            if LINUX:
+                self._spi.writebytes(spi_data[::-1])
+            if DEBUG:
+                print(spi_data)
         
-        sigma_delta = np.array([i for i in (self._sigma_delta_coeff).
-                                to_bytes(2, "big")])
-        enable = sum([2**i*int(value) for i,value in
-                      enumerate(self._enable_channel)]).to_bytes(2, "big")
-        
-        gain_int = (self._gain * 32767).astype(int)
-        gains = np.array([i for gain in gain_int for i in int(gain).
-                          to_bytes(2, "big", signed=True)])
-        delay_count = (self._delay / self._tick_length).astype(int)
-        delay_count = np.array([i for d in delay_count for i in int(d).
-                                to_bytes(2, "big", signed=True)])
-        
-        spi_data = []
-        for fpga in range(self._fpga_count):
-            spi_data.append(settings)
-            spi_data.append(int(sigma_delta[0]))
-            spi_data.append(int(sigma_delta[1]))
-            spi_data.append(int(enable[0]))
-            spi_data.append(int(enable[1]))
-            for channel in range(self._channel_per_fpga):
-                if((channel + 1) * (fpga + 1) > self._channel_count):
-                    break
-                spi_data.append(int(delay_count[channel * 2]))
-                spi_data.append(int(delay_count[channel * 2 + 1]))
-                spi_data.append(int(gains[channel * 2 + 0]))
-                spi_data.append(int(gains[channel * 2 + 1]))
-
-        if LINUX:
-            self._spi.writebytes(spi_data[::-1])
-        if DEBUG:
-            print(spi_data)
-        
-        
+ 
+fpgaControl = FPGAControl(channel_count=6, channel_per_fpga=10)       
+ 
 if __name__ == '__main__':   
-    fpgaControl = FPGAControl(channel_count=6, channel_per_fpga=10)
     fpgaControl.enableChannels([False, False, False, True, False, False])
     fpgaControl.begin()
     
