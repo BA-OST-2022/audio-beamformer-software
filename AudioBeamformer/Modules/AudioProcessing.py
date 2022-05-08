@@ -29,6 +29,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ###############################################################################
+
+
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
 from scipy.interpolate import interp1d
@@ -36,6 +38,7 @@ from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, fir
 # Audio In / Output Handling
 import sounddevice as sd
 # Other
+import os
 import sys
 import numpy as np
 import ast
@@ -47,7 +50,7 @@ class AudioProcessing:
                 samplerate=44100,
                 chunk_size=4096,
                 equalizer_window_size=123):
-        self.__equalier_dict_path = "Modules/Files/equalizer_dict.txt"
+        self.__equalier_dict_path = os.getcwd() + "/Files/equalizer_dict.txt"
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
         with open(self.__equalier_dict_path) as f:
