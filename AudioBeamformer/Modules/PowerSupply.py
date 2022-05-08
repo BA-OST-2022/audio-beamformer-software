@@ -37,7 +37,7 @@ LINUX = (sys.platform == 'linux')
 
 if LINUX:
     import spidev
-    import RPi.GPIO as GPIO 
+    import RPi.GPIO as GPIO
 
 
 class PowerSupply():
@@ -47,13 +47,16 @@ class PowerSupply():
         self._spiCs = 1                       # SPI-Device Chip-Select
         self._hvEnPin = 27                    # Raspberry Pi GPIO Number
         
-        self._vRef = 1.23                     # Reference Voltage in V
-        self._rTop = 100E3                    # Top Resistor in Ohm
-        self._rBot = 3.01E3                   # Bottom Resistor in Ohm
-        self._rPot = 10E3                     # Dig. Pot. Resistance in Ohm
+        vRef = 1.23                           # Reference Voltage in V
+        rTop = 100E3                          # Top Resistor in Ohm
+        rBot = 3.01E3                         # Bottom Resistor in Ohm
+        rPot = 10E3                           # Dig. Pot. Resistance in Ohm
         
         self._initialized = False
         self._maxVolume = 1.0                 # Default is max volume
+        self._vMax = (vRef / rBot) * (rBot + rTop)
+        self._vMin = (vRef / (rBot + rPot)) * (rBot + rPot + rTop)
+        
     
     def __del__(self):
         self.end()
@@ -92,9 +95,8 @@ class PowerSupply():
         if not (0 <= volume <= 1.0):
             raise ValueError("Volume out of bound: 0.0 ... 1.0")
 
-        vMax = (self._vRef / self._rBot) * (self._rBot + self._rTop)
-        vMin = (self._vRef / (self._rBot + self._rPot)) * (self._rBot + self._rPot + self._rTop)
-        vTarget = vMin + (vMax - vMin) * min(volume, self._maxVolume)
+        volume = min(volume, self._maxVolume)
+        vTarget = self._vMin + (self._vMax - self._vMin) * volume
         if DEBUG:
             print(f"Output Voltage: {vTarget:.01f} V")
         if LINUX:
