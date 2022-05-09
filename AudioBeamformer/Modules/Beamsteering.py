@@ -9,7 +9,7 @@
 ###############################################################################
 # MIT License
 #
-# Copyright (c) 2021 Institute for Networked Solutions OST
+# Copyright (c) 2022 ICAI Interdisciplinary Center for Artificial Intelligence
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,13 @@ class Beamsteering():
                  temperature=22,
                  row_count=6,
                  distance=14.75e-3):
+        self._beamsteeringEnable = False
+        self._beamsteeringSources = {0: "Face", 1: "Manual", 2: "Pattern"}
+        self._activeSource = 0
+        self._beamsteeringPattern = {0: (-45,45,10,1)}
+        self._activePattern = 0 
+        self._activeWindow = "rect"
+        self._fpga_control = 
         self.spi_interface = spi_interface
         self.temperature = temperature
         self.speed_of_sound = 331.5 + 0.607*temperature
@@ -107,5 +114,10 @@ class Beamsteering():
         else:
             return np.cos(N*np.arccos(val))
 
-    
+    def steerAngle(self, angle):
+        delay = np.arange(self.row_count) * self.distance / self.speed_of_sound * np.sin(angle/180*np.pi)
+        if (np.sin(angle/180*np.pi) < 0):
+            delay = delay[::-1] * -1
+        self.spi_interface.delay = delay
+        self.spi_interface.updateSPI()
         
