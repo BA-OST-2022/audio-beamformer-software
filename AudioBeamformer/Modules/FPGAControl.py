@@ -34,7 +34,7 @@ import sys
 import time
 import numpy as np
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 
 if LINUX:

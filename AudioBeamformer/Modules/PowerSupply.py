@@ -44,7 +44,7 @@ class PowerSupply():
     def __init__(self):
         self._spiBus = 4                      # Physical SPI-Bus Interface
         self._spiFreq = 8000000               # Interface Frequency in Hz
-        self._spiCs = 1                       # SPI-Device Chip-Select
+        self._spiCs = 0                       # SPI-Device Chip-Select
         self._hvEnPin = 27                    # Raspberry Pi GPIO Number
         
         vRef = 1.23                           # Reference Voltage in V
@@ -86,9 +86,9 @@ class PowerSupply():
     def enableOutput(self, state):
         if LINUX:
             if(state):
-                GPIO.output(self._syncPin, GPIO.LOW)
+                GPIO.output(self._hvEnPin, GPIO.LOW)
             else:
-                GPIO.output(self._syncPin, GPIO.HIGH)
+                GPIO.output(self._hvEnPin, GPIO.HIGH)
     
     
     def setVolume(self, volume):
