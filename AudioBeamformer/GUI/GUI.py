@@ -45,6 +45,7 @@ sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python pat
 
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
 app = QGuiApplication.instance()
 if app == None:
     app = QGuiApplication(sys.argv)
@@ -59,14 +60,15 @@ import cv2
 import PyCVQML
 
 class GUI: 
-    def __init__(self):
+    def __init__(self, audio_processing):
         self._callback = None
+        self._audio_processing = audio_processing
         
     def run(self):
         PyCVQML.registerTypes()
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
-        main = MainWindow()
+        main = MainWindow(self._audio_processing)
         engine.rootContext().setContextProperty("backend", main)
         if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
@@ -91,70 +93,67 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 
 # Send and receive data from user interface
 class MainWindow(QObject):
-    def __init__(self):
+    def __init__(self, audio_processing):
         QObject.__init__(self)
+        self._audio_processing = audio_processing
         self.source_list = ["1","2","3"]
         self.equalizer_list = ["1","2"]
         self.source_gain_value = 20
         self.beamsteering_pattern_list = ["Pattern 1", "Pattern 2"]
         self.window_list = ["Window 1", "Window 2"]
+        self._gainSourceMax = 10
 
     # Audio processing Source
     @pyqtProperty(list, constant=True)
     def sourceList(self):
+        self.source_list = self._audio_processing.getSourceList()
         return self.source_list
 
-    @pyqtProperty(int)
+    @pyqtProperty(float)
     def sourceGainValue(self):
+        self.source_gain_value = self._audio_processing.getSourceLevel()
         return self.source_gain_value
 
-    @pyqtSlot(str)
-    def getSource(self, name):
-        print(f"Source: {name}")
-        pass
+    @pyqtSlot(int)
+    def getSource(self, index):
+        self._audio_processing.setSource(index)
 
     @pyqtSlot(float)
     def getSourceGain(self, gain):
-        print(f"Gain: {gain}")
-        pass
+        self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
     def equalizerList(self):
+        self.equalizer_list = self._audio_processing.getEqualizerProfileList()
         return self.equalizer_list
 
     @pyqtSlot(int)
     def getEnableEqualizer(self, enable):
-        print(f"Equalizer: {enable}")
-        pass
+        self._audio_processing.enableEqualizer(enable)
 
     @pyqtSlot(int)
     def getEqualizerProfile(self, profile):
-        print(f"Equalizer profile: {profile}")
-        pass
+        self._audio_processing.setEqualizerProfile(profile)
 
     # Audio processing interpolation
     @pyqtSlot(int)
     def getEnableInterpolation(self, enable):
-        print(f"Interpolation enable: {enable}")
-        pass
+        self._audio_processing.enableInterpolation(enable)
 
     @pyqtSlot(int)
     def getInterpolationLevel(self, level):
-        print(f"Interpolation level: {level}")
-        pass
+        self._audio_processing.setInterpolationFactor(level)
 
     # Audio processing modulation type
 
     @pyqtSlot(int)
     def getModulationType(self, type):
-        print(f"Modulation type: {type}")
-        pass
+        self._audio_processing.setModulationType(type)
 
     @pyqtSlot(float)
     def getMAMGain(self, gain):
-        print(f"MAM gain: {gain}")
-        pass
+        self._audio_processing.setMAMMix(gain)
 
     # Channels Beamsteering
 
@@ -196,6 +195,52 @@ class MainWindow(QObject):
     def getWindowType(self, type):
         print(f"window type: {type}")
         pass
+
+    # Settings LEDS
+    @pyqtSlot(int)
+    def getEnableLED(self, enable):
+        print(f"LEDs enable: {enable}")
+        pass
+
+    @pyqtSlot(float)
+    def getLEDBrightness(self, value):
+        print(f"LED: {value}")
+
+    # Settings ToF
+    @pyqtProperty(float)
+    def ToFDistance(self):
+        return 1.0
+
+    @pyqtSlot(int)
+    def getEnableToF(self, enable):
+        print(f"ToF enable: {enable}")
+
+    @pyqtSlot(float)
+    def getToFDistance(self, value):
+        print(f"ToF distance: {value}")
+
+    # Settings max. volume
+    @pyqtSlot(float)
+    def getMaxVolume(self, value):
+        print(f"Max. volume: {value}")
+
+    # Settings stats
+    
+    @pyqtProperty(str)
+    def AmbientTemperature(self):
+        return "22.5 C"
+
+    @pyqtProperty(str)
+    def SystemTemperature(self):
+        return "32.5 C" 
+
+    @pyqtProperty(str)
+    def CPUTemperature(self):
+        return "42.5 C"
+
+    @pyqtProperty(str)
+    def CPULoad(self):
+        return "50 %"
 
     # General information
     @pyqtProperty(int)

@@ -53,5 +53,4 @@ gain_dict = equalizeModell(model_transducer,
                             fit_to_type,
                             bin_nr,
                             spacing)
-with open(f"Model_2/3_{fit_to_type}_{bin_nr}_{spacing}","w") as f:
-    f.writelines(gain_dict)
+print(gain_dict)

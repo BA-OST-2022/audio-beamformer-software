@@ -66,6 +66,11 @@ Item{
             anchors.fill: parent
             source: "channels.qml"
         }
+
+        Loader{
+            anchors.fill: parent
+            source: "settings.qml"
+        }
         
     }
     // General information

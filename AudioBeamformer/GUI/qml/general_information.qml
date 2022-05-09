@@ -35,17 +35,36 @@ Item{
         interval: 50
         running: true
         repeat: true
-        onTriggered: gi_main_gauge.value = backend.mainGainValue
+        onTriggered: {gi_main_gauge.height = backend.sourceGainValue * gi_gauge_background.width;gi_main_gauge.color = (backend.sourceGainValue > 0.95) ?  "red": ((backend.sourceGainValue > 0.8) ? "orange" : "#24c5fc")}
     }
 
-           Gauge {
-                id: gi_main_gauge
+    Item{
+                id: gi_gauge_holder
                 anchors.top: parent.top
                 anchors.bottom: main_mute_button.top
                 anchors.left: parent.left
+                width: 20
                 anchors.topMargin: 5
-                minimumValue: 0
-                value: 50
-                maximumValue: 100
+                anchors.bottomMargin: 5
+                // Background Rectangle
+                Rectangle{
+                    id: gi_gauge_background
+                    width: parent.height
+                    height: parent.width
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    rotation: 90
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#424242" }
+                        GradientStop { position: 1.0; color: "#595959" }
+                    }
+                }
+                Rectangle{
+                    id: gi_main_gauge
+                    height: parent.height
+                    width: parent.width
+                    anchors.bottom:gi_gauge_holder.bottom
+                    color: "#24c5fc"
+                }
             }
 }

@@ -51,7 +51,7 @@ Item{
                  Switch{
                     id: ch_beamsteering_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableBeamsteering(ch_beamsteering_switch.position)
                 }
             }
@@ -160,7 +160,7 @@ Item{
                  Switch{
                     id: ch_window_switch
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
+                    onReleased: {
                         backend.getEnableWindow(ch_window_switch.position)
                 }
             }
@@ -192,24 +192,32 @@ Item{
         }
 
     }
-
-        CVItem 
-        {
-            id: imageWriter
-            x: 800
-            y: 10
-            anchors.fill: parent
-            image: capture.image
-        }
-        CVCapture
-        {
-            id: capture
-            width: 400
-            height: 300
-            index: 0
-            filters: capture_image
-            Component.onCompleted: capture.start()
-            Component.onDestruction: capture.stop()
-        }
     
+    Image{
+        x: 800
+        y: 10
+        source: "images/camera_placeholder.jpg"
+    }
+
+    /*
+    CVItem 
+    {
+        id: imageWriter
+        x: 800
+        y: 10
+        anchors.fill: parent
+        image: capture.image
+    }
+    CVCapture
+    {
+        id: capture
+        width: 400
+        height: 300
+        index: 0
+        filters: capture_image
+        Component.onCompleted: capture.start()
+        Component.onDestruction: capture.stop()
+    }
+    */
+
 }

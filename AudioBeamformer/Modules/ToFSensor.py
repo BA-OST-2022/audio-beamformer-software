@@ -1,11 +1,11 @@
 ###############################################################################
-# file    AudioBeamformer.py
+# file    ToFSensor.py
 ###############################################################################
-# brief   Main Application
+# brief   This module controls the communication with the ToF-Sensor (VL53L5CX)
 ###############################################################################
 # author  Florian Baumgartner & Thierry Schwaller
 # version 1.0
-# date    2022-05-04
+# date    2022-05-08
 ###############################################################################
 # MIT License
 #
@@ -30,30 +30,9 @@
 # SOFTWARE.
 ###############################################################################
 
-from Modules.PowerSupply import powerSupply
-from Modules.LEDs import leds
-from GUI.GUI import GUI
-from Modules.AudioProcessing import AudioProcessing
+import sys
 
-class AudioBeamformer():
-    def __init__(self):
-        self.audio_processing = AudioProcessing()
-        
-        self.gui = GUI(self.audio_processing)  # GUI get all object references
-    
-    def begin(self):
-        powerSupply.begin()
-        leds.begin()
-        
-        self.gui.registerTerminateCallback(self.end)
-        self.gui.run()  # This functioncall is blocking and must be at the end
-        
-    def end(self):
-        leds.end()
-        powerSupply.end()
-        print("Main Application terminated...")
+DEBUG = False
+LINUX = (sys.platform == 'linux')
 
-
-if __name__ == '__main__':
-    audioBeamformer = AudioBeamformer()
-    audioBeamformer.begin()
+# https://github.com/mp-extras/vl53l5cx/blob/c7476877e96fabe81516176fbe8c575923d368b1/vl53l5cx/cp.py#L27

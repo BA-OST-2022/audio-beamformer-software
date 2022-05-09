@@ -33,29 +33,38 @@
 import sys
 import threading
 import numpy as np
+import time
+from colorsys import hsv_to_rgb
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
 
-if(LINUX or DEBUG):
+if LINUX:
     from apa102_pi.driver import apa102
 
 
 class LEDs():    
-    def __init__(self):
+    def __init__(self, updateRate=30, channelCount=5, ringCount=20):
         self.OFF = 0
+        self.SEARCHING = 1
+        self.TRACKING = 2
+        
+        self._spiBus = 5                    # Physical SPI-Bus Interface
+        self._spiFreq = 8000000             # Interface Frequency in Hz
         
         self._initialized = False
         self._runThread = False
-        self._updateRate = 30
-        self._channelCount = 5   # 19
-        self._ringCount = 20
-        self._brightness = 1
+        self._updateRate = updateRate
+        self._channelCount = channelCount   # 19
+        self._ringCount = ringCount
+        self._brightness = 31               # Default Max Brightness
         self._enableChannels = True
         self._enableCamera = True
+        self._enableMagic = False
         self._ringColors = np.zeros((self._ringCount, 3))
         self._channelColors = np.zeros((self._channelCount, 3))
         self._cameraAnimation = self.OFF
+        self._strip = None
     
     def __del__(self):
         self.end()
@@ -65,37 +74,44 @@ class LEDs():
             self._initialized = True
             self._updateRate = framerate
             
-            if(LINUX or DEBUG):
+            if LINUX:
                 ledCount = self._channelCount * 2 + self._ringCount
-                self.strip = apa102.APA102(num_led=ledCount, spi_bus=5,
-                                           bus_speed_hz=8000000,
-                                           global_brightness=self._brightness)
-                self.strip.clear_strip()
-                self._runThread = True
-                self.update()
+                self._strip = apa102.APA102(num_led=ledCount,
+                                            spi_bus=self._spiBus,
+                                            bus_speed_hz=self._spiFreq,
+                                            global_brightness=self._brightness)
+                self._strip.clear_strip()
+
+            self._runThread = True
+            self.update()
 
     
     def end(self):
-        if(self._initialized):
-            if(LINUX or DEBUG):
-                self.strip.clear_strip()
-                self.strip.cleanup()
-
         self._runThread = False
-        self._initialized = False
+        if(self._initialized):
+            self._initialized = False
+            if LINUX:
+                self._strip.clear_strip()
+                self._strip.cleanup()
+        
     
     def enableCamera(self, state):
         self._enableCamera = state
     
     def enableChannels(self, state):
         self._enableChannels = state
+    
+    def enableMagic(self, state):
+        self._enableMagic = state
       
     def setBrightness(self, brightness):
         self._brightness = np.clip(brightness * 31, 0, 31)
-        self.strip.set_global_brightness(self._brightness)
-        self.strip.show()
+        if LINUX:
+            self._strip.set_global_brightness(self._brightness)
     
     def setChannelColors(self, colors):
+        if(np.shape(colors) != (self._channelCount, 3)):
+            raise ValueError("Channel color data format incorrect")
         self._channelColors = colors
     
     def setCameraAnimation(self, animation):
@@ -106,25 +122,65 @@ class LEDs():
         if(self._initialized):
             if(self._runThread):
                 threading.Timer(1.0 / self._updateRate, self.update).start()            
+            else:
+                return
             
-            # Prepare a few individual pixels
-            self.strip.set_pixel_rgb(0, 0xFF0000)  # Red
-            self.strip.set_pixel_rgb(1, 0xFFFFFF)  # White
-            self.strip.set_pixel_rgb(2, 0x00FF00)  # Green
+            if(self._cameraAnimation == self.OFF):
+                self._ringColors = np.zeros((self._ringCount, 3))
+            elif(self._cameraAnimation == self.SEARCHING):
+                speed = 10
+                grad = np.linspace(0, 1, self._ringCount)
+                grad = np.roll(grad, int(time.time() * speed))
+                self._ringColors[:,0] = grad * 0.0  # Red
+                self._ringColors[:,1] = grad * 1.0  # Green
+                self._ringColors[:,2] = grad * 1.0  # Blue
+            elif(self._cameraAnimation == self.TRACKING):
+                speed = 5
+                val = np.abs((time.time() * 0.1 * speed) % 2 - 1) # Triangle
+                val = np.ones(self._ringCount) * val
+                self._ringColors[:,0] = val * 1.0   # Red
+                self._ringColors[:,1] = val * 1.0   # Green
+                self._ringColors[:,2] = val * 1.0   # Blue
+                
             
-            self.strip.set_pixel_rgb(11, 0x00FF00)  # Green
-            
-            self.strip.show()
-            # print("Update")
-
+            # TODO: Check if LUT for gamma correction is necessary
+            if LINUX:
+                for i in range(self._channelCount):
+                    r = g = b = 0
+                    if self._enableChannels:
+                        r = int(self._channelColors[i][0] * 255)
+                        g = int(self._channelColors[i][1] * 255)
+                        b = int(self._channelColors[i][2] * 255)
+                    if self._enableMagic:
+                        val = (time.time() / 2 + i // 4)
+                        val /= i // self._channelCount
+                        r, g, b = [int(c * 255) for c in hsv_to_rgb(val, 1, 1)]
+                    self._strip.set_pixel(i, r, g, b)
+                    self._strip.set_pixel(i + self._channelCount, r, g, b)
+                
+                for i in range(self._ringCount):
+                    r = g = b = 0
+                    if self._enableCamera:
+                        r = int(self._ringColors[i][0] * 255)
+                        g = int(self._ringColors[i][1] * 255)
+                        b = int(self._ringColors[i][2] * 255)
+                    if self._enableMagic:
+                        val = (time.time() / 2 + i // 4)
+                        val /= i // self._ringCount
+                        r, g, b = [int(c * 255) for c in hsv_to_rgb(val, 1, 1)]
+                    self._strip.set_pixel(i + self._channelCount * 2, r, g, b)
+                
+                self._strip.show()
 
 
 leds = LEDs()
 
 if __name__ == '__main__':
-    import time
     leds.begin()
     leds.setBrightness(0.1)
+    leds.setCameraAnimation(leds.SEARCHING)
+    leds.enableMagic(True)
     
     time.sleep(3)
     leds.end()
+    
