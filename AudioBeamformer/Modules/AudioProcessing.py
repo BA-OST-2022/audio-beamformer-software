@@ -118,6 +118,8 @@ class AudioProcessing:
 
     def getChannels(self):
         channelInfo = []
+        sd._terminate()
+        sd._initialize()
         for p,i in enumerate(sd.query_devices()):
             print(f"{p} Name: {i['name']},API: {i['hostapi']} ,In {i['max_input_channels']}, Out {i['max_output_channels']}") 
             channelInfo.append((p,
@@ -131,6 +133,8 @@ class AudioProcessing:
         sourceDict = {}
         sourceList = []
         counter = 0
+        sd._terminate()
+        sd._initialize()
         for i,device in enumerate(sd.query_devices()):
             if device['max_input_channels'] > 0 and device['hostapi'] == 0:
                 sourceList.append(device["name"])

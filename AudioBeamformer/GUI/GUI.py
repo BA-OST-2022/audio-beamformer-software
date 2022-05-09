@@ -39,7 +39,7 @@ from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python path
 
@@ -104,7 +104,7 @@ class MainWindow(QObject):
         self._gainSourceMax = 10
 
     # Audio processing Source
-    @pyqtProperty(list, constant=True)
+    @pyqtProperty(list)
     def sourceList(self):
         self.source_list = self._audio_processing.getSourceList()
         return self.source_list

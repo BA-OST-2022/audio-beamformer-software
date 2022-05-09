@@ -32,7 +32,7 @@
 
 import sys
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
@@ -42,7 +42,7 @@ if LINUX:
 # TMP112 Register Map
 TMP112_REG_TEMP					= 0x00
 TMP112_REG_CONFIG				= 0x01
-TMP112_REG_THIGH				= 0x02
+TMP112_REG_THIGH				    = 0x02
 TMP112_REG_TLOW					= 0x03
 
 # TMP112 Configuration Register
@@ -55,7 +55,7 @@ TMP112_REG_CONFIG_FQ_2			= 0x0800 # Fault Queue = 2
 TMP112_REG_CONFIG_FQ_4			= 0x1000 # Fault Queue = 4
 TMP112_REG_CONFIG_FQ_6			= 0x1800 # Fault Queue = 6
 TMP112_REG_CONFIG_RES			= 0x6000 # 12-bits Resolution
-TMP112_REG_CONFIG_OS			= 0x8000 # One-shot enabled
+TMP112_REG_CONFIG_OS			    = 0x8000 # One-shot enabled
 TMP112_REG_CONFIG_CR_0_25		= 0x0000 # Conversion Rate = 0.25 Hz
 TMP112_REG_CONFIG_CR_1			= 0x0040 # Conversion Rate = 1 Hz
 TMP112_REG_CONFIG_CR_4			= 0x0080 # Conversion Rate = 4 Hz
@@ -89,10 +89,7 @@ class TempSensor():
                                TMP112_REG_CONFIG_AL_H)
                 
                 self._i2c = I2C(self._i2cBusID, self._i2cBusFrequency)
-                self._i2c.write_byte_data(self._deviceAdress,
-                                          TMP112_REG_CONFIG, TEMP_CONFIG)
-                
-                # https://github.com/mp-extras/vl53l5cx/blob/c7476877e96fabe81516176fbe8c575923d368b1/vl53l5cx/cp.py
+                self._writeReg(TMP112_REG_CONFIG, TEMP_CONFIG)
                 
     
     def end(self):
@@ -101,17 +98,30 @@ class TempSensor():
             if LINUX:
                 self._i2c.deinit()
                 
-    def getTemperature(self):
-        
+    def getTemperature(self): 
         if LINUX and self._initialized:
-            data = self._i2c.read_i2c_block_data(self._deviceAdress,
-                                                 TMP112_REG_TEMP, 2)
+            data = self._readReg(TMP112_REG_TEMP)
             temp =(data[0] * 256 + data[1]) / 16  # Convert the data to 12-bits
             if temp > 2047:
                 temp -= 4096
                 temp *= 0.0625
             return temp
         return float("nan")
+    
+    def _writeReg(self, reg, data):
+        if LINUX and self._initialized:
+            buf = bytearray([reg, data >> 8, data & 0xFF])
+            self._i2c.writeto(self._deviceAdress, buf)
+            if DEBUG:
+                print(buf)
+    
+    def _readReg(self, reg):
+        if LINUX and self._initialized:
+            reg = bytearray([reg])
+            data = bytearray([0, 0])
+            self._i2c.writeto_then_readfrom(self._deviceAdress,reg, data)
+            return data        
+        return None
 
 
 if __name__ == '__main__':
