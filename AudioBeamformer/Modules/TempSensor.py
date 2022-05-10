@@ -32,11 +32,11 @@
 
 import sys
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
-    from adafruit_extended_bus import ExtendedI2C as I2C
+    from smbus2 import SMBus
     
     
 # TMP112 Register Map
@@ -64,13 +64,11 @@ TMP112_REG_CONFIG_AL_H			= 0x0020 # When the POL bit = 0, AL is HIGH
 
 
 class TempSensor():
-    def __init__(self, deviceAdresse=0x48):      
-        self._i2cBusID = 20                     # /dev/i2c-20
-        self._i2cBusFrequency = 400000          # I2C Bus Speed
+    def __init__(self, deviceAddresse=0x48):      
+        self._i2cBusID = 0                      # TODO: Change to /dev/i2c-20
         
         self._initialized = False
-        self._deviceAdress = deviceAdresse
-        self._i2c = None
+        self._deviceAddress = deviceAddresse
         
     
     def __del__(self):
@@ -87,52 +85,49 @@ class TempSensor():
                                TMP112_REG_CONFIG_FQ_1 |
                                TMP112_REG_CONFIG_CR_4 |
                                TMP112_REG_CONFIG_AL_H)
-                
-                self._i2c = I2C(self._i2cBusID, self._i2cBusFrequency)
                 self._writeReg(TMP112_REG_CONFIG, TEMP_CONFIG)
                 
     
     def end(self):
         if(self._initialized):
             self._initialized = False
-            if LINUX:
-                self._i2c.deinit()
+
                 
     def getTemperature(self): 
         if LINUX and self._initialized:
             data = self._readReg(TMP112_REG_TEMP)
-            temp =(data[0] * 256 + data[1]) / 16  # Convert the data to 12-bits
-            if temp > 2047:
-                temp -= 4096
-                temp *= 0.0625
-            return temp
+            res = int((data[0] << 4) + (data[1] >> 4))
+            if (data[0] | 0x7F == 0xFF):
+                res = 0 - 4096
+            return res * 0.0625
         return float("nan")
+    
     
     def _writeReg(self, reg, data):
         if LINUX and self._initialized:
-            buf = bytearray([reg, data >> 8, data & 0xFF])
-            self._i2c.writeto(self._deviceAdress, buf)
-            if DEBUG:
-                print(buf)
+            with SMBus(self._i2cBusID) as bus:
+                buf = [data & 0xFF, data >> 8]
+                bus.write_i2c_block_data(self._deviceAddress, reg, buf)
+                if DEBUG:
+                    print(buf)
+    
     
     def _readReg(self, reg):
         if LINUX and self._initialized:
-            reg = bytearray([reg])
-            data = bytearray([0, 0])
-            self._i2c.writeto_then_readfrom(self._deviceAdress,reg, data)
-            return data        
+            with SMBus(self._i2cBusID) as bus:
+                return bus.read_i2c_block_data(self._deviceAddress, reg, 2)     
         return None
-
+    
 
 if __name__ == '__main__':
     tempSensorAmbient = TempSensor(0x48)
-    tempSensorSystem = TempSensor(0x49)
+    # tempSensorSystem = TempSensor(0x49)
     tempSensorAmbient.begin()
-    tempSensorSystem.begin()
+    # tempSensorSystem.begin()
     
     print(f"Ambient Temperature: {tempSensorAmbient.getTemperature():.1f} °C")
-    print(f"System Temperature: {tempSensorSystem.getTemperature():.1f} °C")
+    # print(f"System Temperature: {tempSensorSystem.getTemperature():.1f} °C")
     
     tempSensorAmbient.end()
-    tempSensorSystem.end()
+    # tempSensorSystem.end()
     
