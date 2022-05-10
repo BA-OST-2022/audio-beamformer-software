@@ -30,38 +30,39 @@
 # SOFTWARE.
 ###############################################################################
 import threading
-import numpy 
+import numpy as np
+
 class Beamsteering():
     def __init__(self,
-                 spi_interface,
-                 temperature=22,
-                 row_count=6,
-                 distance=14.75e-3):
+                 fpga_controll,
+                 sensors,
+                 facetracking):
         self._beamsteeringEnable = False
-        self._beamsteeringSources = {0: "Face", 1: "Manual", 2: "Pattern"}
+        self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
         self._activeSource = 0
         self._beamsteeringPattern = {0: (-45,45,10,1)}
-        self._activePattern = 0 
+        self._activePattern = np.linspace(-45,45,10)
         self._activeWindow = "rect"
-        self._fpga_control = 
-        self.spi_interface = spi_interface
-        self.temperature = temperature
-        self.speed_of_sound = 331.5 + 0.607*temperature
-        self.row_count = row_count
-        self.distance = distance
+        self._fpga_controlller = fpga_controll
+        self._sensors = sensors
+        self._facetracking = facetracking
+        self._angleToSteer = 0
+        self._angleToSteer_faceTracking = 0
+        self._angleToSteer_manual = 0
+        self._currentPattern = 0
+        self._PatternHoldTime = 1
         self.window_types = {"rect": self.rectWindow(),
                              "cosine": self.cosineWindow(),
                              "hann": self.hannWindow(),
                              "hamming": self.hammingWindow(),
                              "blackman": self.blackmanWindow(),
                              "cheby": self.chebyWindow()}
-        self._updateRate = 30
         self._initialized = False
 
     def begin(self):
          if not self._initialized:
             self._initialized = True
-            self._updateRate = framerate
+            self._updateRate = 30
             self._runThread = True
             self.update()
 
@@ -72,6 +73,29 @@ class Beamsteering():
         if(self._initialized):
             if(self._runThread):
                 threading.Timer(1.0 / self._updateRate, self.update).start()
+                self.setAngle()
+
+    def setBeamsteeringSource(self, source):
+        self._activeSource = source
+
+    def setBeamsteeringAngle(self, angle):
+        self._angleToSteer_manual = angle
+
+    def setBeamsteeringPattern(self, pattern):  
+        min_angle, max_angle, steps, time = self._beamsteeringPattern[pattern]
+        self._activePattern = np.linspace(min_angle,max_angle, steps)
+        self._PatternHoldTime = time
+
+    def setAngle(self):
+        # Face Tracking
+        if (self._activeSource == 0):
+            self._angleToSteer = self._facetracking.angle() # Needs to be adjusted
+        # Manual
+        elif (self._activeSource == 1):
+            self._angleToSteer = self._angleToSteer_manual
+        #else:
+        #    self._angleToSteer = 
+
     
     def rectWindow(self):
         gains = [1] * self.row_count

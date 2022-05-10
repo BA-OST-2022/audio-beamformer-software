@@ -37,7 +37,7 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Source")
             }
-            
+            /*
             // Timer for Input Source
             Timer {
                 // Every 500ms
@@ -46,7 +46,7 @@ Item{
                 repeat: true
                 onTriggered: ap_source_combobox.model = backend.sourceList
             }
-
+            */
             // ComboBox
             Row{
                 id: ap_source_row_input_source
@@ -64,6 +64,9 @@ Item{
                     model: backend.sourceList
                     onCurrentIndexChanged: {
                         backend.getSource(ap_source_combobox.currentIndex)
+                    }
+                    onHighlighted:{
+                        ap_source_combobox.model = backend.sourceList
                     }
                 }
 
