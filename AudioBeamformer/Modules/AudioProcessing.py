@@ -77,6 +77,7 @@ class AudioProcessing:
             self._output_device = output_device_index
         self._channel_count_input = 1 # Get channel count
         self._channel_count_output = 2
+        self.__black_list_input_device = ["pulse"]
 
         # Window size can not be even
         if not (equalizer_window_size % 2):
@@ -137,9 +138,11 @@ class AudioProcessing:
         sd._initialize()
         for i,device in enumerate(sd.query_devices()):
             if device['max_input_channels'] > 0 and device['hostapi'] == 0:
-                sourceList.append(device["name"])
-                sourceDict[counter] = i
-                counter += 1
+                if not any([bl_device == device["name"] for bl_device in self.__black_list_input_device]):
+                        if not (device["name"].startswith('Loopback') and device["name"].endswith(',0)')):
+                            sourceList.append(device["name"])
+                            sourceDict[counter] = i
+                            counter += 1
         self.__source_dict = sourceDict
         # Filter source list
         return sourceList
@@ -149,7 +152,10 @@ class AudioProcessing:
             # Stream terminate
             self.endStream()
         # Stream setup
-        self._input_device = self.__source_dict[source_index]
+        if source_index < len(self.__source_dict.keys()):
+            self._input_device = self.__source_dict[source_index]
+        else:
+            self._input_device = 0
         # Stream start
         self.setupStream()
         self.startStream()
