@@ -37,7 +37,7 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Source")
             }
-            
+            /*
             // Timer for Input Source
             Timer {
                 // Every 500ms
@@ -46,7 +46,7 @@ Item{
                 repeat: true
                 onTriggered: ap_source_combobox.model = backend.sourceList
             }
-
+            */
             // ComboBox
             Row{
                 id: ap_source_row_input_source
@@ -65,7 +65,18 @@ Item{
                     onCurrentIndexChanged: {
                         backend.getSource(ap_source_combobox.currentIndex)
                     }
+                    MouseArea{
+                        id: ap_mouse_area
+                        anchors.fill: parent
+                        preventStealing: true
+                        propagateComposedEvents: true
+                        onClicked:{
+                            ap_source_combobox.model = backend.sourceList
+                            ap_source_combobox.popup.open()
+                        }
+                    }
                 }
+
 
             }
 
@@ -100,7 +111,11 @@ Item{
                 interval: 50
                 running: true
                 repeat: true
-                onTriggered: {ap_source_gauge.height = backend.sourceGainValue * gauge_background.width;ap_source_gauge.color = (backend.sourceGainValue > 0.95) ?  "red": ((backend.sourceGainValue > 0.8) ? "orange" : "#24c5fc")}
+                onTriggered: {
+                    ap_source_gauge_base.height = Math.min(backend.sourceGainValue , 0.6)* gauge_background.width
+                    ap_source_gauge_middle.height = Math.min(backend.sourceGainValue-0.6,0.2)* gauge_background.width
+                    ap_source_gauge_top.height = Math.min(backend.sourceGainValue-0.8,0.2)* gauge_background.width
+                    }
             }
 
             Item{
@@ -125,11 +140,25 @@ Item{
                     }
                 }
                 Rectangle{
-                    id: ap_source_gauge
-                    height: parent.height
+                    id: ap_source_gauge_base
+                    height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:ap_gauge_holder.bottom
                     color: "#24c5fc"
+                }
+                Rectangle{
+                    id: ap_source_gauge_middle
+                    height: parent.height*0.2
+                    width: parent.width
+                    anchors.bottom:ap_source_gauge_base.top
+                    color: "orange"
+                }
+                Rectangle{
+                    id: ap_source_gauge_top
+                    height: parent.height
+                    width: parent.width
+                    anchors.bottom:ap_source_gauge_middle.top
+                    color: "red"
                 }
             }
         

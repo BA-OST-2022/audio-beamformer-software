@@ -7,5 +7,4 @@ import QtQuick.Extras 1.4
 
 Connections {
     target: backend
-    
 }

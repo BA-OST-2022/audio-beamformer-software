@@ -11,7 +11,7 @@ ApplicationWindow{
     height: 320
     visible: true
     Material.theme: Material.Dark // Material.Dark
-    Material.accent: Material.LightBlue // Material.LightBlue
+    Material.accent: Material.Cyan // Material.LightBlue
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     

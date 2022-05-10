@@ -30,25 +30,32 @@
 # SOFTWARE.
 ###############################################################################
 
+from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
 from GUI.GUI import GUI
 from Modules.AudioProcessing import AudioProcessing
+from Modules.Beamsteering import Beamsteering
 
 class AudioBeamformer():
     def __init__(self):
-        # Initialize objects here
         self.audio_processing = AudioProcessing()
-        print(type(self.audio_processing))
-        self.gui = GUI(self.audio_processing)
+        self.beamsteering = Beamsteering()
+        self.gui = GUI(self.audio_processing,
+                    self.beamsteering)  # GUI get all object references
     
     def begin(self):
+        powerSupply.begin()
         leds.begin()
+        self.beamsteering.begin()
+
         self.gui.registerTerminateCallback(self.end)
-        self.gui.run()   # This function call is blocking and must be at the end
+        self.gui.run()  # This functioncall is blocking and must be at the end
         
     def end(self):
-        print("Main Application terminating...")
         leds.end()
+        powerSupply.end()
+        self.beamsteering.end()
+        print("Main Application terminated...")
 
 
 if __name__ == '__main__':

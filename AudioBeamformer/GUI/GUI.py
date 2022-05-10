@@ -39,7 +39,7 @@ from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python path
 
@@ -60,15 +60,19 @@ import cv2
 import PyCVQML
 
 class GUI: 
-    def __init__(self, audio_processing):
+    def __init__(self,
+                audio_processing,
+                beamsteering):
         self._callback = None
         self._audio_processing = audio_processing
+        self._beamsteering = beamsteering
         
     def run(self):
         PyCVQML.registerTypes()
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
-        main = MainWindow(self._audio_processing)
+        main = MainWindow(self._audio_processing,
+                        self._beamsteering)
         engine.rootContext().setContextProperty("backend", main)
         if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
@@ -93,18 +97,23 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 
 # Send and receive data from user interface
 class MainWindow(QObject):
-    def __init__(self, audio_processing):
+    def __init__(self, 
+                audio_processing,
+                beamsteering):
         QObject.__init__(self)
         self._audio_processing = audio_processing
-        self.source_list = ["1","2","3"]
-        self.equalizer_list = ["1","2"]
+        self._beamsteering = beamsteering
+        self.source_list = []
+        self.equalizer_list = []
         self.source_gain_value = 20
-        self.beamsteering_pattern_list = ["Pattern 1", "Pattern 2"]
-        self.window_list = ["Window 1", "Window 2"]
+        self.beamsteering_pattern_list = []
+        self.window_list = []
         self._gainSourceMax = 10
+        self._maxAngleSlider = 45
 
+    update_Source = pyqtSignal()
     # Audio processing Source
-    @pyqtProperty(list, constant=True)
+    @pyqtProperty(list,constant=True)
     def sourceList(self):
         self.source_list = self._audio_processing.getSourceList()
         return self.source_list
@@ -159,33 +168,32 @@ class MainWindow(QObject):
 
     @pyqtProperty(list, constant=True)
     def beamsteeringPatternList(self):
+        self.beamsteering_pattern_list = self._beamsteering.getBeamsteeringPattern()
         return self.beamsteering_pattern_list
 
     @pyqtSlot(int)
     def getEnableBeamsteering(self, enable):
-        print(f"Beamsteering enable: {enable}")
-        pass
+        self._beamsteering.enableBeamsteering(enable)
 
     @pyqtSlot(int)
     def getBeamsteeringSource(self, source):
-        print(f"Beamsteering source: {source}")
-        pass
+        self._beamsteering.setBeamsteeringSource(source)
 
     @pyqtSlot(float)
     def getBeamsteeringManualAngle(self, angle):
-        print(f"Beamsteering angle: {angle}")
-        pass
+        self._beamsteering.setBeamsteeringAngle((2*angle - 1)*self._maxAngleSlider)
     
     @pyqtSlot(int)
     def getBeamsteeringPattern(self, pattern):
-        print(f"Beamsteering pattern: {pattern}")
-        pass
+        self._beamsteering.setBeamsteeringPattern(pattern)
 
     # Channels Window
     @pyqtProperty(list, constant=True)
     def windowList(self):
-        return self.beamsteering_pattern_list
+        self.window_list = self._beamsteering.getWindowProfileList()
+        return self.window_list
 
+    # BESPRECHEN
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
         print(f"Window enable: {enable}")
@@ -193,8 +201,7 @@ class MainWindow(QObject):
 
     @pyqtSlot(int)
     def getWindowType(self, type):
-        print(f"window type: {type}")
-        pass
+        self._beamsteering.setWindowProfile(type)
 
     # Settings LEDS
     @pyqtSlot(int)

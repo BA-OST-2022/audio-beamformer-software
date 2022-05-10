@@ -29,6 +29,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ###############################################################################
+
+
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
 from scipy.interpolate import interp1d
@@ -36,6 +38,7 @@ from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, fir
 # Audio In / Output Handling
 import sounddevice as sd
 # Other
+import os
 import sys
 import numpy as np
 import ast
@@ -47,7 +50,7 @@ class AudioProcessing:
                 samplerate=44100,
                 chunk_size=4096,
                 equalizer_window_size=123):
-        self.__equalier_dict_path = "Modules/Files/equalizer_dict.txt"
+        self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
         with open(self.__equalier_dict_path) as f:
@@ -74,6 +77,7 @@ class AudioProcessing:
             self._output_device = output_device_index
         self._channel_count_input = 1 # Get channel count
         self._channel_count_output = 2
+        self.__black_list_input_device = ["pulse"]
 
         # Window size can not be even
         if not (equalizer_window_size % 2):
@@ -115,6 +119,8 @@ class AudioProcessing:
 
     def getChannels(self):
         channelInfo = []
+        sd._terminate()
+        sd._initialize()
         for p,i in enumerate(sd.query_devices()):
             print(f"{p} Name: {i['name']},API: {i['hostapi']} ,In {i['max_input_channels']}, Out {i['max_output_channels']}") 
             channelInfo.append((p,
@@ -128,11 +134,15 @@ class AudioProcessing:
         sourceDict = {}
         sourceList = []
         counter = 0
+        sd._terminate()
+        sd._initialize()
         for i,device in enumerate(sd.query_devices()):
             if device['max_input_channels'] > 0 and device['hostapi'] == 0:
-                sourceList.append(device["name"])
-                sourceDict[counter] = i
-                counter += 1
+                if not any([bl_device == device["name"] for bl_device in self.__black_list_input_device]):
+                        if not (device["name"].startswith('Loopback') and device["name"].endswith(',0)')):
+                            sourceList.append(device["name"])
+                            sourceDict[counter] = i
+                            counter += 1
         self.__source_dict = sourceDict
         # Filter source list
         return sourceList
@@ -142,7 +152,10 @@ class AudioProcessing:
             # Stream terminate
             self.endStream()
         # Stream setup
-        self._input_device = self.__source_dict[source_index]
+        if source_index < len(self.__source_dict.keys()):
+            self._input_device = self.__source_dict[source_index]
+        else:
+            self._input_device = 0
         # Stream start
         self.setupStream()
         self.startStream()

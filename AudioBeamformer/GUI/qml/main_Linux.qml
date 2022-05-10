@@ -12,7 +12,7 @@ ApplicationWindow{
     visible: true
     visibility: "FullScreen"
     Material.theme: Material.Dark // Material.Dark
-    Material.accent: Material.LightBlue // Material.LightBlue
+    Material.accent: Material.Green // Material.LightBlue
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
