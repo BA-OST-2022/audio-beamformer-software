@@ -65,10 +65,18 @@ Item{
                     onCurrentIndexChanged: {
                         backend.getSource(ap_source_combobox.currentIndex)
                     }
-                    onActivated:{
-                        ap_source_combobox.model = backend.sourceList
+                    MouseArea{
+                        id: ap_mouse_area
+                        anchors.fill: parent
+                        preventStealing: true
+                        propagateComposedEvents: true
+                        onClicked:{
+                            ap_source_combobox.model = backend.sourceList
+                            ap_source_combobox.popup.open()
+                        }
                     }
                 }
+
 
             }
 
