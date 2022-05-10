@@ -65,7 +65,7 @@ Item{
                     onCurrentIndexChanged: {
                         backend.getSource(ap_source_combobox.currentIndex)
                     }
-                    onHighlighted:{
+                    onActivated:{
                         ap_source_combobox.model = backend.sourceList
                     }
                 }
