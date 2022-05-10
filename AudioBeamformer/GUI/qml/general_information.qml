@@ -30,15 +30,20 @@ Item{
             backend.getMainGain(main_volume_slider.value)
             }
     }
-    Timer {
-        // Every 50ms
-        interval: 50
-        running: true
-        repeat: true
-        onTriggered: {gi_main_gauge.height = backend.sourceGainValue * gi_gauge_background.width;gi_main_gauge.color = (backend.sourceGainValue > 0.95) ?  "red": ((backend.sourceGainValue > 0.8) ? "orange" : "#24c5fc")}
-    }
+     // Timer for Gauge
+            Timer {
+                // Every 50ms
+                interval: 50
+                running: true
+                repeat: true
+                onTriggered: {
+                    gi_source_gauge_base.height = Math.min(backend.sourceGainValue , 0.6)* gauge_background.width
+                    gi_source_gauge_middle.height = Math.min(backend.sourceGainValue-0.6,0.2)* gauge_background.width
+                    gi_source_gauge_top.height = Math.min(backend.sourceGainValue-0.8,0.2)* gauge_background.width
+                    }
+            }
 
-    Item{
+            Item{
                 id: gi_gauge_holder
                 anchors.top: parent.top
                 anchors.bottom: main_mute_button.top
@@ -48,7 +53,7 @@ Item{
                 anchors.bottomMargin: 5
                 // Background Rectangle
                 Rectangle{
-                    id: gi_gauge_background
+                    id: gauge_background
                     width: parent.height
                     height: parent.width
                     anchors.verticalCenter: parent.verticalCenter
@@ -60,11 +65,25 @@ Item{
                     }
                 }
                 Rectangle{
-                    id: gi_main_gauge
-                    height: parent.height
+                    id: gi_source_gauge_base
+                    height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:gi_gauge_holder.bottom
                     color: "#24c5fc"
+                }
+                Rectangle{
+                    id: gi_source_gauge_middle
+                    height: parent.height*0.2
+                    width: parent.width
+                    anchors.bottom:gi_source_gauge_base.top
+                    color: "orange"
+                }
+                Rectangle{
+                    id: gi_source_gauge_top
+                    height: parent.height
+                    width: parent.width
+                    anchors.bottom:gi_source_gauge_middle.top
+                    color: "red"
                 }
             }
 }
