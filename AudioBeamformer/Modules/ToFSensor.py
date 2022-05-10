@@ -46,7 +46,6 @@ class ToFSensor():
         self._i2cBusID = 0                      # TODO: Change to /dev/i2c-20
         
         self._initialized = False
-        self._i2c_bus = SMBus()
         self._driver = None
         self._updateRate = updateRate           # Update-Rate in Hz
         self._resolution = 8                    # 4x4 or 8x8 zones
