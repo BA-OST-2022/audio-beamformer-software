@@ -123,7 +123,7 @@ class RotaryEncoder():
         
         self._encoder = None
         self._encoderValue = 0.0
-        self._buttonValue = False
+        self._buttonState = False
 
 
     def begin(self):
@@ -140,10 +140,17 @@ class RotaryEncoder():
 
     def getEncoderValue(self):
         return self._encoderValue
-
-
-    def getButtonValue(self):
-        return self._buttonValue
+    
+    def setEncoderValue(self, value):
+        if not(0.0 <= value <= 1.0):
+            raise ValueError("Value must be between 0.0 .. 1.0")
+        self._encoderValue = value
+            
+    def getButtonState(self):
+        return self._buttonState
+    
+    def setButtonState(self, state):
+        self._buttonState = state
 
 
     def _valueChanged(self, value):
@@ -156,7 +163,7 @@ class RotaryEncoder():
 
 
     def _buttonChanged(self, channel):
-        self._buttonValue = not self._buttonValue
+        self._buttonState = not self._buttonState
         
             
 
@@ -166,6 +173,6 @@ if __name__ == '__main__':
     rotaryEncoder.begin()
 
     for i in range(10):
-        print(f"Enocder: {rotaryEncoder.getEncoderValue()}, Button: {rotaryEncoder.getButtonValue()}")
+        print(f"Enocder: {rotaryEncoder.getEncoderValue()}, Button: {rotaryEncoder.getButtonState()}")
         time.sleep(0.5)
         
