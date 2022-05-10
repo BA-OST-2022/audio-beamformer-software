@@ -103,6 +103,7 @@ class MainWindow(QObject):
         self.window_list = ["Window 1", "Window 2"]
         self._gainSourceMax = 10
 
+    update_Source = pyqtSignal()
     # Audio processing Source
     @pyqtProperty(list)
     def sourceList(self):
