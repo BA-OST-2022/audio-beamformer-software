@@ -146,6 +146,8 @@ class Sensors():
                     self._freeCallback()
                 if DEBUG:
                     print("Updated ToF Sensor Data")
+                    
+            # TODO: Update power supply data
             
     
 
