@@ -62,13 +62,13 @@ class Sensors():
         self._hmi = HMI(0x62)
         self._tofSensor = ToFSensor()
         self._rotaryEncoder = RotaryEncoder(pinA=12, pinB=16, pinS=20)
+        self._powerSupply = powerSupply
         
         self._initialized = False
         self._runThread = False
         self._updateRate = None
         self._alertEnable = True
-        self._alertCallback = None
-        self._freeCallback = None
+        self._alertState = False
         self._alertSensitivity = None
         self._distanceLevel = None
         self._enableMagic = False
@@ -131,15 +131,17 @@ class Sensors():
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
                 self._systemTemp = self._tempSensorSystem.getTemperature()
                 self._cpuTemp = self._getCpuTemperature()
-                fanSpeed = np.clip((self._systemTemp - 30.0) / 20.0, 0.0, 1.0)
-                self._hmi.setFanSpeed(fanSpeed)   # 30°C = 0% .. 50°C = 100%
+                if not np.isnan(self._systemTemp):
+                    fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
+                    self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
                 if DEBUG:
                     print("Updated Temperatures")
             
             if(time.time() - self._timeLed > 1 / self._updateRateLed):
                 self._timeLed = time.time()
                 if(self._enableMagic):
-                    pass # TODO: Overwrite the color here with some magic
+                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
+                    self._ledColor = np.array([r, g, b])
                 self._hmi.setButtonColor(self._ledColor)
                 if DEBUG:
                     print("Update LED Color")
@@ -147,14 +149,21 @@ class Sensors():
             if(self._tofSensor.update()):
                 self._distanceMap = self._tofSensor.getDistance()
                 event = self._checkDistanceMap(self._distanceMap)
-                if(event == self.EVENT_ALERT and self._alertCallback):
-                    self._alertCallback()
-                if(event == self.EVENT_FREE and self._freeCallback):
-                    self._freeCallback()
+                if(event == self.EVENT_ALERT):
+                    self._alertState = True
+                if(event == self.EVENT_FREE):
+                    self._alertState = False
                 if DEBUG:
                     print("Updated ToF Sensor Data")
-                    
-            # TODO: Update power supply data
+                
+            
+            if self._powerSupply:
+                self._powerSupply.enableOutput(not self.getMute())
+                
+            if(self.getMute()):
+                self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
+            else:
+                self._ledColor = np.array([1.0, 1.0, 1.0])  # White
             
     
 
@@ -195,21 +204,26 @@ class Sensors():
     
     def setVolume(self, volume):
         self._rotaryEncoder.setEncoderValue(volume)
+        if self._powerSupply:
+            self._powerSupply.setVolume(volume)
     
     
     def getVolume(self):
         return self._rotaryEncoder.getEncoderValue()
     
     
+    def setMaxVolume(self, maxVolume):
+        if self._powerSupply:
+            self._powerSupply.setMaxVolume(maxVolume)
+    
+    
     def setMute(self, state):
-        self._rotaryEncoder.setButtonValue(state)
-        if(state):
-            self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
-        else:
-            self._ledColor = np.array([1.0, 1.0, 1.0])  # White
-            
+        self._rotaryEncoder.setButtonState(state)
+
+    
     def getMute(self):
-        return self._rotaryEncoder.getButtonValue()
+        muteButton = self._rotaryEncoder.getButtonState()
+        return muteButton or (self._alertState and self._alertEnable)    
     
     
     def enableMagic(self, state):
@@ -227,8 +241,8 @@ class Sensors():
                     pass
         return float("NAN")
     
+    
     def _checkDistanceMap(self, distanceMap):
-        # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
         row_size = 3
         column_size = 2
         distance_foreground_on = 1200
@@ -257,5 +271,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(200)
+    time.sleep(5)
     sensors.end()
