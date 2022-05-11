@@ -320,14 +320,94 @@ Item{
             }
         }
     }
-
+    Timer{
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+        }
+    }
+    
     Row{
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: settings_row.bottom
         height: 50
-        RadioButton{
-
+        CheckBox{
+            id: channel_1
+            checked: True
+        }
+        CheckBox{
+            id: channel_2
+            checked: True
+        }
+        CheckBox{
+            id: channel_3
+            checked: True
+        }
+        CheckBox{
+            id: channel_4
+            checked: True
+        }
+        CheckBox{
+            id: channel_5
+            checked: True
+        }
+        CheckBox{
+            id: channel_6
+            checked: True
+        }
+        CheckBox{
+            id: channel_7
+            checked: True
+        }
+        CheckBox{
+            id: channel_8
+            checked: True
+        }
+        CheckBox{
+            id: channel_9
+            checked: True
+        }
+        CheckBox{
+            id: channel_10
+            checked: True
+        }
+        CheckBox{
+            id: channel_11
+            checked: True
+        }
+        CheckBox{
+            id: channel_12
+            checked: True
+        }
+        CheckBox{
+            id: channel_13
+            checked: True
+        }
+        CheckBox{
+            id: channel_14
+            checked: True
+        }
+        CheckBox{
+            id: channel_15
+            checked: True
+        }
+        CheckBox{
+            id: channel_16
+            checked: True
+        }
+        CheckBox{
+            id: channel_17
+            checked: True
+        }
+        CheckBox{
+            id: channel_18
+            checked: True
+        }
+        CheckBox{
+            id: channel_19
+            checked: True
         }
     }
 }
