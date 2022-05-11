@@ -31,6 +31,7 @@
 ###############################################################################
 
 import sys
+import time
 import threading
 import re, subprocess
 import numpy as np
@@ -43,12 +44,13 @@ DEBUG = False
 LINUX = (sys.platform == 'linux')
 
 
-
 class Sensors():
     def __init__(self, powerSupply=None):  
         self.SRC_AMBIENT = 0
         self.SRC_SYSTEM = 1
         self.SRC_CPU = 2
+        self.EVENT_ALERT = 0
+        self.EVENT_FREE = 1
         
         self._tempSensorAmbient = TempSensor(0x48)
         self._tempSensorSystem = TempSensor(0x49)
@@ -59,11 +61,23 @@ class Sensors():
         self._initialized = False
         self._runThread = False
         self._updateRate = None
+        self._alertEnable = True
+        self._alertCallback = None
+        self._freeCallback = None
+        self._alertSensitivity = None
+        self._enableMagic = False
+        self._ledColor = np.zeros((1, 3))
         
-        self._ambientTemperature = float("NAN")
-        self._systemTemperature = float("NAN")
-        self._cpuTemperature = float("NAN")
+        self._updateRateTemp = 0.5              # Update rate in Hz
+        self._updateRateLed = 20                # Update rate in Hz
+        
+        self._ambientTemp = float("NAN")
+        self._systemTemp = float("NAN")
+        self._cpuTemp = float("NAN")
         self._distanceMap = self._tofSensor.getDistance()
+        
+        self._timeTemp = 0
+        self._timeLed = 0
         
     
     def __del__(self):
@@ -106,15 +120,36 @@ class Sensors():
             else:
                 return
             
+            if(time.time() - self._timeTemp > 1 / self._updateRateTemp):
+                self._timeTemp = time.time()
+                self._ambientTemp = self._tempSensorAmbient.getTemperature()
+                self._systemTemp = self._tempSensorSystem.getTemperature()
+                self._cpuTemp = self._getCpuTemperature()
+                # TODO: Update Fan-Speed here
+            
+            if(time.time() - self._timeLed > 1 / self._updateRateLed):
+                self._timeLed = time.time()
+                if(self._enableMagic):
+                    pass # TODO: Overwrite the color here with some magic
+                self._hmi.setButtonColor(self._ledColor)
+                
+            if(self._tofSensor.update()):
+                self._distanceMap = self._tofSensor.getDistance()
+                event = self._checkDistance(self._distanceMap)
+                if(event == self.EVENT_ALERT and self._alertCallback):
+                    self._alertCallback()
+                if(event == self.EVENT_FREE and self._freeCallback):
+                    self._freeCallback()
+            
     
 
     def getTemperature(self, source):
         if(source == self.SRC_AMBIENT):
-            return self._ambientTemperature
+            return self._ambientTemp
         elif(source == self.SRC_SYSTEM):
-            return self._systemTemperature
+            return self._systemTemp
         elif(source == self.SRC_CPU):
-            return self._cpuTemperature
+            return self._cpuTemp
         return float("NAN")
     
     
@@ -124,43 +159,44 @@ class Sensors():
     
     
     def enableAlert(self, state):
-        pass
+        self._alertEnable = state
     
     
     def setAlertCallback(self, callback):
-        pass
+        self._alertCallback = callback
     
     
     def setFreeCallback(self, callback):
-        pass
+        self._freeCallback = callback
     
     
     def setAlertSensitivity(self, sensitivity):
-        pass
-    
-    
-    def setButtonColor(self, color):
-        pass
+        if not(0.0 <= sensitivity <= 1.0):
+            raise ValueError("Sensitivity out of bound: 0.0 .. 1.0")
+        self._alertSensitivity = sensitivity
     
     
     def setVolume(self, volume):
-        pass
+        self._rotaryEncoder.setEncoderValue(volume)
     
     
     def getVolume(self):
-        pass
+        return self._rotaryEncoder.getEncoderValue()
     
     
     def setMute(self, state):
-        pass
-    
-    
+        self._rotaryEncoder.setButtonValue(state)
+        if(state):
+            self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
+        else:
+            self._ledColor = np.array([1.0, 1.0, 1.0])  # White
+            
     def getMute(self):
-        pass
+        return self._rotaryEncoder.getButtonValue()
     
     
     def enableMagic(self, state):
-        pass
+        self._enableMagic = state
     
     
     def _getCpuTemperature(self):
@@ -174,13 +210,15 @@ class Sensors():
                     pass
         return float("NAN")
     
+    def _checkDistance(self, distanceMap):
+        # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
+        return None
+    
 
 
 if __name__ == '__main__':
-    import time
-    
     sensors = Sensors()
     sensors.begin()
 
-    # time.sleep(10)
+    time.sleep(10)
     sensors.end()
