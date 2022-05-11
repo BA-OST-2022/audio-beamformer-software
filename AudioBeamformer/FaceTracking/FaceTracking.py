@@ -29,7 +29,7 @@ class FaceTracking():
     def __init__(self, lifetime):
         self.fd = FaceDetector()
 
-        self.Ts = 1/30
+        self.Ts = 1/15
         self.R = 507
         self.Qp = 10
         self.Qv = 0.01
@@ -114,7 +114,7 @@ class FaceTracking():
 
 
 
-faceTracking = FaceTracking(lifetime=50)
+faceTracking = FaceTracking(lifetime=15)
 
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
