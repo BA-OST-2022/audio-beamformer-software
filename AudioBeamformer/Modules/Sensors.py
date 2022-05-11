@@ -139,7 +139,7 @@ class Sensors():
                 
             if(self._tofSensor.update()):
                 self._distanceMap = self._tofSensor.getDistance()
-                event = self._checkDistance(self._distanceMap)
+                event = self._checkDistanceMap(self._distanceMap)
                 if(event == self.EVENT_ALERT and self._alertCallback):
                     self._alertCallback()
                 if(event == self.EVENT_FREE and self._freeCallback):
@@ -218,7 +218,7 @@ class Sensors():
                     pass
         return float("NAN")
     
-    def _checkDistance(self, distanceMap):
+    def _checkDistanceMap(self, distanceMap):
         # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
         return None
     
