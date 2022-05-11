@@ -104,6 +104,8 @@ class GUI:
 
 class ImageProcessing(PyCVQML.CVAbstractFilter):
     def process_image(self, src):
+        if LINUX:
+            src = cv2.rotate(src, cv2.ROTATE_180)
         if globalFaceTracking and src:
             return globalFaceTracking.runDetection(src)
         return src
