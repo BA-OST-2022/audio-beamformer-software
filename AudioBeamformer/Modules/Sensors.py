@@ -248,11 +248,12 @@ class Sensors():
         distance_foreground_on = 1200
         distance_foreground_off = 1500
 
+        sens = self._alertSensitivity * row_size * column_size
         mask = np.ones((row_size,column_size))
         foreground_map_on = distanceMap < distance_foreground_on
         foreground_map_off = distanceMap < distance_foreground_off
-        element_foreground_on = convolve2d(mask,foreground_map_on) >= self._alertSensitivity * row_size * column_size
-        element_foreground_off = convolve2d(mask,foreground_map_off) >= self._alertSensitivity * row_size * column_size
+        element_foreground_on = convolve2d(mask,foreground_map_on) >= sens
+        element_foreground_off = convolve2d(mask,foreground_map_off) >= sens
 
         self._distanceLevel = np.mean(element_foreground_on)
 

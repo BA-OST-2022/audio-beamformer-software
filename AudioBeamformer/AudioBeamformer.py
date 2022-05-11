@@ -32,21 +32,25 @@
 
 from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
-from GUI.GUI import GUI
 from Modules.AudioProcessing import AudioProcessing
 from Modules.Beamsteering import Beamsteering
 from Modules.Sensors import Sensors
+from Modules.FPGAControl import fpgaControl
+from GUI.GUI import GUI
+from FaceTracking.FaceTracking import faceTracking
 
 class AudioBeamformer():
     def __init__(self):
         self.audio_processing = AudioProcessing()
-        self.beamsteering = Beamsteering()
         self.sensors = Sensors(powerSupply)
-        self.gui = GUI(self.audio_processing,
-                    self.beamsteering)  # GUI get all object references
+        self.beamsteering = Beamsteering(self.sensors, faceTracking,
+                                         fpgaControl)
+        self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,
+                       self.sensors, leds)
     
     def begin(self):
         powerSupply.begin()
+        fpgaControl.begin()
         leds.begin()
         self.sensors.begin()
         self.beamsteering.begin()
@@ -57,6 +61,7 @@ class AudioBeamformer():
     def end(self):
         leds.end()
         powerSupply.end()
+        fpgaControl.end()
         self.beamsteering.end()
         self.sensors.end()
         print("Main Application terminated...")
