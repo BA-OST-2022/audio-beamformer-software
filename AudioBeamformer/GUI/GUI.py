@@ -59,7 +59,6 @@ engine = QQmlApplicationEngine()
 import cv2
 import PyCVQML
 
-globalFaceTracking = None
 
 class GUI: 
     def __init__(self,
@@ -68,16 +67,16 @@ class GUI:
                 faceTracking = None,
                 sensors = None,
                 leds = None):
-        global globalFaceTracking
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
-        self._faceTracking = globalFaceTracking = faceTracking
+        self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
         
     def run(self):
         PyCVQML.registerTypes()
+        PyCVQML.registerCallback(self.imageCallback)
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
         main = MainWindow(self._audio_processing,
@@ -100,13 +99,23 @@ class GUI:
         PyCVQML.stopCamera()
         if(self._callback):
             self._callback()
-    
+            
+    def imageCallback(self, src):
+        if LINUX:
+            src = cv2.rotate(src, cv2.ROTATE_180)
+        if self._faceTracking:
+            if DEBUG:
+                print(f"Count: {self._faceTracking.getDetectionCount()}")
+                print(f"Focus: {self._faceTracking.getFocus()}")
+                print(f"Location: {self._faceTracking.getFocusLocation()}")
+            return self._faceTracking.runDetection(src)
+        return src
 
+    
 class ImageProcessing(PyCVQML.CVAbstractFilter):
     def process_image(self, src):
-        if globalFaceTracking and src:
-            return globalFaceTracking.runDetection(src)
-        return src
+        pass   # Placeholder Class
+
 
 # Send and receive data from user interface
 class MainWindow(QObject):

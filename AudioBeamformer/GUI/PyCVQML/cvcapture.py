@@ -9,7 +9,7 @@ from PyQt5 import QtCore, QtGui, QtQml
 gray_color_table = [QtGui.qRgb(i, i, i) for i in range(256)]
 
 runCameraThread = True
-
+imageCallback = None
 
 class CVAbstractFilter(QtCore.QObject):
     def process_image(self, src):
@@ -37,11 +37,16 @@ class CVCapture(QtCore.QObject):
         self.m_busy = False
         
         self.mainThread = None
+        self._callback = None
         
     def __del__(self):
         self.stop()
         if(self.m_videoCapture):
             self.m_videoCapture.release()
+            
+    def registerCallback(callback):
+        global imageCallback
+        imageCallback = callback
 
     @QtCore.pyqtSlot()
     @QtCore.pyqtSlot(int)
@@ -86,9 +91,10 @@ class CVCapture(QtCore.QObject):
     def process_image(self, frame):
         self.m_busy = True
     
+        
         # TODO: Mmaybe rotate image here
-        for f in self.m_filters:
-            frame = f.process_image(frame)
+        if imageCallback:
+            frame = imageCallback(frame)
         
         
         # print('Original Dimensions : ',img.shape)
