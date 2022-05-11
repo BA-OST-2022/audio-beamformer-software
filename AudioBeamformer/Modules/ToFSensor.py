@@ -49,7 +49,7 @@ class ToFSensor():
         self._driver = None
         self._updateRate = updateRate           # Update-Rate in Hz
         self._resolution = 8                    # 4x4 or 8x8 zones
-        self._distanceData = np.zeros((self._resolution, self._resolution))
+        self._distanceData = np.ones((self._resolution, self._resolution))*4E3
         
     
     def __del__(self):
@@ -96,6 +96,10 @@ class ToFSensor():
     
     def getDistance(self):
         return self._distanceData
+    
+    
+    def getResolution(self):
+        return self._resolution
     
     
     

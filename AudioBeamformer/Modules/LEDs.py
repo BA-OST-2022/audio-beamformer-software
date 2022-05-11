@@ -44,7 +44,7 @@ if LINUX:
 
 
 class LEDs():    
-    def __init__(self, updateRate=30, channelCount=5, ringCount=20):
+    def __init__(self, channelCount=5, ringCount=20):
         self.OFF = 0
         self.SEARCHING = 1
         self.TRACKING = 2
@@ -54,7 +54,7 @@ class LEDs():
         
         self._initialized = False
         self._runThread = False
-        self._updateRate = updateRate
+        self._updateRate = None
         self._channelCount = channelCount   # 19
         self._ringCount = ringCount
         self._brightness = 31               # Default Max Brightness

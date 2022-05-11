@@ -20,6 +20,8 @@ class KalmanFilter2D:
                            [0.0, 1.0, 0.0, 0.0]])
         self.R = np.array([[R, 0.0],
                            [0.0, R]])
+        
+        self.lifetime = 5
 
     def _predict(self):
         """
@@ -61,6 +63,12 @@ class KalmanFilter2D:
         Get the current velocity
         """
         return self.x[2:4, 0]
+    
+    def inc(self):
+        self.lifetime += 1
+
+    def dec(self):
+        self.lifetime -= 1
 
 """
 Test the code above

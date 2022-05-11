@@ -105,7 +105,7 @@ class FaceDetector:
         boxes = self.interpreter.getSessionOutput(self.session, "boxes").getData()
         boxes = np.expand_dims(np.reshape(boxes, (-1, 4)), axis=0)
         scores = np.expand_dims(np.reshape(scores, (-1, 2)), axis=0)
-        print("inference time: {} s".format(round(time.time() - time_time, 4)))
+        #print("inference time: {} s".format(round(time.time() - time_time, 4)))
         boxes = box_utils.convert_locations_to_boxes(boxes, self.priors, self.center_variance, self.size_variance)
         boxes = box_utils.center_form_to_corner_form(boxes)
         boxes, labels, probs = predict(image_ori.shape[1], image_ori.shape[0], scores, boxes, 0.6)
