@@ -152,13 +152,13 @@ Item{
                 }
             }
 
-             Item{
+            Item{
                 id: se_gauge_holder
                 visible: se_tof_switch.position
                 anchors.top: parent.top
-                anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 width: 20
+                height:  150
                 anchors.topMargin: 5
                 anchors.bottomMargin: 5
                 // Background Rectangle
@@ -179,14 +179,14 @@ Item{
                     height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:se_gauge_holder.bottom
-                    color: "#24c5fc"
+                    color: "#37d417"
                 }
                 Rectangle{
                     id: se_source_gauge_middle
                     height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:se_source_gauge_base.top
-                    color: "orange"
+                    color: "#ffd70f"
                 }
                 Rectangle{
                     id: se_source_gauge_top
@@ -195,27 +195,6 @@ Item{
                     anchors.bottom:se_source_gauge_middle.top
                     color: "red"
                 }
-            }
-
-            // Current distance 
-            Row{
-                id: se_tof_row_curr_distance
-                visible: se_tof_switch.position
-                anchors.top: se_tof_row_distance.bottom
-                anchors.topMargin: 10       
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Current distance")
-                }
-
-                Label{
-                    id: se_tof_label_curr_distance
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Current distance")
-                }
-
             }
 
         }
