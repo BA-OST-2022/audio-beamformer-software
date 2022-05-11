@@ -125,6 +125,8 @@ class Sensors():
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
                 self._systemTemp = self._tempSensorSystem.getTemperature()
                 self._cpuTemp = self._getCpuTemperature()
+                if DEBUG:
+                    print("Updated Temperatures")
                 # TODO: Update Fan-Speed here
             
             if(time.time() - self._timeLed > 1 / self._updateRateLed):
@@ -132,6 +134,8 @@ class Sensors():
                 if(self._enableMagic):
                     pass # TODO: Overwrite the color here with some magic
                 self._hmi.setButtonColor(self._ledColor)
+                if DEBUG:
+                    print("Update LED Color")
                 
             if(self._tofSensor.update()):
                 self._distanceMap = self._tofSensor.getDistance()
@@ -140,6 +144,8 @@ class Sensors():
                     self._alertCallback()
                 if(event == self.EVENT_FREE and self._freeCallback):
                     self._freeCallback()
+                if DEBUG:
+                    print("Updated ToF Sensor Data")
             
     
 
@@ -155,7 +161,7 @@ class Sensors():
     
     def getDistance(self):
         # TODO: Implement fancy algorythm out of self._distanceMap
-        pass
+        return None
     
     
     def enableAlert(self, state):
@@ -220,5 +226,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(10)
+    time.sleep(5)
     sensors.end()
