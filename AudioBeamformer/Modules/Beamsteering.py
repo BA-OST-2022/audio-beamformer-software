@@ -33,9 +33,7 @@ import threading
 import numpy as np
 import time
 
-DEBUG = True
-np.set_printoptions(suppress=True)
-np.set_printoptions(precision=2)
+DEBUG = False
 
 class Beamsteering():
     def __init__(self,
@@ -129,12 +127,13 @@ class Beamsteering():
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
         else:
-            print(f"Delay: {np.array(delay*1000000)}ns")
+            print(delay[0])
+            print(f"Delay: {delay}")
     
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
         if not DEBUG:
-            self._fpga_controller.setChannelGain(gains)
+            self._fpga_controller.setChannelGain(np.array(gains))
         else:
             print(f"Gains: {np.array(gains)}")
 
