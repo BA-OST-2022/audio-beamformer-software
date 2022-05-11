@@ -36,6 +36,7 @@ import time
 import threading
 import re, subprocess
 import numpy as np
+import psutil
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -47,9 +48,6 @@ from HMI import HMI
 from RotaryEncoder import RotaryEncoder
 from scipy.signal import convolve2d
 from colorsys import hsv_to_rgb
-
-if LINUX:
-    from gpiozero import LoadAverage
 
 
 class Sensors():
@@ -72,7 +70,7 @@ class Sensors():
         self._updateRate = None
         self._alertEnable = True
         self._alertState = False
-        self._alertSensitivity = None
+        self._alertSensitivity = 0.5
         self._distanceLevel = None
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
@@ -179,10 +177,9 @@ class Sensors():
             return self._cpuTemp
         return float("NAN")
     
+    
     def getCpuLoad(self):
-        if LINUX:
-            return float(LoadAverage(minutes=1).load_average * 100)
-        return float("NAN")
+        return psutil.cpu_percent()
     
     
     def getDistanceLevel(self):
