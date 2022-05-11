@@ -68,7 +68,7 @@ class Sensors():
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         
-        self._updateRateTemp = 0.5              # Update rate in Hz
+        self._updateRateTemp = 2                # Update rate in Hz
         self._updateRateLed = 20                # Update rate in Hz
         
         self._ambientTemp = float("NAN")
