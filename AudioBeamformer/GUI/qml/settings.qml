@@ -17,11 +17,10 @@ Item{
 
     Row{
         id: settings_row
-        height: main_window.height/4
+        height: main_window.height/4*3
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        
         // LED
         Item{
             id: settings_led_item
@@ -218,7 +217,6 @@ Item{
                     orientation: Qt.Vertical
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: -settings_volume_item.height * 2
                     onValueChanged: {
                         backend.getMaxVolume(se_volume_level_slider.value)
                     }
@@ -320,6 +318,16 @@ Item{
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
+        }
+    }
+
+    Row{
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: settings_row.bottom
+        height: 50
+        RadioButton{
+
         }
     }
 }
