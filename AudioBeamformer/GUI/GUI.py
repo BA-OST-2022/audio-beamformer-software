@@ -296,9 +296,10 @@ class MainWindow(QObject):
     @pyqtProperty(float)
     def ToFDistanceLevel(self):
         if not self._sensors == None:
-            return self._sensors.getDistanceLevel()
-        else:
-            return 1.0
+            distanceLevel = self._sensors.getDistanceLevel()
+            if distanceLevel:
+                return self._sensors.getDistanceLevel()
+        return 1.0
 
     @pyqtSlot(int)
     def getEnableToF(self, enable):
@@ -327,28 +328,28 @@ class MainWindow(QObject):
     @pyqtProperty(str)
     def AmbientTemperature(self):
         if not self._sensors == None:
-            self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
+            return f"{self._sensors.getTemperature(self._sensors.SRC_AMBIENT)} °C"
         else:
             return "None"
 
     @pyqtProperty(str)
     def SystemTemperature(self):
         if not self._sensors == None:
-            self._sensors.getTemperature(self._sensors.self.SRC_SYSTEM )
+            return f"{self._sensors.getTemperature(self._sensors.SRC_SYSTEM )} °C"
         else:
             return "None" 
 
     @pyqtProperty(str)
     def CPUTemperature(self):
         if not self._sensors == None:
-            self._sensors.getTemperature(self._sensors.self.SRC_CPU)
+            return f"{self._sensors.getTemperature(self._sensors.SRC_CPU)} °C"
         else:
             return "None" 
 
     @pyqtProperty(str)
     def CPULoad(self):
         if not self._sensors == None:
-            self._sensors.getCpuLoad(self._sensors.self.SRC_CPU)
+            return f"{self._sensors.getCpuLoad()} %"
         else:
             return "None" 
 
