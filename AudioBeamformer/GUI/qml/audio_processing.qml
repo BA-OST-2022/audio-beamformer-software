@@ -121,9 +121,9 @@ Item{
             Item{
                 id: ap_gauge_holder
                 anchors.top: parent.top
-                anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 width: 20
+                height: 150
                 anchors.topMargin: 5
                 anchors.bottomMargin: 5
                 // Background Rectangle
