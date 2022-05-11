@@ -59,6 +59,8 @@ engine = QQmlApplicationEngine()
 import cv2
 import PyCVQML
 
+globalFaceTracking = None
+
 class GUI: 
     def __init__(self,
                 audio_processing = None,
@@ -66,10 +68,11 @@ class GUI:
                 faceTracking = None,
                 sensors = None,
                 leds = None):
+        global globalFaceTracking
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
-        self._faceTracking = faceTracking
+        self._faceTracking = globalFaceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
         
@@ -101,7 +104,8 @@ class GUI:
 
 class ImageProcessing(PyCVQML.CVAbstractFilter):
     def process_image(self, src):
-        # Do FaceTracking here...
+        if globalFaceTracking:
+            return globalFaceTracking.runDetection(src)
         return src
 
 # Send and receive data from user interface
