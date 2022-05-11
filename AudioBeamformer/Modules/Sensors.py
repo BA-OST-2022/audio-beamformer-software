@@ -39,6 +39,7 @@ from TempSensor import TempSensor
 from ToFSensor import ToFSensor
 from HMI import HMI
 from RotaryEncoder import RotaryEncoder
+from scipy.signal import convolve2d
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -220,6 +221,25 @@ class Sensors():
     
     def _checkDistanceMap(self, distanceMap):
         # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
+        row_size = 3
+        column_size = 2
+        sensitivity = 1/3
+        distance_foreground_on = 1200
+        distance_foreground_off = 1500
+        mask = np.ones((row_size,column_size))
+
+        foreground_map_on = distanceMap < distance_foreground_on
+        foreground_map_off = distanceMap < distance_foreground_off
+        element_foreground_on = convolve2d(mask,foreground_map_on) >= sensitivity * row_size * column_size
+        element_foreground_off = convolve2d(mask,foreground_map_off) >= sensitivity * row_size * column_size
+
+        mute_channel = any(element_foreground_on)
+
+        if mute_channel and not any(element_foreground_off):
+            mute_channel = False
+            
+        print(f"Channel muted: {mute_channel}")
+
         return None
     
 
