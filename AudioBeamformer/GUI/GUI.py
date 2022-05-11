@@ -104,7 +104,7 @@ class GUI:
 
 class ImageProcessing(PyCVQML.CVAbstractFilter):
     def process_image(self, src):
-        if globalFaceTracking:
+        if globalFaceTracking and src:
             return globalFaceTracking.runDetection(src)
         return src
 

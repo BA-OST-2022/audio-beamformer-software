@@ -83,8 +83,8 @@ class FaceDetector:
 
         torch.clamp(self.priors, 0.0, 1.0, out=self.priors)
 
-        
-        self.interpreter = MNN.Interpreter("models/" + interpreter)
+        path = os.path.join(os.path.dirname(__file__), "models/" + interpreter)
+        self.interpreter = MNN.Interpreter(path)
         self.session = self.interpreter.createSession()
         self.input_tensor = self.interpreter.getSessionInput(self.session)
         
