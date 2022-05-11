@@ -30,19 +30,26 @@
 # SOFTWARE.
 ###############################################################################
 
+import os
 import sys
 import time
 import threading
 import re, subprocess
 import numpy as np
+
+DEBUG = False
+LINUX = (sys.platform == 'linux')
+sys.path.insert(0, os.getcwd() + "/Modules")   # Add this subdirectory to path
+
 from TempSensor import TempSensor
 from ToFSensor import ToFSensor
 from HMI import HMI
 from RotaryEncoder import RotaryEncoder
 from scipy.signal import convolve2d
+from colorsys import hsv_to_rgb
 
-DEBUG = False
-LINUX = (sys.platform == 'linux')
+if LINUX:
+    from gpiozero import LoadAverage
 
 
 class Sensors():
@@ -58,14 +65,15 @@ class Sensors():
         self._hmi = HMI(0x62)
         self._tofSensor = ToFSensor()
         self._rotaryEncoder = RotaryEncoder(pinA=12, pinB=16, pinS=20)
+        self._powerSupply = powerSupply
         
         self._initialized = False
         self._runThread = False
         self._updateRate = None
         self._alertEnable = True
-        self._alertCallback = None
-        self._freeCallback = None
+        self._alertState = False
         self._alertSensitivity = None
+        self._distanceLevel = None
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         
@@ -126,14 +134,17 @@ class Sensors():
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
                 self._systemTemp = self._tempSensorSystem.getTemperature()
                 self._cpuTemp = self._getCpuTemperature()
+                if not np.isnan(self._systemTemp):
+                    fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
+                    self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
                 if DEBUG:
                     print("Updated Temperatures")
-                # TODO: Update Fan-Speed here
             
             if(time.time() - self._timeLed > 1 / self._updateRateLed):
                 self._timeLed = time.time()
                 if(self._enableMagic):
-                    pass # TODO: Overwrite the color here with some magic
+                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
+                    self._ledColor = np.array([r, g, b])
                 self._hmi.setButtonColor(self._ledColor)
                 if DEBUG:
                     print("Update LED Color")
@@ -141,14 +152,21 @@ class Sensors():
             if(self._tofSensor.update()):
                 self._distanceMap = self._tofSensor.getDistance()
                 event = self._checkDistanceMap(self._distanceMap)
-                if(event == self.EVENT_ALERT and self._alertCallback):
-                    self._alertCallback()
-                if(event == self.EVENT_FREE and self._freeCallback):
-                    self._freeCallback()
+                if(event == self.EVENT_ALERT):
+                    self._alertState = True
+                if(event == self.EVENT_FREE):
+                    self._alertState = False
                 if DEBUG:
                     print("Updated ToF Sensor Data")
-                    
-            # TODO: Update power supply data
+                
+            
+            if self._powerSupply:
+                self._powerSupply.enableOutput(not self.getMute())
+                
+            if(self.getMute()):
+                self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
+            else:
+                self._ledColor = np.array([1.0, 1.0, 1.0])  # White
             
     
 
@@ -161,11 +179,14 @@ class Sensors():
             return self._cpuTemp
         return float("NAN")
     
+    def getCpuLoad(self):
+        if LINUX:
+            return float(LoadAverage(minutes=1).load_average * 100)
+        return float("NAN")
     
-    def getDistance(self):
-        # TODO: Implement fancy algorythm out of self._distanceMap
-        return None
     
+    def getDistanceLevel(self):
+        return self._distanceLevel
     
     def enableAlert(self, state):
         self._alertEnable = state
@@ -184,24 +205,28 @@ class Sensors():
             raise ValueError("Sensitivity out of bound: 0.0 .. 1.0")
         self._alertSensitivity = sensitivity
     
-    
     def setVolume(self, volume):
         self._rotaryEncoder.setEncoderValue(volume)
+        if self._powerSupply:
+            self._powerSupply.setVolume(volume)
     
     
     def getVolume(self):
         return self._rotaryEncoder.getEncoderValue()
     
     
+    def setMaxVolume(self, maxVolume):
+        if self._powerSupply:
+            self._powerSupply.setMaxVolume(maxVolume)
+    
+    
     def setMute(self, state):
-        self._rotaryEncoder.setButtonValue(state)
-        if(state):
-            self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
-        else:
-            self._ledColor = np.array([1.0, 1.0, 1.0])  # White
-            
+        self._rotaryEncoder.setButtonState(state)
+
+    
     def getMute(self):
-        return self._rotaryEncoder.getButtonValue()
+        muteButton = self._rotaryEncoder.getButtonState()
+        return muteButton or (self._alertState and self._alertEnable)    
     
     
     def enableMagic(self, state):
@@ -219,27 +244,28 @@ class Sensors():
                     pass
         return float("NAN")
     
+    
     def _checkDistanceMap(self, distanceMap):
-        # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
         row_size = 3
         column_size = 2
-        sensitivity = 1/3
         distance_foreground_on = 1200
         distance_foreground_off = 1500
-        mask = np.ones((row_size,column_size))
 
+        mask = np.ones((row_size,column_size))
         foreground_map_on = distanceMap < distance_foreground_on
         foreground_map_off = distanceMap < distance_foreground_off
-        element_foreground_on = convolve2d(mask,foreground_map_on) >= sensitivity * row_size * column_size
-        element_foreground_off = convolve2d(mask,foreground_map_off) >= sensitivity * row_size * column_size
+        element_foreground_on = convolve2d(mask,foreground_map_on) >= self._alertSensitivity * row_size * column_size
+        element_foreground_off = convolve2d(mask,foreground_map_off) >= self._alertSensitivity * row_size * column_size
+
+        self._distanceLevel = np.mean(element_foreground_on)
 
         mute_channel = np.any(element_foreground_on)
 
         if mute_channel and not np.any(element_foreground_off):
             mute_channel = False
-            
-        print(f"Channel muted: {mute_channel}")
-
+            return self.EVENT_FREE
+        if mute_channel:
+            return self.EVENT_ALERT
         return None
     
 
@@ -248,5 +274,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(200)
+    time.sleep(5)
     sensors.end()
