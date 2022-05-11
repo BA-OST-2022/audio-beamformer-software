@@ -70,6 +70,7 @@ class Sensors():
         self._alertCallback = None
         self._freeCallback = None
         self._alertSensitivity = None
+        self._distanceLevel = None
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         
@@ -172,10 +173,8 @@ class Sensors():
         return float("NAN")
     
     
-    def getDistance(self):
-        # TODO: Implement fancy algorythm out of self._distanceMap
-        return None
-    
+    def getDistanceLevel(self):
+        return self._distanceLevel
     
     def enableAlert(self, state):
         self._alertEnable = state
@@ -193,7 +192,6 @@ class Sensors():
         if not(0.0 <= sensitivity <= 1.0):
             raise ValueError("Sensitivity out of bound: 0.0 .. 1.0")
         self._alertSensitivity = sensitivity
-    
     
     def setVolume(self, volume):
         self._rotaryEncoder.setEncoderValue(volume)
@@ -233,23 +231,24 @@ class Sensors():
         # TODO: return either self.EVENT_ALERT or self.EVENT_FREE or None
         row_size = 3
         column_size = 2
-        sensitivity = 1/3
         distance_foreground_on = 1200
         distance_foreground_off = 1500
-        mask = np.ones((row_size,column_size))
 
+        mask = np.ones((row_size,column_size))
         foreground_map_on = distanceMap < distance_foreground_on
         foreground_map_off = distanceMap < distance_foreground_off
-        element_foreground_on = convolve2d(mask,foreground_map_on) >= sensitivity * row_size * column_size
-        element_foreground_off = convolve2d(mask,foreground_map_off) >= sensitivity * row_size * column_size
+        element_foreground_on = convolve2d(mask,foreground_map_on) >= self._alertSensitivity * row_size * column_size
+        element_foreground_off = convolve2d(mask,foreground_map_off) >= self._alertSensitivity * row_size * column_size
+
+        self._distanceLevel = np.mean(element_foreground_on)
 
         mute_channel = np.any(element_foreground_on)
 
         if mute_channel and not np.any(element_foreground_off):
             mute_channel = False
-            
-        print(f"Channel muted: {mute_channel}")
-
+            return self.EVENT_FREE
+        if mute_channel:
+            return self.EVENT_ALERT
         return None
     
 
