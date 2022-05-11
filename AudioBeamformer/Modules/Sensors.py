@@ -40,9 +40,13 @@ from ToFSensor import ToFSensor
 from HMI import HMI
 from RotaryEncoder import RotaryEncoder
 from scipy.signal import convolve2d
+from colorsys import hsv_to_rgb
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
+
+if LINUX:
+    from gpiozero import LoadAverage
 
 
 class Sensors():
@@ -126,9 +130,10 @@ class Sensors():
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
                 self._systemTemp = self._tempSensorSystem.getTemperature()
                 self._cpuTemp = self._getCpuTemperature()
+                fanSpeed = np.clip((self._systemTemp - 30.0) / 20.0, 0.0, 1.0)
+                self._hmi.setFanSpeed(fanSpeed)   # 30°C = 0% .. 50°C = 100%
                 if DEBUG:
                     print("Updated Temperatures")
-                # TODO: Update Fan-Speed here
             
             if(time.time() - self._timeLed > 1 / self._updateRateLed):
                 self._timeLed = time.time()
@@ -159,6 +164,11 @@ class Sensors():
             return self._systemTemp
         elif(source == self.SRC_CPU):
             return self._cpuTemp
+        return float("NAN")
+    
+    def getCpuLoad(self):
+        if LINUX:
+            return float(LoadAverage(minutes=1).load_average * 100)
         return float("NAN")
     
     
