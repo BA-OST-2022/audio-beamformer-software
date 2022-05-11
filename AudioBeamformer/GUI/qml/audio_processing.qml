@@ -144,14 +144,14 @@ Item{
                     height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:ap_gauge_holder.bottom
-                    color: "#24c5fc"
+                    color: "#37d417"
                 }
                 Rectangle{
                     id: ap_source_gauge_middle
                     height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:ap_source_gauge_base.top
-                    color: "orange"
+                    color: "#ffd70f"
                 }
                 Rectangle{
                     id: ap_source_gauge_top

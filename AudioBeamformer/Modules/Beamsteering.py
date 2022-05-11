@@ -32,7 +32,6 @@
 import threading
 import numpy as np
 import time
-from Modules.FPGAControl import fpgaControl
 
 DEBUG = True
 np.set_printoptions(suppress=True)
@@ -41,7 +40,8 @@ np.set_printoptions(precision=2)
 class Beamsteering():
     def __init__(self,
                  sensors = None,
-                 facetracking = None):
+                 facetracking = None,
+                 fpgaControl = None):
         self._beamsteeringEnable = False
         self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
         self._activeSource = 0
@@ -85,7 +85,6 @@ class Beamsteering():
                     self.setAngle()
                     self.calculateSpeedOfSound()
                     self.calculateDelay()
-                self.calculateGains()
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
@@ -152,6 +151,7 @@ class Beamsteering():
 
     def setWindowProfile(self, profile):
         self._activeWindow = self.__window_list[profile]
+        self.calculateGains()
 
     def rectWindow(self):
         gains = [1] * self.__row_count

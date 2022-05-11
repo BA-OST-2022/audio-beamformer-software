@@ -145,7 +145,56 @@ Item{
                 interval: 50
                 running: true
                 repeat: true
-                onTriggered: se_tof_label_curr_distance.text = backend.ToFDistance
+                 onTriggered: {
+                    se_source_gauge_base.height = Math.min(backend.ToFDistanceLevel , 0.6)* se_gauge_background.width
+                    se_source_gauge_middle.height = Math.min(backend.ToFDistanceLevel-0.6,0.2)* se_gauge_background.width
+                    se_source_gauge_top.height = Math.min(backend.ToFDistanceLevel-0.8,0.2)* se_gauge_background.width
+                }
+            }
+
+             Item{
+                id: se_gauge_holder
+                visible: se_tof_switch.position
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                width: 20
+                anchors.topMargin: 5
+                anchors.bottomMargin: 5
+                // Background Rectangle
+                Rectangle{
+                    id: se_gauge_background
+                    width: parent.height
+                    height: parent.width
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    rotation: 90
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#424242" }
+                        GradientStop { position: 1.0; color: "#595959" }
+                    }
+                }
+                Rectangle{
+                    id: se_source_gauge_base
+                    height: parent.height*0.6
+                    width: parent.width
+                    anchors.bottom:se_gauge_holder.bottom
+                    color: "#24c5fc"
+                }
+                Rectangle{
+                    id: se_source_gauge_middle
+                    height: parent.height*0.2
+                    width: parent.width
+                    anchors.bottom:se_source_gauge_base.top
+                    color: "orange"
+                }
+                Rectangle{
+                    id: se_source_gauge_top
+                    height: parent.height
+                    width: parent.width
+                    anchors.bottom:se_source_gauge_middle.top
+                    color: "red"
+                }
             }
 
             // Current distance 

@@ -61,18 +61,27 @@ import PyCVQML
 
 class GUI: 
     def __init__(self,
-                audio_processing,
-                beamsteering):
+                audio_processing = None,
+                beamsteering = None,
+                faceTracking = None,
+                sensors = None,
+                leds = None):
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
+        self._faceTracking = faceTracking
+        self._sensors = sensors
+        self._leds = leds
         
     def run(self):
         PyCVQML.registerTypes()
         QtQml.qmlRegisterType(ImageProcessing, "Filters", 1, 0, "CaptureImage")
         
         main = MainWindow(self._audio_processing,
-                        self._beamsteering)
+                        self._beamsteering,
+                        self._faceTracking,
+                        self._sensors,
+                        self._leds)
         engine.rootContext().setContextProperty("backend", main)
         if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
@@ -98,11 +107,19 @@ class ImageProcessing(PyCVQML.CVAbstractFilter):
 # Send and receive data from user interface
 class MainWindow(QObject):
     def __init__(self, 
-                audio_processing,
-                beamsteering):
+                audio_processing = None,
+                beamsteering = None,
+                faceTracking = None,
+                sensors = None,
+                leds = None):
+
         QObject.__init__(self)
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
+        self._faceTracking = faceTracking
+        self._sensors = sensors
+        self._leds = leds
+
         self.source_list = []
         self.equalizer_list = []
         self.source_gain_value = 20
@@ -111,112 +128,173 @@ class MainWindow(QObject):
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
 
-    update_Source = pyqtSignal()
     # Audio processing Source
     @pyqtProperty(list,constant=True)
     def sourceList(self):
-        self.source_list = self._audio_processing.getSourceList()
-        return self.source_list
+        if not self._audio_processing == None:
+            self.source_list = self._audio_processing.getSourceList()
+            return self.source_list
+        else:
+            return ["Test 1","Test 2","Test 3"]
+
 
     @pyqtProperty(float)
     def sourceGainValue(self):
-        self.source_gain_value = self._audio_processing.getSourceLevel()
-        return self.source_gain_value
+        if not self._audio_processing == None:
+            self.source_gain_value = self._audio_processing.getSourceLevel()
+            return self.source_gain_value
+        else:
+            return 1.0
 
     @pyqtSlot(int)
     def getSource(self, index):
-        self._audio_processing.setSource(index)
+        if not self._audio_processing == None:
+            self._audio_processing.setSource(index)
+        else:
+            print(f"Source index: {index}")
 
     @pyqtSlot(float)
     def getSourceGain(self, gain):
-        self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
+        if not self._audio_processing == None:
+            self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
+        else:
+            print(f"Gain value: {(self._gainSourceMax-1)*gain + 1}")
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
     def equalizerList(self):
-        self.equalizer_list = self._audio_processing.getEqualizerProfileList()
-        return self.equalizer_list
+        if not self._audio_processing == None:
+            self.equalizer_list = self._audio_processing.getEqualizerProfileList()
+            return self.equalizer_list
+        else:
+            return ["Test 1","Test 2","Test 3"]
 
     @pyqtSlot(int)
     def getEnableEqualizer(self, enable):
-        self._audio_processing.enableEqualizer(enable)
+        if not self._audio_processing == None:
+            self._audio_processing.enableEqualizer(enable)
+        else:
+            print(f"Equalizer enable: {enable}")
 
     @pyqtSlot(int)
     def getEqualizerProfile(self, profile):
-        self._audio_processing.setEqualizerProfile(profile)
+        if not self._audio_processing == None:
+            self._audio_processing.setEqualizerProfile(profile)
+        else:
+            print(f"Equalizer Profile: {profile}")
 
     # Audio processing interpolation
     @pyqtSlot(int)
     def getEnableInterpolation(self, enable):
-        self._audio_processing.enableInterpolation(enable)
+        if not self._audio_processing == None:
+            self._audio_processing.enableInterpolation(enable)
+        else:
+            print(f"Interpolation enable: {enable}")
 
     @pyqtSlot(int)
     def getInterpolationLevel(self, level):
-        self._audio_processing.setInterpolationFactor(level)
+        if not self._audio_processing == None:
+            self._audio_processing.setInterpolationFactor(level)
+        else:
+            print(f"Interpolation level: {level}")
 
     # Audio processing modulation type
-
     @pyqtSlot(int)
     def getModulationType(self, type):
-        self._audio_processing.setModulationType(type)
+        if not self._audio_processing == None:
+            self._audio_processing.setModulationType(type)
+        else:
+             print(f"Modulation type: {type}")
 
     @pyqtSlot(float)
     def getMAMGain(self, gain):
-        self._audio_processing.setMAMMix(gain)
+        if not self._audio_processing == None:
+            self._audio_processing.setMAMMix(gain)
+        else:
+            print(f"MAM Distortion: {gain}")
 
     # Channels Beamsteering
-
     @pyqtProperty(list, constant=True)
     def beamsteeringPatternList(self):
-        self.beamsteering_pattern_list = self._beamsteering.getBeamsteeringPattern()
-        return self.beamsteering_pattern_list
+        if not self._beamsteering == None:
+            self.beamsteering_pattern_list = self._beamsteering.getBeamsteeringPattern()
+            return self.beamsteering_pattern_list
+        else:
+             return ["Test 1","Test 2","Test 3"]
 
     @pyqtSlot(int)
     def getEnableBeamsteering(self, enable):
-        self._beamsteering.enableBeamsteering(enable)
+        if not self._beamsteering == None:
+            self._beamsteering.enableBeamsteering(enable)
+        else:
+            print(f"Beamsteering enable: {enable}")
 
     @pyqtSlot(int)
     def getBeamsteeringSource(self, source):
-        self._beamsteering.setBeamsteeringSource(source)
+        if not self._beamsteering == None:
+            self._beamsteering.setBeamsteeringSource(source)
+        else:
+            print(f"Source: {source}")
 
     @pyqtSlot(float)
     def getBeamsteeringManualAngle(self, angle):
-        self._beamsteering.setBeamsteeringAngle((2*angle - 1)*self._maxAngleSlider)
+        if not self._beamsteering == None:
+            self._beamsteering.setBeamsteeringAngle((2*angle - 1)*self._maxAngleSlider)
+        else:
+            print(f"Angle: {angle}")
     
     @pyqtSlot(int)
     def getBeamsteeringPattern(self, pattern):
-        self._beamsteering.setBeamsteeringPattern(pattern)
+        if not self._beamsteering == None:
+            self._beamsteering.setBeamsteeringPattern(pattern)
+        else:
+            print(f"Beamsteering pattern: {pattern}")
 
     # Channels Window
     @pyqtProperty(list, constant=True)
     def windowList(self):
-        self.window_list = self._beamsteering.getWindowProfileList()
-        return self.window_list
+        if not self._beamsteering == None:
+            self.window_list = self._beamsteering.getWindowProfileList()
+            return self.window_list
+        else:
+            return ["Test 1","Test 2", "Test 3"]
 
-    # BESPRECHEN
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
-        print(f"Window enable: {enable}")
-        pass
+        if not self._beamsteering == None:
+            self._beamsteering.setWindowProfile(0)
+        else:
+            print(f"Window enable: {enable}")
 
     @pyqtSlot(int)
     def getWindowType(self, type):
-        self._beamsteering.setWindowProfile(type)
+        if not self._beamsteering == None:
+            self._beamsteering.setWindowProfile(type)
+        else:
+            print(f"Window type: {type}")
 
     # Settings LEDS
     @pyqtSlot(int)
     def getEnableLED(self, enable):
-        print(f"LEDs enable: {enable}")
-        pass
+        if not self._leds == None:
+            self._leds.enableChannels(enable)
+        else:
+            print(f"LEDs enable: {enable}")
 
     @pyqtSlot(float)
     def getLEDBrightness(self, value):
-        print(f"LED: {value}")
+        if not self._leds == None:
+            self._leds.setBrightness(value)
+        else:
+            print(f"LED: {value}")
 
     # Settings ToF
     @pyqtProperty(float)
-    def ToFDistance(self):
-        return 1.0
+    def ToFDistanceLevel(self):
+        if not self._sensors == None:
+            return self._sensors.getDistanceLevel()
+        else:
+            return 1.0
 
     @pyqtSlot(int)
     def getEnableToF(self, enable):
