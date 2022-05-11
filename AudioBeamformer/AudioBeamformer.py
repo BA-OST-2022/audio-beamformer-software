@@ -35,17 +35,20 @@ from Modules.LEDs import leds
 from GUI.GUI import GUI
 from Modules.AudioProcessing import AudioProcessing
 from Modules.Beamsteering import Beamsteering
+from Modules.Sensors import Sensors
 
 class AudioBeamformer():
     def __init__(self):
         self.audio_processing = AudioProcessing()
         self.beamsteering = Beamsteering()
+        self.sensors = Sensors(powerSupply)
         self.gui = GUI(self.audio_processing,
                     self.beamsteering)  # GUI get all object references
     
     def begin(self):
         powerSupply.begin()
         leds.begin()
+        self.sensors.begin()
         self.beamsteering.begin()
 
         self.gui.registerTerminateCallback(self.end)
@@ -55,6 +58,7 @@ class AudioBeamformer():
         leds.end()
         powerSupply.end()
         self.beamsteering.end()
+        self.sensors.end()
         print("Main Application terminated...")
 
 

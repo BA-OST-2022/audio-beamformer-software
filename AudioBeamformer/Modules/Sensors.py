@@ -30,20 +30,23 @@
 # SOFTWARE.
 ###############################################################################
 
+import os
 import sys
 import time
 import threading
 import re, subprocess
 import numpy as np
+
+DEBUG = False
+LINUX = (sys.platform == 'linux')
+sys.path.insert(0, os.getcwd() + "/Modules")   # Add this subdirectory to path
+
 from TempSensor import TempSensor
 from ToFSensor import ToFSensor
 from HMI import HMI
 from RotaryEncoder import RotaryEncoder
 from scipy.signal import convolve2d
 from colorsys import hsv_to_rgb
-
-DEBUG = False
-LINUX = (sys.platform == 'linux')
 
 if LINUX:
     from gpiozero import LoadAverage
