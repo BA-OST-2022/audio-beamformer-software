@@ -140,8 +140,6 @@ class FPGAControl():
             
             sigma_delta = np.array([i for i in (self._sigma_delta_coeff).
                                     to_bytes(2, "big")])
-            enable = sum([2**i*int(value) for i,value in
-                          enumerate(self._enable_channel)]).to_bytes(2, "big")
             
             gain_int = (self._gain * 32767).astype(int)
             gains = np.array([i for gain in gain_int for i in int(gain).
@@ -155,6 +153,10 @@ class FPGAControl():
                 spi_data.append(settings)
                 spi_data.append(int(sigma_delta[0]))
                 spi_data.append(int(sigma_delta[1]))
+                enable_list = self._enable_channel[fpga * self._channel_per_fpga:(fpga+1) * self._channel_per_fpga]
+                enable = sum([2**i*int(value) for i,value in
+                            enumerate(enable_list)]).to_bytes(2, "big")
+                print(enable)
                 spi_data.append(int(enable[0]))
                 spi_data.append(int(enable[1]))
                 for channel in range(self._channel_per_fpga):
@@ -171,7 +173,7 @@ class FPGAControl():
                 print(spi_data)
         
  
-fpgaControl = FPGAControl(channel_count=6, channel_per_fpga=10)       
+fpgaControl = FPGAControl(channel_count=19, channel_per_fpga=10)       
  
 if __name__ == '__main__':   
     fpgaControl.enableChannels([False, False, False, True, False, False])

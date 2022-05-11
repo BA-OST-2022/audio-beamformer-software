@@ -337,28 +337,28 @@ class MainWindow(QObject):
     @pyqtProperty(str)
     def AmbientTemperature(self):
         if not self._sensors == None:
-            return f"{self._sensors.getTemperature(self._sensors.SRC_AMBIENT)} °C"
+            return f"{self._sensors.getTemperature(self._sensors.SRC_AMBIENT):.1f} °C"
         else:
             return "None"
 
     @pyqtProperty(str)
     def SystemTemperature(self):
         if not self._sensors == None:
-            return f"{self._sensors.getTemperature(self._sensors.SRC_SYSTEM )} °C"
+            return f"{self._sensors.getTemperature(self._sensors.SRC_SYSTEM):.1f} °C"
         else:
             return "None" 
 
     @pyqtProperty(str)
     def CPUTemperature(self):
         if not self._sensors == None:
-            return f"{self._sensors.getTemperature(self._sensors.SRC_CPU)} °C"
+            return f"{self._sensors.getTemperature(self._sensors.SRC_CPU):.1f} °C"
         else:
             return "None" 
 
     @pyqtProperty(str)
     def CPULoad(self):
         if not self._sensors == None:
-            return f"{self._sensors.getCpuLoad()} %"
+            return f"{self._sensors.getCpuLoad():.1f} %"
         else:
             return "None" 
 
