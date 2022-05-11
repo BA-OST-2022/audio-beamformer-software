@@ -90,12 +90,12 @@ class Sensors():
             self._initialized = True
             self._updateRate = updateRate
             
-            self._hmi.begin()
+            # self._hmi.begin()
             self._hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))
             self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
             self._rotaryEncoder.begin()
             self._tempSensorAmbient.begin()
-            self._tempSensorSystem.begin()
+            # self._tempSensorSystem.begin()
             self._tofSensor.begin()       # This takes up to 10s
             self._hmi.setButtonColor(np.array([1.0, 1.0, 1.0]))
             
@@ -233,9 +233,9 @@ class Sensors():
         element_foreground_on = convolve2d(mask,foreground_map_on) >= sensitivity * row_size * column_size
         element_foreground_off = convolve2d(mask,foreground_map_off) >= sensitivity * row_size * column_size
 
-        mute_channel = any(element_foreground_on)
+        mute_channel = np.any(element_foreground_on)
 
-        if mute_channel and not any(element_foreground_off):
+        if mute_channel and not np.any(element_foreground_off):
             mute_channel = False
             
         print(f"Channel muted: {mute_channel}")
@@ -248,5 +248,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(5)
+    time.sleep(200)
     sensors.end()
