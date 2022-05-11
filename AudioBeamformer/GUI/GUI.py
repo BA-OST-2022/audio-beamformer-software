@@ -59,6 +59,8 @@ engine = QQmlApplicationEngine()
 import cv2
 import PyCVQML
 
+globalFaceTracking = None
+
 class GUI: 
     def __init__(self,
                 audio_processing = None,
@@ -66,10 +68,11 @@ class GUI:
                 faceTracking = None,
                 sensors = None,
                 leds = None):
+        global globalFaceTracking
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
-        self._faceTracking = faceTracking
+        self._faceTracking = globalFaceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
         
@@ -101,7 +104,8 @@ class GUI:
 
 class ImageProcessing(PyCVQML.CVAbstractFilter):
     def process_image(self, src):
-        # Do FaceTracking here...
+        if globalFaceTracking and src:
+            return globalFaceTracking.runDetection(src)
         return src
 
 # Send and receive data from user interface
@@ -292,54 +296,91 @@ class MainWindow(QObject):
     @pyqtProperty(float)
     def ToFDistanceLevel(self):
         if not self._sensors == None:
-            return self._sensors.getDistanceLevel()
-        else:
-            return 1.0
+            distanceLevel = self._sensors.getDistanceLevel()
+            if distanceLevel:
+                return self._sensors.getDistanceLevel()
+        return 1.0
 
     @pyqtSlot(int)
     def getEnableToF(self, enable):
-        print(f"ToF enable: {enable}")
+        if not self._sensors == None:
+            self._sensors.enableAlert(enable)
+        else:
+            print(f"ToF enable: {enable}")
 
     @pyqtSlot(float)
     def getToFDistance(self, value):
-        print(f"ToF distance: {value}")
+        if not self._sensors == None:
+            self._sensors.setAlertSensitivity(value)
+        else:
+            print(f"ToF distance: {value}")
 
     # Settings max. volume
     @pyqtSlot(float)
     def getMaxVolume(self, value):
-        print(f"Max. volume: {value}")
+        if not self._sensors == None:
+            self._sensors.setMaxVolume(value)
+        else:
+            print(f"Max. volume: {value}")
 
     # Settings stats
     
     @pyqtProperty(str)
     def AmbientTemperature(self):
-        return "22.5 C"
+        if not self._sensors == None:
+            return f"{self._sensors.getTemperature(self._sensors.SRC_AMBIENT)} °C"
+        else:
+            return "None"
 
     @pyqtProperty(str)
     def SystemTemperature(self):
-        return "32.5 C" 
+        if not self._sensors == None:
+            return f"{self._sensors.getTemperature(self._sensors.SRC_SYSTEM )} °C"
+        else:
+            return "None" 
 
     @pyqtProperty(str)
     def CPUTemperature(self):
-        return "42.5 C"
+        if not self._sensors == None:
+            return f"{self._sensors.getTemperature(self._sensors.SRC_CPU)} °C"
+        else:
+            return "None" 
 
     @pyqtProperty(str)
     def CPULoad(self):
-        return "50 %"
+        if not self._sensors == None:
+            return f"{self._sensors.getCpuLoad()} %"
+        else:
+            return "None" 
 
     # General information
     @pyqtProperty(int)
     def mainGainValue(self):
-        return self.source_gain_value
+        if not self._sensors == None:
+            return self._sensors.getVolume()
+        else:
+            return 1
+
+    @pyqtProperty(bool)
+    def muteEnable(self):
+        if not self._sensors == None:
+            return self._sensors.getMute()
+        else:
+            return 1
 
     @pyqtSlot(float)
     def getMainGain(self, gain):
-        print(f"Main gain: {gain}")
-        pass
+        if not self._sensors == None:
+            self._sensors.setVolume(gain)
+        else:
+            print(f"Main gain: {gain}")
+
     @pyqtSlot(int)
     def getMuteEnable(self, enable):
-        print(f"Mute enable: {enable}")
-        pass
+        if not self._sensors == None:
+            self._sensors.setMute(enable)
+        else:
+            print(f"Mute enable: {enable}")
 
     
 
