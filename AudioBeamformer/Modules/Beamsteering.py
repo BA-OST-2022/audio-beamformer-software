@@ -32,13 +32,14 @@
 import threading
 import numpy as np
 import time
+from Modules.FPGAControl import fpgaControl
 
+DEBUG = True
 np.set_printoptions(suppress=True)
 np.set_printoptions(precision=2)
 
 class Beamsteering():
     def __init__(self,
-                 fpga_controll = None,
                  sensors = None,
                  facetracking = None):
         self._beamsteeringEnable = False
@@ -47,7 +48,7 @@ class Beamsteering():
         self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
         self._activePattern = np.linspace(-45,45,10)
         self._activeWindow = "rect"
-        self._fpga_controlller = fpga_controll
+        self._fpga_controller = fpgaControl
         self._sensors = sensors
         self._facetracking = facetracking
         self._angleToSteer = 0
@@ -82,12 +83,16 @@ class Beamsteering():
                 threading.Timer(1.0 / self._updateRate, self.update).start()
                 if(self._beamsteeringEnable):
                     self.setAngle()
-                    self.calculateDelay()
                     self.calculateSpeedOfSound()
+                    self.calculateDelay()
                 self.calculateGains()
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
+        if value==0:
+            self._angleToSteer = 0
+            self.calculateDelay()
+
 
     def setBeamsteeringSource(self, source):
         self._activeSource = source
@@ -119,17 +124,18 @@ class Beamsteering():
 
     def calculateDelay(self):
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
+        print(delay)
         if (np.sin(self._angleToSteer/180*np.pi) < 0):
             delay = delay[::-1] * -1
-        if not self._fpga_controlller == None:
-            self._fpga_controlller.setChannelDelay(delay)
+        if not DEBUG:
+            self._fpga_controller.setChannelDelay(delay)
         else:
-            print(f"Delay: {np.array(delay)}")
+            print(f"Delay: {np.array(delay*1000000)}ns")
     
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
-        if not self._fpga_controlller == None:
-            self._fpga_controlller.setChannelGain(gains)
+        if not DEBUG:
+            self._fpga_controller.setChannelGain(gains)
         else:
             print(f"Gains: {np.array(gains)}")
 

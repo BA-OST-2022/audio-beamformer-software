@@ -197,6 +197,9 @@ class AudioProcessing:
         #ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
         return taps
 
+    def equalizerPlot(self):
+        pass
+
     def setEqualizerProfile(self,profile):
         taps = self.equalizer(self.__equalizer_profile_list[self.__equalizerList[profile]])
         self._equalizer_filter = taps
