@@ -91,7 +91,7 @@ Item{
 
         Loader{
             anchors.fill: parent
-            source: "channels.qml"
+            source: "channels_col.qml"
         }
 
         Loader{
