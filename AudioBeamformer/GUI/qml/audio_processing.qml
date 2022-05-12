@@ -112,9 +112,9 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    ap_source_gauge_base.height = Math.min(backend.sourceGainValue , 0.6)* gauge_background.width
-                    ap_source_gauge_middle.height = Math.min(backend.sourceGainValue-0.6,0.2)* gauge_background.width
-                    ap_source_gauge_top.height = Math.min(backend.sourceGainValue-0.8,0.2)* gauge_background.width
+                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width
+                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width
+                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width
                     }
             }
 

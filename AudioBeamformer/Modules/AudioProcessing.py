@@ -172,7 +172,12 @@ class AudioProcessing:
 
     def setSourceLevel(self, indata):
         indata = indata /2147483648
-        self.__current_source_level = np.log10(np.sqrt(np.mean(indata**2)))
+        rms = np.sqrt(np.mean(indata**2))
+        if not rms < 0.00001:
+            self.__current_source_level = 10*np.log10(np.sqrt(np.mean(indata**2)))
+        else:
+            self.__current_source_level = -50
+        print(self.__current_source_level)
         
 
     def getSourceLevel(self):
