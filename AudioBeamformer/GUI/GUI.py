@@ -81,6 +81,8 @@ class GUI:
         self._sensors = sensors
         self._leds = leds
         
+        self._enableMagic = False    # TODO: Set this variable on event
+        
     def run(self):
         PyCVQML.registerTypes()
         PyCVQML.registerCallback(self.imageCallback)
