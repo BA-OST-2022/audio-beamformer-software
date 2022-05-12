@@ -140,12 +140,14 @@ class MainWindow(QObject):
         self.window_list = []
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
+        self.__enableChannels = np.ones(19)
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
     def sourceList(self):
         if not self._audio_processing == None:
             self.source_list = self._audio_processing.getSourceList()
+            self._audio_processing.startStream()
             return self.source_list
         else:
             return ["Test 1","Test 2","Test 3"]
@@ -361,6 +363,16 @@ class MainWindow(QObject):
             return f"{self._sensors.getCpuLoad():.1f} %"
         else:
             return "None" 
+
+    # Settings channel
+    @pyqtSlot(list)
+    def getEnableChannels(self, list):
+        if not all(i==u for i,u in zip(self.__enableChannels,list)):
+            if not self._beamsteering == None:
+                self._beamsteering.setChannelEnable(list)
+            else:
+                print(f"Channel Gains: {list}")
+            self.__enableChannels = list
 
     # General information
     @pyqtProperty(int)
