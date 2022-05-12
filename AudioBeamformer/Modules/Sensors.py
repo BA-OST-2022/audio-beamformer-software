@@ -125,8 +125,8 @@ class Sensors():
             self._runInitialization = False
             if DEBUG:
                 print("Asynchronous Sensors Initialization started...")
+            self._hmi.registerButtonCallback(self._shutdownEvent)
             self._hmi.begin()
-            self._hmi.registerButtonCallback(self._shutdownCallback)
             self._hmi.setButtonColor(self.COLOR_BOOT)
             self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
             self._rotaryEncoder.begin()
@@ -248,6 +248,8 @@ class Sensors():
         
         
     def _shutdownEvent(self):
+        if DEBUG:
+            print("Shutdown Event occurred")
         if self._shutdownCallback:
             self._shutdownCallback(True)
     

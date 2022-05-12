@@ -33,7 +33,7 @@
 import sys
 import numpy as np
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
@@ -80,7 +80,7 @@ class HMI():
         self._pinLedB = 1
         self._pinFan = 0
         
-        self._gpioButton = 4
+        self._gpioButton = 3
         
         self._initialized = False
         self._GAMMA_CORRECT_FACTOR = 2.8
@@ -105,17 +105,22 @@ class HMI():
                 GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
                 GPIO.setup(self._gpioButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)
                 try:
-                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 100)  
+                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)  
                 except RuntimeError:
                     GPIO.remove_event_detect(self._gpioButton)
-                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 100)
+                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)
                 
     
     def end(self):
         if(self._initialized):
             self.setFanSpeed(0)
             self._initialized = False
-            # Do not turn off LED, since it can be used as stanby indicator
+            # Do not turn off LED, since it can be used as stanby 
+            if LINUX:
+                try:
+                    GPIO.remove_event_detect(self._gpioButton)
+                except RuntimeError:
+                    pass
             
         
     def registerButtonCallback(self, callback):
@@ -169,7 +174,9 @@ class HMI():
         return np.clip(np.power(val, self._GAMMA_CORRECT_FACTOR), 0.0, 1.0)
     
     
-    def _buttonPress(self):
+    def _buttonPress(self, pin):
+        if DEBUG:
+            print("Button has been pressed")
         if self._buttonCallback:
             self._buttonCallback()
 

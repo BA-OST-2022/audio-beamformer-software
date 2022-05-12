@@ -59,7 +59,18 @@ if LINUX:
             except RuntimeError:
                 GPIO.remove_event_detect(self.rightPin)
                 GPIO.add_event_detect(self.rightPin, GPIO.BOTH, callback=self.transitionOccurred)
+                
         
+        def __del__(self):
+            try:
+                GPIO.remove_event_detect(self.leftPin)  
+            except RuntimeError:
+                pass
+            try:
+                GPIO.remove_event_detect(self.rightPin)  
+            except RuntimeError:
+                pass
+            
     
         def transitionOccurred(self, channel):
             p1 = GPIO.input(self.leftPin)
@@ -124,6 +135,10 @@ class RotaryEncoder():
         self._encoder = None
         self._encoderValue = 0.0
         self._buttonState = False
+        
+    
+    def __del__(self):
+        self.end()
 
 
     def begin(self):
@@ -135,7 +150,17 @@ class RotaryEncoder():
                 GPIO.add_event_detect(self._pinS, GPIO.FALLING, callback=self._buttonChanged)  
             except RuntimeError:
                 GPIO.remove_event_detect(self._pinS)
-                GPIO.add_event_detect(self._pinS, GPIO.FALLING, callback=self._buttonChanged)  
+                GPIO.add_event_detect(self._pinS, GPIO.FALLING, callback=self._buttonChanged)
+                
+                
+    def end(self):
+        if self._encoder:
+            self._encoder.__del__()
+        if LINUX:
+            try:
+                GPIO.remove_event_detect(self._pinS)
+            except RuntimeError:
+                pass
 
 
     def getEncoderValue(self):
