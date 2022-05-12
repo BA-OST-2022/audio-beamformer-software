@@ -67,6 +67,13 @@ class GUI:
                 faceTracking = None,
                 sensors = None,
                 leds = None):
+        
+        self.MODULE_AUDIO_PROCESSING = 0
+        self.MODULE_BEAMSTEERING = 1
+        self.MODULE_FACE_TRACKING = 2
+        self.MODULE_SENSORS = 3
+        self.MODULE_LEDS = 4
+        
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
@@ -95,6 +102,20 @@ class GUI:
     def registerTerminateCallback(self, callback):
         self._callback = callback
         
+        
+    def setModuleReference(self, module, reference):
+        if(module == self.MODULE_AUDIO_PROCESSING):
+            self._audio_processing = reference
+        elif(module == self.MODULE_BEAMSTEERING):
+            self._beamsteering = reference
+        elif(module == self.MODULE_FACE_TRACKING):
+            self._faceTracking = reference
+        elif(module == self.MODULE_SENSORS):
+            self._sensors = reference
+        elif(module == self.MODULE_LEDS):
+            self._leds = reference
+     
+        
     def terminate(self):
         PyCVQML.stopCamera()
         if(self._callback):
@@ -104,6 +125,8 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
+            # TODO: Check if magic... do stuff
+            
             # if DEBUG:
             #     print(f"Count: {self._faceTracking.getDetectionCount()}")
             #     print(f"Focus: {self._faceTracking.getFocus()}")
