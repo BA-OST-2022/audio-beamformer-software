@@ -58,6 +58,11 @@ class Sensors():
         self.EVENT_ALERT = 0
         self.EVENT_FREE = 1
         
+        self.COLOR_BOOT = np.array([1.0, 1.0, 0.0])        # White
+        self.COLOR_RUN = np.array([0.0, 1.0, 1.0])         # Cyan
+        self.COLOR_MUTE = np.array([1.0, 0.0, 0.0])        # Red
+        self.COLOR_STANDBY = np.array([0.62, 0.62, 0.0])   # Yellow (dark)
+        
         self._tempSensorAmbient = TempSensor(0x48)
         self._tempSensorSystem = TempSensor(0x49)
         self._hmi = HMI(0x62)
@@ -107,6 +112,7 @@ class Sensors():
         self._runThread = False
         if(self._initialized):
             self._initialized = False
+            self._hmi.setButtonColor(self.COLOR_BOOT)
             self._hmi.end()
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
@@ -119,13 +125,13 @@ class Sensors():
             if DEBUG:
                 print("Asynchronous Sensors Initialization started...")
             self._hmi.begin()
-            self._hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))
+            self._hmi.setButtonColor(self.COLOR_BOOT)
             self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
             self._rotaryEncoder.begin()
             self._tempSensorAmbient.begin()
             self._tempSensorSystem.begin()
             # self._tofSensor.begin()       # This takes up to 10s
-            self._hmi.setButtonColor(np.array([1.0, 1.0, 1.0]))
+            self._hmi.setButtonColor(self.COLOR_RUN)
             self._readyState = True
             if DEBUG:
                 print("Asynchronous Sensors Initialization done")
@@ -171,9 +177,9 @@ class Sensors():
                 self._powerSupply.enableOutput(not self.getMute())
                 
             if(self.getMute()):
-                self._ledColor = np.array([1.0, 0.0, 0.0])  # Red
+                self._ledColor = self.COLOR_MUTE
             else:
-                self._ledColor = np.array([1.0, 1.0, 1.0])  # White
+                self._ledColor = self.COLOR_RUN
             
     
     def getReadyState(self):

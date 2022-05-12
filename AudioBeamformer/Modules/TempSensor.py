@@ -37,33 +37,33 @@ LINUX = (sys.platform == 'linux')
 
 if LINUX:
     from smbus2 import SMBus
-    
-    
-# TMP112 Register Map
-TMP112_REG_TEMP					= 0x00
-TMP112_REG_CONFIG				= 0x01
-TMP112_REG_THIGH				    = 0x02
-TMP112_REG_TLOW					= 0x03
-
-# TMP112 Configuration Register
-TMP112_REG_CONFIG_CONTINOUS		= 0x0000 # Continuous Conversion Mode
-TMP112_REG_CONFIG_SHUTDOWN		= 0x0100 # Shutdown Mode enabled
-TMP112_REG_CONFIG_INTERRUPT		= 0x0200 # Interrupt Mode enabled
-TMP112_REG_CONFIG_POL_H			= 0x0400 # Polarity Active HIGH
-TMP112_REG_CONFIG_FQ_1			= 0x0000 # Fault Queue = 1
-TMP112_REG_CONFIG_FQ_2			= 0x0800 # Fault Queue = 2
-TMP112_REG_CONFIG_FQ_4			= 0x1000 # Fault Queue = 4
-TMP112_REG_CONFIG_FQ_6			= 0x1800 # Fault Queue = 6
-TMP112_REG_CONFIG_RES			= 0x6000 # 12-bits Resolution
-TMP112_REG_CONFIG_OS			    = 0x8000 # One-shot enabled
-TMP112_REG_CONFIG_CR_0_25		= 0x0000 # Conversion Rate = 0.25 Hz
-TMP112_REG_CONFIG_CR_1			= 0x0040 # Conversion Rate = 1 Hz
-TMP112_REG_CONFIG_CR_4			= 0x0080 # Conversion Rate = 4 Hz
-TMP112_REG_CONFIG_CR_8			= 0x00C0 # Conversion Rate = 8 Hz
-TMP112_REG_CONFIG_AL_H			= 0x0020 # When the POL bit = 0, AL is HIGH
 
 
 class TempSensor():
+    # TMP112 Register Map
+    TMP112_REG_TEMP					= 0x00
+    TMP112_REG_CONFIG				= 0x01
+    TMP112_REG_THIGH				    = 0x02
+    TMP112_REG_TLOW					= 0x03
+
+    # TMP112 Configuration Register
+    TMP112_REG_CONFIG_CONTINOUS		= 0x0000 # Continuous Conversion Mode
+    TMP112_REG_CONFIG_SHUTDOWN		= 0x0100 # Shutdown Mode enabled
+    TMP112_REG_CONFIG_INTERRUPT		= 0x0200 # Interrupt Mode enabled
+    TMP112_REG_CONFIG_POL_H			= 0x0400 # Polarity Active HIGH
+    TMP112_REG_CONFIG_FQ_1			= 0x0000 # Fault Queue = 1
+    TMP112_REG_CONFIG_FQ_2			= 0x0800 # Fault Queue = 2
+    TMP112_REG_CONFIG_FQ_4			= 0x1000 # Fault Queue = 4
+    TMP112_REG_CONFIG_FQ_6			= 0x1800 # Fault Queue = 6
+    TMP112_REG_CONFIG_RES			= 0x6000 # 12-bits Resolution
+    TMP112_REG_CONFIG_OS			    = 0x8000 # One-shot enabled
+    TMP112_REG_CONFIG_CR_0_25		= 0x0000 # Conversion Rate = 0.25 Hz
+    TMP112_REG_CONFIG_CR_1			= 0x0040 # Conversion Rate = 1 Hz
+    TMP112_REG_CONFIG_CR_4			= 0x0080 # Conversion Rate = 4 Hz
+    TMP112_REG_CONFIG_CR_8			= 0x00C0 # Conversion Rate = 8 Hz
+    TMP112_REG_CONFIG_AL_H			= 0x0020 # When the POL bit = 0, AL is HIGH
+    
+    
     def __init__(self, deviceAddresse=0x48):      
         self._i2cBusID = 10              # Change to /dev/i2c-10
         
@@ -79,13 +79,13 @@ class TempSensor():
         if not self._initialized:
             self._initialized = True
             if LINUX:
-                TEMP_CONFIG = (TMP112_REG_CONFIG_CONTINOUS |
-                               TMP112_REG_CONFIG_FQ_1 |
-                               TMP112_REG_CONFIG_RES |
-                               TMP112_REG_CONFIG_FQ_1 |
-                               TMP112_REG_CONFIG_CR_4 |
-                               TMP112_REG_CONFIG_AL_H)
-                self._writeReg(TMP112_REG_CONFIG, TEMP_CONFIG)
+                TEMP_CONFIG = (TempSensor.TMP112_REG_CONFIG_CONTINOUS |
+                               TempSensor.TMP112_REG_CONFIG_FQ_1 |
+                               TempSensor.TMP112_REG_CONFIG_RES |
+                               TempSensor.TMP112_REG_CONFIG_FQ_1 |
+                               TempSensor.TMP112_REG_CONFIG_CR_4 |
+                               TempSensor.TMP112_REG_CONFIG_AL_H)
+                self._writeReg(TempSensor.TMP112_REG_CONFIG, TEMP_CONFIG)
                 
     
     def end(self):
@@ -95,7 +95,7 @@ class TempSensor():
                 
     def getTemperature(self): 
         if LINUX and self._initialized:
-            data = self._readReg(TMP112_REG_TEMP)
+            data = self._readReg(TempSensor.TMP112_REG_TEMP)
             res = int((data[0] << 4) + (data[1] >> 4))
             if (data[0] | 0x7F == 0xFF):
                 res = 0 - 4096

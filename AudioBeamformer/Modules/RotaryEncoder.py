@@ -132,10 +132,10 @@ class RotaryEncoder():
             GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
             GPIO.setup(self._pinS, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             try:
-                GPIO.add_event_detect(self._pinS, GPIO.BOTH, callback=self._buttonChanged)  
+                GPIO.add_event_detect(self._pinS, GPIO.FALLING, callback=self._buttonChanged)  
             except RuntimeError:
                 GPIO.remove_event_detect(self._pinS)
-                GPIO.add_event_detect(self._pinS, GPIO.BOTH, callback=self._buttonChanged)  
+                GPIO.add_event_detect(self._pinS, GPIO.FALLING, callback=self._buttonChanged)  
 
 
     def getEncoderValue(self):
@@ -153,7 +153,7 @@ class RotaryEncoder():
         self._buttonState = state
 
 
-    def _valueChanged(self, value):
+    def _valueChanged(self, value, direction):
         if(value < 0):
             value = 0
         if(value > 100):
@@ -169,10 +169,10 @@ class RotaryEncoder():
 
 if __name__ == '__main__':
     import time
-    rotaryEncoder = RotaryEncoder(pinA=12, pinB=16, pinS=20)
+    rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
     rotaryEncoder.begin()
 
-    for i in range(10):
+    for i in range(25):
         print(f"Enocder: {rotaryEncoder.getEncoderValue()}, Button: {rotaryEncoder.getButtonState()}")
         time.sleep(0.5)
         
