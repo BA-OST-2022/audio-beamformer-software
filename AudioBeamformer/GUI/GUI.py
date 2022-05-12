@@ -104,10 +104,10 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
-            if DEBUG:
-                print(f"Count: {self._faceTracking.getDetectionCount()}")
-                print(f"Focus: {self._faceTracking.getFocus()}")
-                print(f"Location: {self._faceTracking.getFocusLocation()}")
+            # if DEBUG:
+            #     print(f"Count: {self._faceTracking.getDetectionCount()}")
+            #     print(f"Focus: {self._faceTracking.getFocus()}")
+            #     print(f"Location: {self._faceTracking.getFocusLocation()}")
             return self._faceTracking.runDetection(src)
         return src
 
