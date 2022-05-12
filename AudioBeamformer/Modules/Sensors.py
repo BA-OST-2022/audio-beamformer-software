@@ -67,7 +67,7 @@ class Sensors():
         self._tempSensorSystem = TempSensor(0x49)
         self._hmi = HMI(0x62)
         self._tofSensor = ToFSensor()
-        self._rotaryEncoder = RotaryEncoder(pinA=12, pinB=16, pinS=20)
+        self._rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
         self._powerSupply = powerSupply
         
         self._initialized = False
@@ -81,6 +81,7 @@ class Sensors():
         self._distanceLevel = None
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
+        self._shutdownCallback  = None
         
         self._updateRateTemp = 2                # Update rate in Hz
         self._updateRateLed = 20                # Update rate in Hz
@@ -125,6 +126,7 @@ class Sensors():
             if DEBUG:
                 print("Asynchronous Sensors Initialization started...")
             self._hmi.begin()
+            self._hmi.registerButtonCallback(self._shutdownCallback)
             self._hmi.setButtonColor(self.COLOR_BOOT)
             self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
             self._rotaryEncoder.begin()
@@ -184,6 +186,10 @@ class Sensors():
     
     def getReadyState(self):
         return self._readyState
+    
+    
+    def registerShutdownCallback(self, callback):
+        self._shutdownCallback = callback
 
 
     def getTemperature(self, source):
@@ -202,17 +208,10 @@ class Sensors():
     
     def getDistanceLevel(self):
         return self._distanceLevel
-    
+
+
     def enableAlert(self, state):
         self._alertEnable = state
-    
-    
-    def setAlertCallback(self, callback):
-        self._alertCallback = callback
-    
-    
-    def setFreeCallback(self, callback):
-        self._freeCallback = callback
     
     
     def setAlertSensitivity(self, sensitivity):
@@ -246,6 +245,11 @@ class Sensors():
     
     def enableMagic(self, state):
         self._enableMagic = state
+        
+        
+    def _shutdownEvent(self):
+        if self._shutdownCallback:
+            self._shutdownCallback(True)
     
     
     def _getCpuTemperature(self):
