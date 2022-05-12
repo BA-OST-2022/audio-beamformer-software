@@ -149,8 +149,6 @@ class AudioProcessing:
                             sourceDict[counter] = i
                             counter += 1
         self.__source_dict = sourceDict
-        if self.__stream_running:
-            self.startStream()
         # Filter source list
         return sourceList
 
