@@ -24,11 +24,18 @@ Item{
             id: audio_processing_button
             anchors.left: parent.left
             anchors.right: parent.right
-            text: qsTr("Audio processing")
+            text: qsTr("Processing")
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
             checked: true
+            contentItem: Text {
+                text: audio_processing_button.text
+                font: audio_processing_button.font
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: {audio_processing_button.checked ? "#303030" :"#c8c8c8"}
+            }
             radius: 8
         }
 
@@ -41,6 +48,13 @@ Item{
             autoExclusive: true
             checkable: true
             radius: 8
+            contentItem: Text {
+                text: channel_button.text
+                font: channel_button.font
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: {channel_button.checked ? "#303030" :"#c8c8c8"}
+            }
         }
 
         RoundButton{
@@ -52,6 +66,13 @@ Item{
             autoExclusive: true
             checkable: true
             radius: 8
+            contentItem: Text {
+                text: setting_button.text
+                font: setting_button.font
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: {setting_button.checked ? "#303030" :"#c8c8c8"}
+            }
         }
     }
 
