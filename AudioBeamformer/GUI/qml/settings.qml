@@ -321,93 +321,158 @@ Item{
         }
     }
     Timer{
-        interval: 1000
+        interval: 200
         running: true
         repeat: true
         onTriggered: {
+            backend.getEnableChannels([channel_1.checked,channel_2.checked,
+                                        channel_3.checked,channel_4.checked,
+                                        channel_5.checked,channel_6.checked,
+                                        channel_7.checked,channel_8.checked,
+                                        channel_9.checked,channel_10.checked,
+                                        channel_11.checked,channel_12.checked,
+                                        channel_13.checked,channel_14.checked,
+                                        channel_15.checked,channel_16.checked,
+                                        channel_17.checked,channel_18.checked,
+                                        channel_19.checked])
         }
     }
     
     Row{
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: settings_row.bottom
+        anchors.bottom: parent.bottom
         height: 50
+        spacing: 5
+        anchors.leftMargin: 10
+        anchors.bottomMargin: 5
+        Label{
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Channel enable")
+            }
         CheckBox{
             id: channel_1
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_2
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_3
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_4
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_5
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_6
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_7
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_8
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_9
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_10
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_11
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_12
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_13
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_14
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_15
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_16
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_17
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_18
-            checked: True
+            checked: true
         }
         CheckBox{
             id: channel_19
-            checked: True
+            checked: true
+        }
+        Button{
+            text: qsTr("Enable all")
+            onClicked:{
+                channel_1.checked= true
+                channel_2.checked= true
+                channel_3.checked= true
+                channel_4.checked= true
+                channel_5.checked= true
+                channel_6.checked= true
+                channel_7.checked= true
+                channel_8.checked= true
+                channel_9.checked= true
+                channel_10.checked= true
+                channel_11.checked= true
+                channel_12.checked= true
+                channel_13.checked= true
+                channel_14.checked= true
+                channel_15.checked= true
+                channel_16.checked= true
+                channel_17.checked= true
+                channel_18.checked= true
+                channel_19.checked= true
+            }
+        }
+        Button{
+            text: qsTr("Disable all")
+            onClicked:{
+                channel_1.checked= false
+                channel_2.checked= false
+                channel_3.checked= false
+                channel_4.checked= false
+                channel_5.checked= false
+                channel_6.checked= false
+                channel_7.checked= false
+                channel_8.checked= false
+                channel_9.checked= false
+                channel_10.checked= false
+                channel_11.checked= false
+                channel_12.checked= false
+                channel_13.checked= false
+                channel_14.checked= false
+                channel_15.checked= false
+                channel_16.checked= false
+                channel_17.checked= false
+                channel_18.checked= false
+                channel_19.checked= false
+            }
         }
     }
 }

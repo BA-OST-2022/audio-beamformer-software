@@ -67,12 +67,21 @@ class GUI:
                 faceTracking = None,
                 sensors = None,
                 leds = None):
+        
+        self.MODULE_AUDIO_PROCESSING = 0
+        self.MODULE_BEAMSTEERING = 1
+        self.MODULE_FACE_TRACKING = 2
+        self.MODULE_SENSORS = 3
+        self.MODULE_LEDS = 4
+        
         self._callback = None
         self._audio_processing = audio_processing
         self._beamsteering = beamsteering
         self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
+        
+        self._enableMagic = False    # TODO: Set this variable on event
         
     def run(self):
         PyCVQML.registerTypes()
@@ -95,6 +104,20 @@ class GUI:
     def registerTerminateCallback(self, callback):
         self._callback = callback
         
+        
+    def setModuleReference(self, module, reference):
+        if(module == self.MODULE_AUDIO_PROCESSING):
+            self._audio_processing = reference
+        elif(module == self.MODULE_BEAMSTEERING):
+            self._beamsteering = reference
+        elif(module == self.MODULE_FACE_TRACKING):
+            self._faceTracking = reference
+        elif(module == self.MODULE_SENSORS):
+            self._sensors = reference
+        elif(module == self.MODULE_LEDS):
+            self._leds = reference
+     
+        
     def terminate(self):
         PyCVQML.stopCamera()
         if(self._callback):
@@ -104,6 +127,8 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
+            # TODO: Check if magic... do stuff
+            
             # if DEBUG:
             #     print(f"Count: {self._faceTracking.getDetectionCount()}")
             #     print(f"Focus: {self._faceTracking.getFocus()}")
@@ -140,12 +165,15 @@ class MainWindow(QObject):
         self.window_list = []
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
+        self.__enableChannels = np.ones(19)
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
     def sourceList(self):
         if not self._audio_processing == None:
             self.source_list = self._audio_processing.getSourceList()
+            self._audio_processing.setupStream()
+            self._audio_processing.startStream()
             return self.source_list
         else:
             return ["Test 1","Test 2","Test 3"]
@@ -361,6 +389,16 @@ class MainWindow(QObject):
             return f"{self._sensors.getCpuLoad():.1f} %"
         else:
             return "None" 
+
+    # Settings channel
+    @pyqtSlot(list)
+    def getEnableChannels(self, list):
+        if not all(i==u for i,u in zip(self.__enableChannels,list)):
+            if not self._beamsteering == None:
+                self._beamsteering.setChannelEnable(list)
+            else:
+                print(f"Channel Gains: {list}")
+            self.__enableChannels = list
 
     # General information
     @pyqtProperty(int)

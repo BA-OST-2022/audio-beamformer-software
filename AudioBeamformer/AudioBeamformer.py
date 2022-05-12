@@ -14,7 +14,7 @@
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell          
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
@@ -54,7 +54,7 @@ class AudioBeamformer():
         leds.begin()
         self.sensors.begin()
         self.beamsteering.begin()
-
+        self.audio_processing.begin()
         self.gui.registerTerminateCallback(self.end)
         self.gui.run()  # This functioncall is blocking and must be at the end
         
@@ -64,6 +64,7 @@ class AudioBeamformer():
         fpgaControl.end()
         self.beamsteering.end()
         self.sensors.end()
+        self.audio_processing.end()
         print("Main Application terminated...")
 
 

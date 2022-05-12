@@ -33,6 +33,7 @@
 
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
+from tkinter.messagebox import NO
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
@@ -44,78 +45,77 @@ import numpy as np
 import ast
 
 class AudioProcessing:
-    def __init__(self,
-                input_device_index = 1,
-                output_device_index = 3,
-                samplerate=44100,
-                chunk_size=4096,
-                equalizer_window_size=123):
-        self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
-        self.__equalizer_profile_list = {}
-        self.__equalizerList = []
-        with open(self.__equalier_dict_path) as f:
-            for line in f.readlines():
-                line_tupel = ast.literal_eval(line)
-                self.__equalizerList.append(line_tupel[0])
-                self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
-        self._chunk_size = chunk_size
-        self._samplerate = samplerate
-        self._tot_gain = 1
-        self._equalizer_enable = False
-        self._equalizer_filter = np.ones(equalizer_window_size)
-        self._modulation_index = 0
-        self._mam_gain = 1
-        self._enable_interpolation = False
-        self._interpolation_factor = 0
+    def __init__(self):
+        # Adjustable values
+        self._chunk_size = 4096
+        self._samplerate = 44100
+        self.equ_window_size = 123
+        self.__black_list_input_device = ["pulse","loopin","default"]
+        self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
+        # Device index
         if(sys.platform == 'linux'):
+            # If system is linux then the loopback and the audio beamformer 
+            # are the initial input/output devices
             channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._input_device = input_device_index
-            self._output_device = output_device_index
-        self._channel_count_input = 1 # Get channel count
-        self._channel_count_output = 2
-        self.__black_list_input_device = ["pulse"]
-
-        # Window size can not be even
-        if not (equalizer_window_size % 2):
-            print(f"FIR window size was made uneven. Length: {equalizer_window_size-1}")
-            self.equ_window_size = equalizer_window_size - 1
-        else:
-             self.equ_window_size = equalizer_window_size
-        # If system is linux then the loopback and the audio beamformer 
-        # are the initial input/output devices
+            self._input_device = 0
+            self._output_device = 0
+        # Start values
+        self._tot_gain = 1
+        self._equalizer_enable = False
+        self._modulation_index = 0
+        self._mam_gain = 1
+        self._enable_interpolation = False
+        self._interpolation_factor = 0
+        self._stream = None
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
-        self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self.__current_source_level = 0
         self.__source_dict = {}
+        self.__equalizer_profile_list = {}
+        self.__equalizerList = []
         self.__stream_running = False
+        # Equalizer initialization
+        self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
+        with open(self.__equalier_dict_path) as f:
+            for line in f.readlines():
+                line_tupel = ast.literal_eval(line)
+                self.__equalizerList.append(line_tupel[0])
+                self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
+        self._equalizer_filter = np.ones(self.equ_window_size)
+
 
     def begin(self):
             self.getChannels()
             self.setupStream()
-            self._stream.start()
+            self.startStream()
 
     def end(self):
         self._stream.close()
 
     def setupStream(self):
-        self._stream = sd.Stream(samplerate=self._samplerate,
-                                blocksize=self._chunk_size,
-                                device=(self._input_device, self._output_device), 
-                                channels=(self._channel_count_input, self._channel_count_output),
-                                dtype=np.int32,
-                                callback=self.callback)
+        if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
+            channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
+            self._stream = sd.Stream(samplerate=self._samplerate,
+                                    blocksize=self._chunk_size,
+                                    device=(self._input_device, self._output_device), 
+                                    channels=(channel_input, 2),
+                                    dtype=np.int32,
+                                    callback=self.callback)
+
+
 
     def startStream(self):
-        self._stream.start()
-        self.__stream_running = True
+        if self._stream:
+            self._stream.start()
+            self.__stream_running = True
 
     def endStream(self):
-        self._stream.close()
-        self.__stream_running = False
+        if self._stream:
+            self._stream.close()
+            self.__stream_running = False
 
     def getChannels(self):
         channelInfo = []
@@ -134,8 +134,9 @@ class AudioProcessing:
         sourceDict = {}
         sourceList = []
         counter = 0
-        sd._terminate()
-        sd._initialize()
+        if self.__stream_running:
+            sd._terminate()
+            sd._initialize()
         for i,device in enumerate(sd.query_devices()):
             if device['max_input_channels'] > 0 and device['hostapi'] == 0:
                 if not any([bl_device == device["name"] for bl_device in self.__black_list_input_device]):
@@ -239,7 +240,7 @@ class AudioProcessing:
         indata_oneCh = indata[:,0] * self._tot_gain
         self.setSourceLevel(indata_oneCh)
         if self._equalizer_enable:
-            indata_oneCh = np.hstack((self.previousWindow,
+            indata_oneCh = np.hstack((self.__previousWindow,
                                     indata_oneCh))
             
             outdata_oneCh = np.convolve(indata_oneCh,
@@ -252,7 +253,7 @@ class AudioProcessing:
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
-        self.previousWindow = indata_oneCh[-self.equ_window_size+1:]
+        self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
 
     def createEqualizerPlots(self):
         path = "../GUI/qml/images"
