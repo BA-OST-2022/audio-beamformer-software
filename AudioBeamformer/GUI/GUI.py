@@ -156,8 +156,6 @@ class MainWindow(QObject):
     def sourceGainValue(self):
         if not self._audio_processing == None:
             self.source_gain_value = self._audio_processing.getSourceLevel()
-            self._audio_processing.setupStream()
-            self._audio_processing.startStream()
             return self.source_gain_value
         else:
             return 1.0
