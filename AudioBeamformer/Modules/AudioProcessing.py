@@ -98,12 +98,15 @@ class AudioProcessing:
     def setupStream(self):
         if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
             channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
-            self._stream = sd.Stream(samplerate=self._samplerate,
-                                    blocksize=self._chunk_size,
-                                    device=(self._input_device, self._output_device), 
-                                    channels=(channel_input, 2),
-                                    dtype=np.int32,
-                                    callback=self.callback)
+        else:
+            channel_input = 2
+            self._input_device = self.__sourceIndexList[0]
+        self._stream = sd.Stream(samplerate=self._samplerate,
+                                blocksize=self._chunk_size,
+                                device=(self._input_device , self._output_device), 
+                                channels=(channel_input, 2),
+                                dtype=np.int32,
+                                callback=self.callback)
 
 
 
@@ -130,21 +133,27 @@ class AudioProcessing:
                                 i['max_output_channels']))
         return channelInfo
 
-    def getSourceList(self):
-        sourceDict = {}
-        sourceList = []
-        counter = 0
+    def getSourceList(self): 
         if self.__stream_running:
             sd._terminate()
-            sd._initialize()
+            sd._initialize()     
+        default_val = "System"
+        sourceIndexList = []
+        sourceList = []
         for i,device in enumerate(sd.query_devices()):
-            if device['max_input_channels'] > 0 and device['hostapi'] == 0:
-                if not any([bl_device == device["name"] for bl_device in self.__black_list_input_device]):
-                        if not (device["name"].startswith('Loopback') and device["name"].endswith(',0)')):
+            if device["hostapi"] == 0 and device['max_input_channels'] > 0:
+                if not any(bl == device["name"] for bl in self.__black_list_input_device):
+                    if not (device["name"].startswith('Loopback') and device["name"].endswith(',0)')):
+                        sourceIndexList.append(i)
+                        if (device["name"].startswith('Loopback') and device["name"].endswith(',1)')):
+                            sourceList.append(default_val)
+                        else:
                             sourceList.append(device["name"])
-                            sourceDict[counter] = i
-                            counter += 1
-        self.__source_dict = sourceDict
+        if(sys.platform == 'linux'):
+            ind = sourceList.index(default_val)
+            sourceList.insert(0,sourceList.pop(ind))
+            sourceIndexList.insert(0,sourceIndexList.pop(ind))
+        self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
 
@@ -153,17 +162,23 @@ class AudioProcessing:
             # Stream terminate
             self.endStream()
         # Stream setup
-        if source_index < len(self.__source_dict.keys()):
-            self._input_device = self.__source_dict[source_index]
+        if source_index < len(self.__sourceIndexList):
+            self._input_device = self.__sourceIndexList[source_index]
         else:
-            self._input_device = 0
+            self._input_device = self.__sourceIndexList[0]
         # Stream start
         self.setupStream()
         self.startStream()
 
     def setSourceLevel(self, indata):
         indata = indata /2147483648
-        self.__current_source_level = np.sqrt(np.mean(indata**2))
+        rms = np.sqrt(np.mean(indata**2))
+        if not rms < 0.00001:
+            self.__current_source_level = 10*np.log10(np.sqrt(np.mean(indata**2)))
+        else:
+            self.__current_source_level = -50
+        print(self.__current_source_level)
+        
 
     def getSourceLevel(self):
         return self.__current_source_level
@@ -257,6 +272,7 @@ class AudioProcessing:
 
     def createEqualizerPlots(self):
         path = "../GUI/qml/images"
+
 
 if __name__ == '__main__':
     audio_processing = AudioProcessing(input_device_index = 7,

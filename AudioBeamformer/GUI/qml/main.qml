@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls 2.5
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
@@ -15,9 +15,12 @@ Item{
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 150
+        anchors.leftMargin: 5
+        anchors.topMargin: 5
+        anchors.bottomMargin: 5
+        width: 170
 
-        Button{
+        RoundButton{
             id: audio_processing_button
             anchors.left: parent.left
             anchors.right: parent.right
@@ -26,9 +29,10 @@ Item{
             autoExclusive: true
             checkable: true
             checked: true
+            radius: 8
         }
 
-        Button{
+        RoundButton{
             id: channel_button
             anchors.left: parent.left
             anchors.right: parent.right
@@ -36,9 +40,10 @@ Item{
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
+            radius: 8
         }
 
-        Button{
+        RoundButton{
             id: setting_button
             anchors.left: parent.left
             anchors.right: parent.right
@@ -46,6 +51,7 @@ Item{
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
+            radius: 8
         }
     }
 
@@ -59,7 +65,7 @@ Item{
 
         Loader{
             anchors.fill: parent
-            source: "audio_processing.qml"
+            source: "audio_processing_col.qml"
         }
 
         Loader{
@@ -79,7 +85,8 @@ Item{
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 100
+        width: 80
+        anchors.rightMargin: 20
         Loader{
             anchors.fill: parent
             source: "general_information.qml"

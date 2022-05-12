@@ -154,12 +154,11 @@ Item{
             Item{
                 id: se_gauge_holder
                 visible: se_tof_switch.position
-                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                width: 20
-                height:  150
-                anchors.topMargin: 5
-                anchors.bottomMargin: 5
+                width: 15
+                height: 90
+                anchors.bottomMargin: 110
                 // Background Rectangle
                 Rectangle{
                     id: se_gauge_background
