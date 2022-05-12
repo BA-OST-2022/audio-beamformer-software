@@ -107,6 +107,8 @@ Item{
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 80
+        anchors.topMargin: 8
+        anchors.bottomMargin: 3
         anchors.rightMargin: 20
         Loader{
             anchors.fill: parent
