@@ -15,7 +15,8 @@ Item{
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 150
+        anchors.leftMargin: 20
+        width: 140
 
         Button{
             id: audio_processing_button
@@ -79,7 +80,8 @@ Item{
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 100
+        width: 80
+        anchors.rightMargin: 20
         Loader{
             anchors.fill: parent
             source: "general_information.qml"

@@ -111,7 +111,7 @@ Item{
                 anchors.top: ch_beamsteering_row_source.bottom
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
+                spacing: 3
 
                 Label{
                     anchors.verticalCenter: parent.verticalCenter
