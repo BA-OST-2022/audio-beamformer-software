@@ -54,6 +54,7 @@ class Beamsteering():
         self._angleToSteer_manual = 0
         self._currentPattern = 0
         self._PatternHoldTime = 1
+        self._enableChannel = np.ones(19)
         self.__window_types = {"rect": self.rectWindow,
                              "cosine": self.cosineWindow,
                              "hann": self.hannWindow,
@@ -90,7 +91,6 @@ class Beamsteering():
             self._angleToSteer = 0
             self.calculateDelay()
 
-
     def setBeamsteeringSource(self, source):
         self._activeSource = source
 
@@ -106,6 +106,11 @@ class Beamsteering():
         self._beamsteeringPattern_list = list(self._beamsteeringPattern.keys())
         return list(self._beamsteeringPattern.keys())
 
+    def setChannelEnable(self,list):
+        self._enableChannel = np.array(list)
+        self._fpga_controller.enableChannels(list)
+        self._fpga_controller.update()
+    
     def _calc_angle_face(self):
         return 0
 
@@ -126,6 +131,7 @@ class Beamsteering():
             delay = delay[::-1] * -1
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
+            self._fpga_controller.update()
         else:
             print(delay[0])
             print(f"Delay: {delay}")
@@ -134,6 +140,7 @@ class Beamsteering():
         gains = self.__window_types[self._activeWindow]()
         if not DEBUG:
             self._fpga_controller.setChannelGain(np.array(gains))
+            self._fpga_controller.update()
         else:
             print(f"Gains: {np.array(gains)}")
 
