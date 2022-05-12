@@ -54,7 +54,7 @@ class AudioBeamformer():
         leds.begin()
         self.sensors.begin()
         self.beamsteering.begin()
-
+        self.audio_processing.begin()
         self.gui.registerTerminateCallback(self.end)
         self.gui.run()  # This functioncall is blocking and must be at the end
         
@@ -64,6 +64,7 @@ class AudioBeamformer():
         fpgaControl.end()
         self.beamsteering.end()
         self.sensors.end()
+        self.audio_processing.end()
         print("Main Application terminated...")
 
 
