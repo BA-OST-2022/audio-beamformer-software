@@ -65,7 +65,7 @@ TMP112_REG_CONFIG_AL_H			= 0x0020 # When the POL bit = 0, AL is HIGH
 
 class TempSensor():
     def __init__(self, deviceAddresse=0x48):      
-        self._i2cBusID = 0                      # TODO: Change to /dev/i2c-20
+        self._i2cBusID = 10              # Change to /dev/i2c-10
         
         self._initialized = False
         self._deviceAddress = deviceAddresse
@@ -121,13 +121,13 @@ class TempSensor():
 
 if __name__ == '__main__':
     tempSensorAmbient = TempSensor(0x48)
-    # tempSensorSystem = TempSensor(0x49)
+    tempSensorSystem = TempSensor(0x49)
     tempSensorAmbient.begin()
-    # tempSensorSystem.begin()
+    tempSensorSystem.begin()
     
     print(f"Ambient Temperature: {tempSensorAmbient.getTemperature():.1f} °C")
-    # print(f"System Temperature: {tempSensorSystem.getTemperature():.1f} °C")
+    print(f"System Temperature: {tempSensorSystem.getTemperature():.1f} °C")
     
     tempSensorAmbient.end()
-    # tempSensorSystem.end()
+    tempSensorSystem.end()
     

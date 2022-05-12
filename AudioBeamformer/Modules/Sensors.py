@@ -118,13 +118,13 @@ class Sensors():
             self._runInitialization = False
             if DEBUG:
                 print("Asynchronous Sensors Initialization started...")
-            # self._hmi.begin()
+            self._hmi.begin()
             self._hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))
             self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
             self._rotaryEncoder.begin()
             self._tempSensorAmbient.begin()
-            # self._tempSensorSystem.begin()
-            self._tofSensor.begin()       # This takes up to 10s
+            self._tempSensorSystem.begin()
+            # self._tofSensor.begin()       # This takes up to 10s
             self._hmi.setButtonColor(np.array([1.0, 1.0, 1.0]))
             self._readyState = True
             if DEBUG:

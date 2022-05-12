@@ -26,7 +26,7 @@ def _list_devices(_bus):
   sys.stdout.write ('\n')
 
 try:
-  _list_devices(smbus2.SMBus(0))
+  _list_devices(smbus2.SMBus(10))
 except KeyboardInterrupt:
   sys.stdout.write('\n')
 except Exception as _error:
