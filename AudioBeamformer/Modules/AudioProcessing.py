@@ -33,6 +33,7 @@
 
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
+from tkinter.messagebox import NO
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
@@ -68,6 +69,7 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         self._stream = None
+        self._setupStream = False
         if(sys.platform == 'linux'):
             channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
@@ -97,28 +99,32 @@ class AudioProcessing:
     def begin(self):
             self.getChannels()
             self.setupStream()
-            self._stream.start()
+            if self._setupStream:
+                self._stream.start()
 
     def end(self):
         self._stream.close()
 
     def setupStream(self):
-        self._stream = sd.Stream(samplerate=self._samplerate,
-                                blocksize=self._chunk_size,
-                                device=(self._input_device, self._output_device), 
-                                channels=(self._channel_count_input, self._channel_count_output),
-                                dtype=np.int32,
-                                callback=self.callback)
+        input_dict = sd.query_devices(self._input_device) 
+        if input_dict["max_input_channels"] >= self._channel_count_input:
+            self._stream = sd.Stream(samplerate=self._samplerate,
+                                    blocksize=self._chunk_size,
+                                    device=(self._input_device, self._output_device), 
+                                    channels=(self._channel_count_input, self._channel_count_output),
+                                    dtype=np.int32,
+                                    callback=self.callback)
+            self._setupStream = True
+
 
     def startStream(self):
-        if self._stream:
+        if self._setupStream:
             self._stream.start()
             self.__stream_running = True
 
     def endStream(self):
-        if self._stream:
-            self._stream.close()
-            self.__stream_running = False
+        self._stream.close()
+        self.__stream_running = False
 
     def getChannels(self):
         channelInfo = []
