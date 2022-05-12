@@ -69,6 +69,7 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         self._stream = None
+
         if(sys.platform == 'linux'):
             channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
@@ -98,7 +99,7 @@ class AudioProcessing:
     def begin(self):
             self.getChannels()
             self.setupStream()
-            self._stream.start()
+            self.startStream()
 
     def end(self):
         self._stream.close()
@@ -148,6 +149,8 @@ class AudioProcessing:
                             sourceDict[counter] = i
                             counter += 1
         self.__source_dict = sourceDict
+        if self.__stream_running:
+            self.startStream()
         # Filter source list
         return sourceList
 
