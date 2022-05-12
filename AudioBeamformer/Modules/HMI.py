@@ -72,7 +72,7 @@ PCA9633_OUTNE0      = 0x01  # bit 0, see above
 
 class HMI():
     def __init__(self, deviceAddresse=0x62):      
-        self._i2cBusID = 0                      # TODO: Change to /dev/i2c-20
+        self._i2cBusID = 10                      # TODO: Change to /dev/i2c-20
         
         self._pinLedR = 3
         self._pinLedG = 2

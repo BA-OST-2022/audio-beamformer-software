@@ -44,7 +44,7 @@ if LINUX:
 
 
 class LEDs():    
-    def __init__(self, channelCount=5, ringCount=20):
+    def __init__(self, channelCount=19, ringCount=20):
         self.OFF = 0
         self.SEARCHING = 1
         self.TRACKING = 2
@@ -153,7 +153,7 @@ class LEDs():
                         g = int(self._gamma(self._channelColors[i][1]) * 255)
                         b = int(self._gamma(self._channelColors[i][2]) * 255)
                     if self._enableMagic:
-                        val = time() / 3 + (i // 3) / (self._channelCount // 3)
+                        val = time() / 3 + i / self._channelCount
                         r, g, b = [int(c * 255) for c in hsv_to_rgb(val, 1, 1)]
                     self._strip.set_pixel(i, r, g, b)
                     self._strip.set_pixel(i + self._channelCount, r, g, b)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     leds.begin()
     leds.setBrightness(0.1)
     leds.setCameraAnimation(leds.SEARCHING)
-    # leds.enableMagic(True)
+    leds.enableMagic(True)
     
     sleep(7)
     leds.end()
