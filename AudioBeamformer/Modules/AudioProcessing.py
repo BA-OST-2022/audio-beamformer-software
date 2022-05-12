@@ -69,7 +69,6 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         self._stream = None
-        self._setupStream = False
         if(sys.platform == 'linux'):
             channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
@@ -99,28 +98,24 @@ class AudioProcessing:
     def begin(self):
             self.getChannels()
             self.setupStream()
-            if self._setupStream:
-                self._stream.start()
+            self._stream.start()
 
     def end(self):
         self._stream.close()
 
     def setupStream(self):
-        input_dict = sd.query_devices(self._input_device) 
-        if input_dict["max_input_channels"] >= self._channel_count_input:
             self._stream = sd.Stream(samplerate=self._samplerate,
                                     blocksize=self._chunk_size,
                                     device=(self._input_device, self._output_device), 
                                     channels=(self._channel_count_input, self._channel_count_output),
                                     dtype=np.int32,
                                     callback=self.callback)
-            self._setupStream = True
+
 
 
     def startStream(self):
-        if self._setupStream:
-            self._stream.start()
-            self.__stream_running = True
+        self._stream.start()
+        self.__stream_running = True
 
     def endStream(self):
         self._stream.close()
