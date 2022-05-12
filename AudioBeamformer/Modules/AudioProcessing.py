@@ -50,8 +50,12 @@ class AudioProcessing:
         self._chunk_size = 4096
         self._samplerate = 44100
         self.equ_window_size = 123
+        self.__black_list_input_device = ["pulse","loopin","default"]
+        self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         # Device index
         if(sys.platform == 'linux'):
+            # If system is linux then the loopback and the audio beamformer 
+            # are the initial input/output devices
             channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
@@ -67,14 +71,7 @@ class AudioProcessing:
         self._enable_interpolation = False
         self._interpolation_factor = 0
         self._stream = None
-
-        self._channel_count_input = 1 # Get channel count
-        self._channel_count_output = 2
-        self.__black_list_input_device = ["pulse","loopin","default"]
-        # If system is linux then the loopback and the audio beamformer 
-        # are the initial input/output devices
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
-        self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self.__current_source_level = 0
         self.__source_dict = {}
         self.__equalizer_profile_list = {}
@@ -137,8 +134,9 @@ class AudioProcessing:
         sourceDict = {}
         sourceList = []
         counter = 0
-        sd._terminate()
-        sd._initialize()
+        if self.__stream_running:
+            sd._terminate()
+            sd._initialize()
         for i,device in enumerate(sd.query_devices()):
             if device['max_input_channels'] > 0 and device['hostapi'] == 0:
                 if not any([bl_device == device["name"] for bl_device in self.__black_list_input_device]):
@@ -242,7 +240,7 @@ class AudioProcessing:
         indata_oneCh = indata[:,0] * self._tot_gain
         self.setSourceLevel(indata_oneCh)
         if self._equalizer_enable:
-            indata_oneCh = np.hstack((self.previousWindow,
+            indata_oneCh = np.hstack((self.__previousWindow,
                                     indata_oneCh))
             
             outdata_oneCh = np.convolve(indata_oneCh,
@@ -255,7 +253,7 @@ class AudioProcessing:
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
-        self.previousWindow = indata_oneCh[-self.equ_window_size+1:]
+        self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
 
     def createEqualizerPlots(self):
         path = "../GUI/qml/images"
