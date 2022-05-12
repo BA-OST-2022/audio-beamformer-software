@@ -33,11 +33,12 @@
 import sys
 import numpy as np
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
     from smbus2 import SMBus
+    import RPi.GPIO as GPIO
     
 
 class HMI():
@@ -72,17 +73,20 @@ class HMI():
     
     
     def __init__(self, deviceAddresse=0x62):      
-        self._i2cBusID = 10                      # TODO: Change to /dev/i2c-20
+        self._i2cBusID = 10     # Represents /dev/i2c-10
         
         self._pinLedR = 3
         self._pinLedG = 2
         self._pinLedB = 1
         self._pinFan = 0
         
+        self._gpioButton = 3
+        
         self._initialized = False
         self._GAMMA_CORRECT_FACTOR = 2.8
         self._deviceAddress = deviceAddresse
         self._outputState = 0x00
+        self._buttonCallback = None
         
     
     def __del__(self):
@@ -97,13 +101,30 @@ class HMI():
             self._writeReg(HMI.PCA9633_MODE2, 0x14)   # Enable Push-Pull Outputs and invert PWM
             self.setFanSpeed(0)
             self.setButtonColor(np.zeros((1, 3)))
+            if LINUX:
+                GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
+                GPIO.setup(self._gpioButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+                try:
+                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)  
+                except RuntimeError:
+                    GPIO.remove_event_detect(self._gpioButton)
+                    GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)
                 
     
     def end(self):
         if(self._initialized):
             self.setFanSpeed(0)
             self._initialized = False
-            # Do not turn off LED, since it can be used as stanby indicator
+            # Do not turn off LED, since it can be used as stanby 
+            if LINUX:
+                try:
+                    GPIO.remove_event_detect(self._gpioButton)
+                except RuntimeError:
+                    pass
+            
+        
+    def registerButtonCallback(self, callback):
+        self._buttonCallback = callback
        
             
     def setButtonColor(self, color=np.zeros((1, 3))):
@@ -151,6 +172,13 @@ class HMI():
                 
     def _gamma(self, val):
         return np.clip(np.power(val, self._GAMMA_CORRECT_FACTOR), 0.0, 1.0)
+    
+    
+    def _buttonPress(self, pin):
+        if DEBUG:
+            print("Button has been pressed")
+        if self._buttonCallback:
+            self._buttonCallback()
 
 
 if __name__ == '__main__':

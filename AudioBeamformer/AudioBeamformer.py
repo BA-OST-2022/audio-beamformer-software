@@ -30,6 +30,8 @@
 # SOFTWARE.
 ###############################################################################
 
+import os
+import sys
 from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
 from Modules.AudioProcessing import AudioProcessing
@@ -38,6 +40,8 @@ from Modules.Sensors import Sensors
 from Modules.FPGAControl import fpgaControl
 from GUI.GUI import GUI
 from FaceTracking.FaceTracking import faceTracking
+
+LINUX = (sys.platform == 'linux')
 
 class AudioBeamformer():
     def __init__(self):
@@ -53,12 +57,13 @@ class AudioBeamformer():
         fpgaControl.begin()
         leds.begin()
         self.sensors.begin()
+        self.sensors.registerShutdownCallback(self.end)
         self.beamsteering.begin()
         self.audio_processing.begin()
         self.gui.registerTerminateCallback(self.end)
         self.gui.run()  # This functioncall is blocking and must be at the end
         
-    def end(self):
+    def end(self, shutdown=False):
         leds.end()
         powerSupply.end()
         fpgaControl.end()
@@ -66,6 +71,10 @@ class AudioBeamformer():
         self.sensors.end()
         self.audio_processing.end()
         print("Main Application terminated...")
+        if shutdown:
+            print("Shut down system...")
+            if LINUX:
+                os.system("sudo shutdown -h now")  
 
 
 if __name__ == '__main__':
