@@ -147,6 +147,8 @@ class MainWindow(QObject):
     def sourceList(self):
         if not self._audio_processing == None:
             self.source_list = self._audio_processing.getSourceList()
+            self._audio_processing.setupStream()
+            self._audio_processing.startStream()
             return self.source_list
         else:
             return ["Test 1","Test 2","Test 3"]

@@ -57,6 +57,7 @@ class ToFSensor():
     
     
     def begin(self):
+        # TODO RETRY LOOP
         if not self._initialized:
             self._initialized = True
             if LINUX:
@@ -81,17 +82,21 @@ class ToFSensor():
     
     def update(self):
         if LINUX:
-            if self._driver.check_data_ready():
-                ranging_data = self._driver.get_ranging_data()
-                for i in range(self._resolution**2):
-                    val = 4000
-                    if(ranging_data.target_status[i] != 255):
-                        val = ranging_data.distance_mm[i]
-                    if(val == 0):
-                        val = 4000  
-                    self._distanceData[i // self._resolution,
-                                       i % self._resolution] = val
-                return True
+            try:
+                if self._driver.check_data_ready():
+                    # TODO try catch
+                    ranging_data = self._driver.get_ranging_data()
+                    for i in range(self._resolution**2):
+                        val = 4000
+                        if(ranging_data.target_status[i] != 255):
+                            val = ranging_data.distance_mm[i]
+                        if(val == 0):
+                            val = 4000  
+                        self._distanceData[i // self._resolution,
+                                           i % self._resolution] = val
+                    return True
+            except:
+                pass
         return False
     
     

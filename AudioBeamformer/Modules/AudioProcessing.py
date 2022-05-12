@@ -105,6 +105,7 @@ class AudioProcessing:
         self._stream.close()
 
     def setupStream(self):
+        if sd.query_devices(self._input_device)['max_input_channels'] >= self._channel_count_input:
             self._stream = sd.Stream(samplerate=self._samplerate,
                                     blocksize=self._chunk_size,
                                     device=(self._input_device, self._output_device), 
@@ -115,12 +116,14 @@ class AudioProcessing:
 
 
     def startStream(self):
-        self._stream.start()
-        self.__stream_running = True
+        if self._stream:
+            self._stream.start()
+            self.__stream_running = True
 
     def endStream(self):
-        self._stream.close()
-        self.__stream_running = False
+        if self._stream:
+            self._stream.close()
+            self.__stream_running = False
 
     def getChannels(self):
         channelInfo = []

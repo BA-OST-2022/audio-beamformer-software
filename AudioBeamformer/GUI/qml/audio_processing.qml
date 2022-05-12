@@ -61,7 +61,7 @@ Item{
 
                 ComboBox {
                     id: ap_source_combobox
-                    model: backend.sourceList
+                    model: []
                     onCurrentIndexChanged: {
                         backend.getSource(ap_source_combobox.currentIndex)
                     }
