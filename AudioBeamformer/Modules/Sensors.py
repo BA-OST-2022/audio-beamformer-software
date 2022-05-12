@@ -66,6 +66,8 @@ class Sensors():
         self._powerSupply = powerSupply
         
         self._initialized = False
+        self._runInitialization = False
+        self._readyState = False
         self._runThread = False
         self._updateRate = None
         self._alertEnable = True
@@ -94,23 +96,14 @@ class Sensors():
     def begin(self, updateRate=30):
         if not self._initialized:
             self._initialized = True
+            self._runInitialization = True
             self._updateRate = updateRate
-            
-            # self._hmi.begin()
-            self._hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))
-            self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
-            self._rotaryEncoder.begin()
-            self._tempSensorAmbient.begin()
-            # self._tempSensorSystem.begin()
-            self._tofSensor.begin()       # This takes up to 10s
-            self._hmi.setButtonColor(np.array([1.0, 1.0, 1.0]))
-            
             self._runThread = True
             self.update()
-            
     
     
     def end(self):
+        self._readyState = False
         self._runThread = False
         if(self._initialized):
             self._initialized = False
@@ -121,6 +114,22 @@ class Sensors():
         
     
     def update(self):
+        if(self._runInitialization):
+            self._runInitialization = False
+            if DEBUG:
+                print("Asynchronous Sensors Initialization started...")
+            # self._hmi.begin()
+            self._hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))
+            self._hmi.setFanSpeed(1.0)    # Do a fan test at startup
+            self._rotaryEncoder.begin()
+            self._tempSensorAmbient.begin()
+            # self._tempSensorSystem.begin()
+            self._tofSensor.begin()       # This takes up to 10s
+            self._hmi.setButtonColor(np.array([1.0, 1.0, 1.0]))
+            self._readyState = True
+            if DEBUG:
+                print("Asynchronous Sensors Initialization done")
+        
         if(self._initialized):
             if(self._runThread):
                 threading.Timer(1.0 / self._updateRate, self.update).start()            
@@ -167,6 +176,9 @@ class Sensors():
                 self._ledColor = np.array([1.0, 1.0, 1.0])  # White
             
     
+    def getReadyState(self):
+        return self._readyState
+
 
     def getTemperature(self, source):
         if(source == self.SRC_AMBIENT):
