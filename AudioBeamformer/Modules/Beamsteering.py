@@ -131,8 +131,13 @@ class Beamsteering():
             if self._leds:
                 self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24]))
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
+        print(self._angleToSteer)
 
     def calculateDelay(self):
+        print(np.arange(self.__row_count))
+        print(self.__distance)
+        print(self.__speed_of_sound)
+        print(self._angleToSteer)
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
         print(delay)
         if (np.sin(self._angleToSteer/180*np.pi) < 0):
@@ -157,8 +162,9 @@ class Beamsteering():
 
     def calculateSpeedOfSound(self):
         if not self._sensors == None:
-            self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature("Ambient")
-            return self.__speed_of_sound
+            #self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
+            #return self.__speed_of_sound
+            return 343.3
         else:
             return 343.3
     

@@ -95,18 +95,19 @@ class AudioProcessing:
     def end(self):
         self._stream.close()
 
-    def setupStream(self):
-        if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
-            channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
-        else:
-            channel_input = 2
-            self._input_device = self.__sourceIndexList[0]
-        self._stream = sd.Stream(samplerate=self._samplerate,
-                                blocksize=self._chunk_size,
-                                device=(self._input_device , self._output_device), 
-                                channels=(channel_input, 2),
-                                dtype=np.int32,
-                                callback=self.callback)
+    def setupStream(self): 
+        if(sys.platform == 'linux'):
+            if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
+                channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
+            else:
+                channel_input = 2
+                self._input_device = self.__sourceIndexList[0]
+            self._stream = sd.Stream(samplerate=self._samplerate,
+                                    blocksize=self._chunk_size,
+                                    device=(self._input_device , self._output_device), 
+                                    channels=(channel_input, 2),
+                                    dtype=np.int32,
+                                    callback=self.callback)
 
 
 
