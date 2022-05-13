@@ -39,7 +39,8 @@ class Beamsteering():
     def __init__(self,
                  sensors = None,
                  facetracking = None,
-                 fpgaControl = None):
+                 fpgaControl = None,
+                 leds=None):
         self._beamsteeringEnable = False
         self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
         self._activeSource = 0
@@ -49,6 +50,7 @@ class Beamsteering():
         self._fpga_controller = fpgaControl
         self._sensors = sensors
         self._facetracking = facetracking
+        self._leds = leds
         self._angleToSteer = 0
         self._angleToSteer_faceTracking = 0
         self._angleToSteer_manual = 0
@@ -117,11 +119,17 @@ class Beamsteering():
     def setAngle(self):
         # Face Tracking
         if (self._activeSource == 0):
+            if self._leds:
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]))
             self._angleToSteer = self._calc_angle_face() # Needs to be adjusted
         # Manual
         elif (self._activeSource == 1):
+            if self._leds:
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153]))
             self._angleToSteer = self._angleToSteer_manual
         else:
+            if self._leds:
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24]))
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
 
     def calculateDelay(self):
@@ -132,6 +140,9 @@ class Beamsteering():
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
             self._fpga_controller.update()
+            leds_display = delay / max(delay)
+            self._leds.setBrightness(leds_display)
+
         else:
             print(delay[0])
             print(f"Delay: {delay}")
