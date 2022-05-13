@@ -34,7 +34,7 @@ import sys
 from scipy import interpolate
 import numpy as np
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
@@ -58,9 +58,12 @@ class PowerSupply():
         self._maxVolume = 1.0                 # Default is max volume
         self._vMax = (vRef / rBot) * (rBot + rTop)
         self._vMin = (vRef / (rBot + rPot)) * (rBot + rPot + rTop)
-        self.__lut = np.array([10.84, 11.12, 11.65, 12.26, 12.98, 13.75, 14.63, 15.64, 16.89, 18.30, 19.98, 22.16, 24.74, 28.05, 32.72, 38.88, 40.22])
-        self.__x_lut = np.arange(10,44,2)
-        self._func_digPot = interpolate.interp1d(self.__lut,self.__x_lut)
+        self._lut = np.array([10.84, 11.12, 11.65, 12.26, 12.98, 13.75, 14.63,
+                              15.64, 16.89, 18.30, 19.98, 22.16, 24.74, 28.05,
+                              32.72, 38.88, 40.22])
+        self._x_lut = np.arange(10, 44, 2)
+        self._func_digPot = interpolate.interp1d(self._lut,self._x_lut,
+                                                 fill_value="extrapolate")
         if DEBUG:
             print(f"Vmin: {self._vMin:.2f} V ... Vmax: {self._vMax:.2f} V")
         
@@ -102,13 +105,9 @@ class PowerSupply():
     def setVolume(self, volume):
         if not (0 <= volume <= 1.0):
             raise ValueError("Volume out of bound: 0.0 ... 1.0")
-
         volume = min(volume, self._maxVolume)
         vTarget = self._vMin + (self._vMax - self._vMin) * volume
-        if DEBUG:
-            print(f"Output Voltage: {vTarget:.01f} V")
-        if LINUX:
-            self._spi.writebytes([0x11, int(volume * 255)])
+        self._setOutputVoltage(vTarget)
 
     
     def setMaxVolume(self, maxVolume):
@@ -118,12 +117,14 @@ class PowerSupply():
 
     
     def _setOutputVoltage(self, voltage):
-        voltage = self._func_digPot(voltage)
-        voltage = min(self._vMax, max(self._vMin, voltage))
-        data = int(((voltage - self._vMin) / (self._vMax - self._vMin)) * 255)
-        print(f"Set voltage to: {voltage:.1f} V, data: {data}")
+        voltage = self._func_digPot(voltage)   # Compensate non-linearity
+        real = min(self._vMax, max(self._vMin, voltage))
+        data = int(((real - self._vMin) / (self._vMax - self._vMin)) * 255)
         if LINUX:
             self._spi.writebytes([0x11, data])
+        if DEBUG:
+            print(f"Target: {voltage:.1f} V, "
+                  f"Effective: {real:.1f} V, Data: {data}")
         
 
 
@@ -133,7 +134,6 @@ if __name__ == '__main__':
     powerSupply.begin()
     powerSupply.setVolume(0.5)
     powerSupply.enableOutput(True)
-    powerSupply._setOutputVoltage(20)
     import time
     time.sleep(1)
     powerSupply.enableOutput(False)
