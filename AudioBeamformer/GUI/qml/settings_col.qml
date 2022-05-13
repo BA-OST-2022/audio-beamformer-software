@@ -339,7 +339,7 @@ Item{
             }
         CheckBox{
             id: channel_1
-            checked: true
+            checked: false
             Label{
                 text: qsTr("1")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -347,7 +347,7 @@ Item{
         }
         CheckBox{
             id: channel_2
-            checked: true
+            checked: false
             Label{
                 text: qsTr("2")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -355,7 +355,7 @@ Item{
         }
         CheckBox{
             id: channel_3
-            checked: true
+            checked: false
             Label{
                 text: qsTr("3")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -363,7 +363,7 @@ Item{
         }
         CheckBox{
             id: channel_4
-            checked: true
+            checked: false
             Label{
                 text: qsTr("4")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -371,7 +371,7 @@ Item{
         }
         CheckBox{
             id: channel_5
-            checked: true
+            checked: false
             Label{
                 text: qsTr("5")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -379,7 +379,7 @@ Item{
         }
         CheckBox{
             id: channel_6
-            checked: true
+            checked: false
             Label{
                 text: qsTr("6")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -387,7 +387,7 @@ Item{
         }
         CheckBox{
             id: channel_7
-            checked: true
+            checked: false
             Label{
                 text: qsTr("7")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -395,7 +395,7 @@ Item{
         }
         CheckBox{
             id: channel_8
-            checked: true
+            checked: false
             Label{
                 text: qsTr("8")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -403,7 +403,7 @@ Item{
         }
         CheckBox{
             id: channel_9
-            checked: true
+            checked: false
             Label{
                 text: qsTr("9")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -411,7 +411,7 @@ Item{
         }
         CheckBox{
             id: channel_10
-            checked: true
+            checked: false
             Label{
                 text: qsTr("10")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -419,7 +419,7 @@ Item{
         }
         CheckBox{
             id: channel_11
-            checked: true
+            checked: false
             Label{
                 text: qsTr("11")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -427,7 +427,7 @@ Item{
         }
         CheckBox{
             id: channel_12
-            checked: true
+            checked: false
             Label{
                 text: qsTr("12")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -435,7 +435,7 @@ Item{
         }
         CheckBox{
             id: channel_13
-            checked: true
+            checked: false
             Label{
                 text: qsTr("13")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -443,7 +443,7 @@ Item{
         }
         CheckBox{
             id: channel_14
-            checked: true
+            checked: false
             Label{
                 text: qsTr("14")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -451,7 +451,7 @@ Item{
         }
         CheckBox{
             id: channel_15
-            checked: true
+            checked: false
             Label{
                 text: qsTr("15")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -459,7 +459,7 @@ Item{
         }
         CheckBox{
             id: channel_16
-            checked: true
+            checked: false
             Label{
                 text: qsTr("16")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -467,7 +467,7 @@ Item{
         }
         CheckBox{
             id: channel_17
-            checked: true
+            checked: false
             Label{
                 text: qsTr("17")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -475,7 +475,7 @@ Item{
         }
         CheckBox{
             id: channel_18
-            checked: true
+            checked: false
             Label{
                 text: qsTr("18")
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -483,7 +483,7 @@ Item{
         }
         CheckBox{
             id: channel_19
-            checked: true
+            checked: false
             Label{
                 text: qsTr("19")
                 anchors.horizontalCenter: parent.horizontalCenter
