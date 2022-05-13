@@ -147,7 +147,6 @@ class Beamsteering():
             if self._leds:
                 self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
-        print(self._angleToSteer)
 
     def calculateDelay(self):
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
