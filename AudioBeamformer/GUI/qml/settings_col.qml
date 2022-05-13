@@ -35,50 +35,45 @@ Item{
                 text: qsTr("LED")
             }
 
-            // Enable
-            Row{
-                id: se_led_row_enable
-                anchors.top: se_led_label.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
+            Label{
+                    id: se_led_switch_label
+                    anchors.topMargin: 8
+                    anchors.top: se_led_label.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("Enable")
-                }
-
-                 Switch{
-                    id: se_led_switch
-                    anchors.verticalCenter: parent.verticalCenter
-                    onReleased: {
-                        backend.getEnableLED(se_led_switch.position)
-                }
             }
 
-            }
-            // Brightness
-            Row{
-                id: se_led_row_level
-                visible: se_led_switch.position
-                anchors.top: se_led_row_enable.bottom
-                anchors.topMargin: 10       
+            Switch{
+                id: se_led_switch
+                anchors.topMargin: 5
+                anchors.top: se_led_switch_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Brightness")
+                onReleased: {
+                    backend.getEnableLED(se_led_switch.position)
                 }
-
-                Slider {
-                    id: se_leds_level_slider
-                    anchors.verticalCenter: parent.verticalCenter
-                    onValueChanged: {
-                        backend.getLEDBrightness(se_leds_level_slider.value)
-                    }
-                }
-
             }
 
+    
+
+            Label{
+                id: se_leds_level_slider_label
+                visible: se_led_switch.checked
+                anchors.topMargin: 5
+                anchors.top: se_led_switch.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {"Brightness: " + se_leds_level_slider.value.toFixed(2)}
+            }
+
+            Slider {
+                id: se_leds_level_slider
+                visible: se_led_switch.checked
+                anchors.topMargin: -2
+                anchors.top: se_leds_level_slider_label.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                onValueChanged: {
+                    backend.getLEDBrightness(se_leds_level_slider.value)
+                }
+            }
         }
 
         // ToF Sensor
@@ -95,48 +90,42 @@ Item{
                 text: qsTr("ToF Sensor")
             }
 
-            // Enable
-            Row{
-                id: se_tof_row_enable
+            Label{
+                id: se_tof_switch_label
                 anchors.top: se_tof_label.bottom
+                anchors.topMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Enable")
-                }
+                text: qsTr("Enable")
+            }
 
-                 Switch{
-                    id: se_tof_switch
-                    anchors.verticalCenter: parent.verticalCenter
-                    onReleased: {
-                        backend.getEnableToF(se_tof_switch.position)
+            Switch{
+                id: se_tof_switch
+                anchors.top: se_tof_switch_label.bottom
+                anchors.topMargin: 5
+                anchors.horizontalCenter: parent.horizontalCenter
+                onReleased: {
+                    backend.getEnableToF(se_tof_switch.position)
                 }
             }
 
-            }
-            // Distance
-            Row{
-                id: se_tof_row_distance
-                visible: se_tof_switch.position
-                anchors.top: se_tof_row_enable.bottom
-                anchors.topMargin: 10       
+            Label{
+                id: se_tof_level_slider_label
+                anchors.top: se_tof_switch.bottom
+                anchors.topMargin: 5
+                visible: se_tof_switch.checked
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Distance")
-                }
+                text: {"Sensitivity: " + se_tof_level_slider.value.toFixed(2)}
+            }
 
-                Slider {
-                    id: se_tof_level_slider
-                    anchors.verticalCenter: parent.verticalCenter
-                    onValueChanged: {
-                        backend.getToFDistance(se_tof_level_slider.value)
-                    }
+            Slider {
+                id: se_tof_level_slider
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: se_tof_level_slider_label.bottom
+                anchors.topMargin: -2
+                visible: se_tof_switch.checked
+                onValueChanged: {
+                    backend.getToFDistance(se_tof_level_slider.value)
                 }
-
             }
 
             Timer {
@@ -154,11 +143,10 @@ Item{
             Item{
                 id: se_gauge_holder
                 visible: se_tof_switch.position
-                anchors.bottom: parent.bottom
+                anchors.bottom: se_tof_level_slider.bottom
+                anchors.top: se_tof_switch_label.top
                 anchors.right: parent.right
                 width: 15
-                height: 90
-                anchors.bottomMargin: 110
                 // Background Rectangle
                 Rectangle{
                     id: se_gauge_background
@@ -177,21 +165,21 @@ Item{
                     height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:se_gauge_holder.bottom
-                    color: "#37d417"
+                    color: "#38f56e"
                 }
                 Rectangle{
                     id: se_source_gauge_middle
                     height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:se_source_gauge_base.top
-                    color: "#ffd70f"
+                    color: "#f59738"
                 }
                 Rectangle{
                     id: se_source_gauge_top
                     height: parent.height
                     width: parent.width
                     anchors.bottom:se_source_gauge_middle.top
-                    color: "red"
+                    color: "#f54b38"
                 }
             }
 
@@ -208,17 +196,17 @@ Item{
                 anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Max. Volume")
+                text: {"Max. Volume: " + se_volume_level_slider.value.toFixed(2)}
             }
 
             Slider {
-                    id: se_volume_level_slider
-                    orientation: Qt.Vertical
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    onValueChanged: {
+                id: se_volume_level_slider
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: se_volume_label.bottom
+                anchors.topMargin: -2
+                onValueChanged: {
                         backend.getMaxVolume(se_volume_level_slider.value)
-                    }
+                }
             }
 
         }

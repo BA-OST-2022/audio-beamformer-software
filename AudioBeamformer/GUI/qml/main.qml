@@ -96,7 +96,7 @@ Item{
 
         Loader{
             anchors.fill: parent
-            source: "settings.qml"
+            source: "settings_col.qml"
         }
         
     }
