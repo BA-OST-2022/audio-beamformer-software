@@ -7,17 +7,27 @@ import QtQuick.Extras 1.4
 
 Item{
     anchors.fill: parent
-    Button{
+    RoundButton{
             id: main_mute_button
-            anchors.left: parent.left
-            anchors.right: parent.right
             anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+
             text: qsTr("Mute")
             height: 80
+            width: 100
             checkable: true
-            onClicked: {
+            onReleased: {
                 backend.getMuteEnable(main_mute_button.checked)
             }
+            contentItem:Image{
+                source: {main_mute_button.checked?"images/mute":"images/unmute"}
+                fillMode: Image.PreserveAspectFit
+                sourceSize.width: 124
+                sourceSize.height: 124
+
+            }
+            Material.background: { main_mute_button.checked?"#f54b38":"#484848"}
+            radius: 8
     }
 
     Slider{
@@ -25,6 +35,7 @@ Item{
         anchors.bottom: main_mute_button.top
         anchors.top: parent.top
         anchors.right: parent.right
+        anchors.rightMargin: -20
         orientation: Qt.Vertical
         onValueChanged: {
             backend.getMainGain(main_volume_slider.value)
@@ -69,21 +80,21 @@ Item{
                     height: parent.height*0.6
                     width: parent.width
                     anchors.bottom:gi_gauge_holder.bottom
-                    color: "#37d417"
+                    color: "#38f56e"
                 }
                 Rectangle{
                     id: gi_source_gauge_middle
                     height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:gi_source_gauge_base.top
-                    color: "#ffd70f"
+                    color: "#f59738"
                 }
                 Rectangle{
                     id: gi_source_gauge_top
                     height: parent.height
                     width: parent.width
                     anchors.bottom:gi_source_gauge_middle.top
-                    color: "red"
+                    color: "#f54b38"
                 }
             }
 }

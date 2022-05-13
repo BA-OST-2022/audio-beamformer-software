@@ -271,26 +271,21 @@ Item{
             }
 
              Label{
-                    anchors.top: ap_interpolation_label.bottom
+                    id: ap_modulation_label_radio_label
+                    anchors.top: ap_modulation_label.bottom
                     anchors.topMargin: 8
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: qsTr("Modulation type")
             }
-            // ModulationType
             Row{
-                id: ap_modulation_row_type
-                anchors.top: ap_modulation_label.bottom
-                anchors.topMargin: 10       
+                id: ap_interpolation_row_radio_button
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Modulation type")
-                }
+                anchors.top: ap_modulation_label_radio_label.bottom
+                anchors.topMargin: 8
                 RadioButton{
                     id: ad_modulation_am
                     text: qsTr("AM")
-                    anchors.verticalCenter: parent.verticalCenter
+                    checked: true
                     onClicked:{
                         backend.getModulationType(0)
                     }
@@ -298,37 +293,28 @@ Item{
                 RadioButton{
                     id: ad_modulation_mam
                     text: qsTr("MAM")
-                    anchors.verticalCenter: parent.verticalCenter
                     onClicked:{
                         backend.getModulationType(1)
                     }
                 }
-
             }
-            // MAM Distortion term
-            Row{
-                id: ap_modulation_row_gain_distortion
+            Label{
+                id: ap_modulation_slider_label
                 visible: ad_modulation_mam.checked
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.topMargin: 5
-                anchors.bottomMargin: 5 
-                anchors.top: ap_modulation_row_type.bottom
-                spacing: 10
-
-                Label{
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("MAM Distortion")
-                }
-
-                Slider {
+                anchors.top: ap_interpolation_row_radio_button.bottom
+                anchors.topMargin: 8
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {"MAM Distortion: " + ap_modulation_slider.value.toFixed(2)}
+            }
+            Slider {
                     id: ap_modulation_slider
-                    anchors.verticalCenter: parent.verticalCenter
+                    visible: ad_modulation_mam.checked
+                    anchors.top: ap_modulation_slider_label.bottom
+                    anchors.topMargin: 0
+                    anchors.horizontalCenter: parent.horizontalCenter
                     onValueChanged: {
                         backend.getMAMGain(ap_modulation_slider.value)
                     }
-                }
-
             }
         }
     }

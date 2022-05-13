@@ -91,12 +91,12 @@ Item{
 
         Loader{
             anchors.fill: parent
-            source: "channels.qml"
+            source: "channels_col.qml"
         }
 
         Loader{
             anchors.fill: parent
-            source: "settings.qml"
+            source: "settings_col.qml"
         }
         
     }
@@ -107,6 +107,8 @@ Item{
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 80
+        anchors.topMargin: 8
+        anchors.bottomMargin: 3
         anchors.rightMargin: 20
         Loader{
             anchors.fill: parent

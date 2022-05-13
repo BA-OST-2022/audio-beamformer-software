@@ -200,7 +200,6 @@ Item{
         source: "images/camera_placeholder.jpg"
     }
     */
-
     CVItem 
     {
         id: imageWriter
