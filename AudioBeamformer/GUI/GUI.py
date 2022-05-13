@@ -39,7 +39,7 @@ from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python path
 
