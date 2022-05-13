@@ -406,17 +406,18 @@ class MainWindow(QObject):
     # General information
     @pyqtProperty(int)
     def mainGainValue(self):
+        global getVolHolder
         if not self._sensors == None:
             return self._sensors.getVolume()
         else:
-            return 1
+            return 0
 
     @pyqtProperty(bool)
     def muteEnable(self):
         if not self._sensors == None:
             return self._sensors.getMute()
         else:
-            return 1
+            return False
 
     @pyqtSlot(float)
     def getMainGain(self, gain):
@@ -434,12 +435,10 @@ class MainWindow(QObject):
 
     @pyqtProperty(str, constant=True)
     def getMuteImagePath(self):
-        print(self.__mutePath)
         return str(self.__mutePath)
 
     @pyqtProperty(str, constant=True)
     def getUnmuteImagePath(self):
-        print(self.__unmutePath)
         return str(self.__unmutePath)
 
 
