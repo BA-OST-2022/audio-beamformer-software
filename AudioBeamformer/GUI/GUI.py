@@ -42,7 +42,8 @@ from pathlib import Path
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
-sys.path.insert(0, os.getcwd() + "/GUI")   # Add this subdirectory to python path
+sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
 
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
@@ -404,9 +405,8 @@ class MainWindow(QObject):
             self.__enableChannels = list
 
     # General information
-    @pyqtProperty(int)
+    @pyqtProperty(float)
     def mainGainValue(self):
-        global getVolHolder
         if not self._sensors == None:
             return self._sensors.getVolume()
         else:

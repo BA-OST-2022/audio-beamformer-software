@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 import os
 
-sys.path.insert(0, os.getcwd() + "/FaceTracking")   # Add subdirectory to path
+sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(__file__) + "/FaceTracking")
 
 from FaceDetector import FaceDetector
 from KalmanFilter2D import KalmanFilter2D

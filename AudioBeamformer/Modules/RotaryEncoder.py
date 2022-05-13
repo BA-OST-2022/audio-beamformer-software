@@ -170,6 +170,9 @@ class RotaryEncoder():
         if not(0.0 <= value <= 1.0):
             raise ValueError("Value must be between 0.0 .. 1.0")
         self._encoderValue = value
+        self._encoder.setValue(int(self._encoderValue * 100))
+        if DEBUG:
+            print(f"Enocder Volume has been set to: {value}")
             
     def getButtonState(self):
         return self._buttonState

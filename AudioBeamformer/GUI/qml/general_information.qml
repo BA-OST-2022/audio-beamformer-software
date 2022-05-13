@@ -8,12 +8,12 @@ import QtQuick.Extras 1.4
 Item{
     anchors.fill: parent
     Timer{
-         interval: 50
+        interval: 50
         running: true
         repeat: true
         onTriggered: {
-            main_mute_button.checked= main_mute_button.checked || backend.muteEnable;
-            main_volume_slider.value = main_volume_slider.value + backend.mainGainValue
+            main_mute_button.checked = backend.muteEnable;
+            main_volume_slider.value = backend.mainGainValue;
         }
     }
     RoundButton{

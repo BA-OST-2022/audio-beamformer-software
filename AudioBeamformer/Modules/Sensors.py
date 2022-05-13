@@ -40,7 +40,8 @@ import psutil
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
-sys.path.insert(0, os.getcwd() + "/Modules")   # Add this subdirectory to path
+sys.path.insert(0, os.path.dirname(__file__)) 
+sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from TempSensor import TempSensor
 from ToFSensor import ToFSensor
@@ -82,6 +83,7 @@ class Sensors():
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         self._shutdownCallback  = None
+        self._shutDownEvent = False
         
         self._updateRateTemp = 2                # Update rate in Hz
         self._updateRateLed = 20                # Update rate in Hz
@@ -113,7 +115,10 @@ class Sensors():
         self._runThread = False
         if(self._initialized):
             self._initialized = False
-            self._hmi.setButtonColor(self.COLOR_BOOT)
+            if self._shutDownEvent:
+                self._hmi.setButtonColor(self.COLOR_BOOT)
+            else:
+                self._hmi.setButtonColor()
             self._hmi.end()
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
@@ -251,6 +256,7 @@ class Sensors():
         if DEBUG:
             print("Shutdown Event occurred")
         if self._shutdownCallback:
+            self._shutDownEvent = True
             self._shutdownCallback(True)
     
     

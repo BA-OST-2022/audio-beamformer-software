@@ -177,7 +177,6 @@ class AudioProcessing:
             self.__current_source_level = 10*np.log10(np.sqrt(np.mean(indata**2)))
         else:
             self.__current_source_level = -50
-        print(self.__current_source_level)
         
 
     def getSourceLevel(self):

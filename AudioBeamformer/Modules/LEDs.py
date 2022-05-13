@@ -181,7 +181,7 @@ leds = LEDs()
 
 if __name__ == '__main__':
     leds.begin()
-    leds.setBrightness(0.1)
+    leds.setBrightness(1)
     leds.setCameraAnimation(leds.SEARCHING)
     leds.enableMagic(True)
     

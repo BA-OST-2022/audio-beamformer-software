@@ -30,8 +30,13 @@
 # SOFTWARE.
 ###############################################################################
 
+# Autostart: https://daviseford.com/blog/2020/05/28/run-script-on-raspberry-pi-gui-startup.html
+
 import os
 import sys
+
+LINUX = (sys.platform == 'linux')
+
 from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
 from Modules.AudioProcessing import AudioProcessing
@@ -41,14 +46,13 @@ from Modules.FPGAControl import fpgaControl
 from GUI.GUI import GUI
 from FaceTracking.FaceTracking import faceTracking
 
-LINUX = (sys.platform == 'linux')
 
 class AudioBeamformer():
     def __init__(self):
         self.audio_processing = AudioProcessing()
         self.sensors = Sensors(powerSupply)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
-                                         fpgaControl)
+                                         fpgaControl, leds)
         self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,
                        self.sensors, leds)
     
