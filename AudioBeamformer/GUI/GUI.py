@@ -38,6 +38,7 @@ from PyQt5 import QtGui, QtCore, QtQuick, QtQml
 from PyQt5.QtGui  import QGuiApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
+from pathlib import Path
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -166,6 +167,8 @@ class MainWindow(QObject):
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
         self.__enableChannels = np.ones(19)
+        self.__mutePath = Path("images") / "Mute.png"
+        self.__unmutePath = Path("images") / "Unmute.png"
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -429,7 +432,15 @@ class MainWindow(QObject):
         else:
             print(f"Mute enable: {enable}")
 
-    
+    @pyqtProperty(str, constant=True)
+    def getMuteImagePath(self):
+        print(self.__mutePath)
+        return str(self.__mutePath)
+
+    @pyqtProperty(str, constant=True)
+    def getUnmuteImagePath(self):
+        print(self.__unmutePath)
+        return str(self.__unmutePath)
 
 
 

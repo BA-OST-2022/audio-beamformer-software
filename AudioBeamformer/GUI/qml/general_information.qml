@@ -20,7 +20,7 @@ Item{
                 backend.getMuteEnable(main_mute_button.checked)
             }
             contentItem:Image{
-                source: {main_mute_button.checked?"images/mute":"images/unmute"}
+                source: {main_mute_button.checked? backend.getMuteImagePath:backend.getUnmuteImagePath}
                 fillMode: Image.PreserveAspectFit
                 sourceSize.width: 124
                 sourceSize.height: 124
