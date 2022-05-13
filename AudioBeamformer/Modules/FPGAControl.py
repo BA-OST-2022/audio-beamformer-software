@@ -79,9 +79,9 @@ class FPGAControl():
                 self._spi.open(bus=self._spiBus, device=self._spiCs)
                 self._spi.max_speed_hz = self._spiFreq
                 GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
-                GPIO.setup(self._syncPin, GPIO.OUT, initial=GPIO.HIGH)
+                GPIO.setup(self._syncPin, GPIO.OUT, initial=GPIO.LOW)
                 time.sleep(0.01)              # 10ms Sync-Pulse
-                GPIO.output(self._syncPin, GPIO.LOW)
+                GPIO.output(self._syncPin, GPIO.HIGH)
             self.update()
     
     

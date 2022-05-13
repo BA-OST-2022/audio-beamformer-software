@@ -155,7 +155,7 @@ class Beamsteering():
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
         if not DEBUG:
-            self._fpga_controller.setChannelGain(np.array(gains))
+            # self._fpga_controller.setChannelGain(np.array(gains))
             self._fpga_controller.update()
         else:
             print(f"Gains: {np.array(gains)}")
