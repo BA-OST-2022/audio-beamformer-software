@@ -178,13 +178,13 @@ class AudioProcessing:
             self.__current_source_level = 10*np.log10(np.sqrt(np.mean(indata**2)))
         else:
             self.__current_source_level = -50
-        
 
     def getSourceLevel(self):
         return self.__current_source_level
 
     def setGain(self,gain):
         self._tot_gain = gain
+        print(self._tot_gain)
     
     def enableEqualizer(self,enable):
         self._equalizer_enable = enable
@@ -253,7 +253,6 @@ class AudioProcessing:
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain
-        self.setSourceLevel(indata_oneCh)
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.__previousWindow,
                                     indata_oneCh))

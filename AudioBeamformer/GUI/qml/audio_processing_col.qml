@@ -281,7 +281,7 @@ Item{
                 id: ap_interpolation_row_radio_button
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: ap_modulation_label_radio_label.bottom
-                anchors.topMargin: 8
+                anchors.topMargin: 5
                 RadioButton{
                     id: ad_modulation_am
                     text: qsTr("AM")

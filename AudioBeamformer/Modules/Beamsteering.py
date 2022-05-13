@@ -114,7 +114,23 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def _calc_angle_face(self):
-        return 0
+        #************************************************************* ENTER VALUES HERE *****************************************************************************************
+        camera_angle_rad = 40 / 180 * np.pi
+        max_image_size_x = 1200
+        #*************************************************************************************************************************************************************************
+        angle = 0
+        if self._facetracking:
+            position = self._facetracking.getFocusLocation()
+            if not position:
+                print("No Image received")
+            else:
+                x_pos = position[0]
+                w = np.sin(np.pi/2 - camera_angle_rad) * max_image_size_x / 2 / np.sin(camera_angle_rad) 
+                x_diff = x_pos - (max_image_size_x // 2)
+                l = np.sqrt(w**2 + x_diff**2)
+                angle = np.arcsin(x_diff/l) * 180/ np.pi
+        print(angle)
+        return angle
 
     def setAngle(self):
         # Face Tracking
