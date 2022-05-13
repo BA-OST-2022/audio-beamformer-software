@@ -32,7 +32,7 @@
 
 import sys
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
@@ -49,17 +49,20 @@ class PowerSupply():
         
         vRef = 1.23                           # Reference Voltage in V
         rTop = 100E3                          # Top Resistor in Ohm
-        rBot = 3.01E3                         # Bottom Resistor in Ohm
-        rPot = 10E3                           # Dig. Pot. Resistance in Ohm
+        rBot = 3.15E3                         # Bottom Resistor in Ohm
+        rPot = 9650                           # Dig. Pot. Resistance in Ohm
         
         self._initialized = False
         self._maxVolume = 1.0                 # Default is max volume
         self._vMax = (vRef / rBot) * (rBot + rTop)
         self._vMin = (vRef / (rBot + rPot)) * (rBot + rPot + rTop)
+        if DEBUG:
+            print(f"Vmin: {self._vMin:.2f} V ... Vmax: {self._vMax:.2f} V")
         
     
     def __del__(self):
-        self.end()
+        pass
+        # self.end()
     
     
     def begin(self):
@@ -100,13 +103,21 @@ class PowerSupply():
         if DEBUG:
             print(f"Output Voltage: {vTarget:.01f} V")
         if LINUX:
-            self._spi.writebytes([0x11, int(volume * 255)]) # TODO: check if potentiometer polarity is correct 
+            self._spi.writebytes([0x11, int(volume * 255)])
 
     
     def setMaxVolume(self, maxVolume):
         if not (0 <= maxVolume <= 1.0):
             raise ValueError("Max Volume out of bound: 0.0 ... 1.0")
         self._maxVolume = maxVolume
+
+    
+    def _setOutputVoltage(self, voltage):
+        voltage = min(self._vMax, max(self._vMin, voltage))
+        data = int(((voltage - self._vMin) / (self._vMax - self._vMin)) * 255)
+        print(f"Set voltage to: {voltage:.1f} V, data: {data}")
+        if LINUX:
+            self._spi.writebytes([0x11, data])
         
 
 
@@ -118,7 +129,7 @@ if __name__ == '__main__':
     powerSupply.enableOutput(True)
     
     import time
-    time.sleep(3)
+    time.sleep(1)
     powerSupply.enableOutput(False)
     powerSupply.end()
     

@@ -77,6 +77,6 @@ class AudioBeamformer():
                 os.system("sudo shutdown -h now")  
 
 
-if __name__ == '__main__':
-    audioBeamformer = AudioBeamformer()
-    audioBeamformer.begin()
+
+audioBeamformer = AudioBeamformer()
+audioBeamformer.begin()
