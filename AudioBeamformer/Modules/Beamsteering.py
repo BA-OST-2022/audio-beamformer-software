@@ -120,32 +120,30 @@ class Beamsteering():
         # Face Tracking
         if (self._activeSource == 0):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]))
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
             self._angleToSteer = self._calc_angle_face() # Needs to be adjusted
         # Manual
         elif (self._activeSource == 1):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153]))
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153])/ 255)
             self._angleToSteer = self._angleToSteer_manual
         else:
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24]))
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
         print(self._angleToSteer)
 
     def calculateDelay(self):
-        print(np.arange(self.__row_count))
-        print(self.__distance)
-        print(self.__speed_of_sound)
-        print(self._angleToSteer)
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
-        print(delay)
         if (np.sin(self._angleToSteer/180*np.pi) < 0):
             delay = delay[::-1] * -1
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
             self._fpga_controller.update()
-            leds_display = delay / max(delay)
+            if not max(delay) == 0:
+                leds_display = delay / max(delay)
+            else:
+                leds_display = np.ones(19) * 0.5
             self._leds.setBrightness(leds_display)
 
         else:
