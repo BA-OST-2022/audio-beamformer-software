@@ -156,7 +156,6 @@ class FPGAControl():
                 enable_list = self._enable_channel[fpga * self._channel_per_fpga:(fpga+1) * self._channel_per_fpga]
                 enable = sum([2**i*int(value) for i,value in
                             enumerate(enable_list)]).to_bytes(2, "big")
-                print(enable)
                 spi_data.append(int(enable[0]))
                 spi_data.append(int(enable[1]))
                 for channel in range(self._channel_per_fpga):
@@ -175,8 +174,10 @@ class FPGAControl():
  
 fpgaControl = FPGAControl(channel_count=19, channel_per_fpga=10)       
  
-if __name__ == '__main__':   
-    fpgaControl.enableChannels([False, False, False, True, False, False])
+if __name__ == '__main__':
+    enable = [False] * 19
+    enable[0] = True
+    fpgaControl.enableChannels(enable)
     fpgaControl.begin()
     
     time.sleep(3)
