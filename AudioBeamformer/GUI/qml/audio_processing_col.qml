@@ -73,13 +73,15 @@ Item{
                 anchors.top: ap_source_combobox.bottom
                 anchors.topMargin: 12
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Gain: " + ap_source_slider.value.toFixed(2)}
+                text: {"Gain: " + (24*(ap_source_slider.value -0.5)).toFixed(2) + "dB"}
             }
 
             Slider {
                 id: ap_source_slider
+                stepSize: 1/24
                 anchors.top: ap_source_label_gain.bottom
                 anchors.topMargin: -2
+                value: 0.5
                 y: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 onValueChanged: {

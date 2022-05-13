@@ -29,11 +29,17 @@ Item{
                 backend.getMuteEnable(main_mute_button.checked)
             }
             contentItem:Image{
+                anchors.fill: parent
+                anchors.leftMargin: 15
+                anchors.topMargin: 15
+                anchors.bottomMargin: 15
+                anchors.rightMargin: 15
                 source: {main_mute_button.checked? backend.getMuteImagePath:backend.getUnmuteImagePath}
                 fillMode: Image.PreserveAspectFit
-                sourceSize.width: 124
-                sourceSize.height: 124
-
+                sourceSize.width: 64
+                sourceSize.height: 64
+                width: 10
+                height: 10
             }
             Material.background: { main_mute_button.checked?"#f54b38":"#484848"}
             radius: 8
@@ -57,9 +63,9 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    gi_source_gauge_base.height = Math.min(backend.sourceGainValue , 0.6)* gauge_background.width
-                    gi_source_gauge_middle.height = Math.min(backend.sourceGainValue-0.6,0.2)* gauge_background.width
-                    gi_source_gauge_top.height = Math.min(backend.sourceGainValue-0.8,0.2)* gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width
                     }
             }
 

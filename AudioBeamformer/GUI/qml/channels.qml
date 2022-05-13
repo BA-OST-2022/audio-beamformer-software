@@ -193,13 +193,12 @@ Item{
 
     }
     
-    /*
     Image{
         x: 800
         y: 10
         source: "images/camera_placeholder.jpg"
     }
-    */
+    /*
     CVItem 
     {
         id: imageWriter
@@ -218,5 +217,5 @@ Item{
         Component.onCompleted: capture.start()
         Component.onDestruction: capture.stop()
     }
-
+    */
 }

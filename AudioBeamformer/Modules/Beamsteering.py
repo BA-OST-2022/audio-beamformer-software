@@ -32,7 +32,7 @@
 import threading
 import numpy as np
 import time
-
+from pathlib import Path
 DEBUG = False
 
 class Beamsteering():
@@ -67,6 +67,7 @@ class Beamsteering():
         self.__distance = 0.01475
         self.__speed_of_sound = 343.2
         self.__row_count = 19
+        self.__pathImages = Path("..") / "GUI" / "qml" / "images"
 
     def begin(self):
          if not self._initialized:
@@ -86,6 +87,8 @@ class Beamsteering():
                     self.setAngle()
                     self.calculateSpeedOfSound()
                     self.calculateDelay()
+
+    def generatePlots(self):
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value

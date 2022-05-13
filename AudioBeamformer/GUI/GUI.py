@@ -168,8 +168,8 @@ class MainWindow(QObject):
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
         self.__enableChannels = np.ones(19)
-        self.__mutePath = Path("images") / "Mute.png"
-        self.__unmutePath = Path("images") / "Unmute.png"
+        self.__mutePath = Path("images") / "Mute_grey.png"
+        self.__unmutePath = Path("images") / "Unmute_grey.png"
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -201,9 +201,9 @@ class MainWindow(QObject):
     @pyqtSlot(float)
     def getSourceGain(self, gain):
         if not self._audio_processing == None:
-            self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
+            self._audio_processing.setGain(10**(24*(gain-0.5)/20))
         else:
-            print(f"Gain value: {(self._gainSourceMax-1)*gain + 1}")
+            print(f"Gain value: {10**(24*(gain-0.5)/20)}")
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
