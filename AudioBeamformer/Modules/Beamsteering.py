@@ -89,7 +89,8 @@ class Beamsteering():
                     self.calculateDelay()
 
     def generatePlots(self):
-
+        pass
+    
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
         if value==0:
