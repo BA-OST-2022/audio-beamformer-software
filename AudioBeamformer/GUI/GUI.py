@@ -178,6 +178,7 @@ class MainWindow(QObject):
         self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.png"
         self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
+        self.__am_holder = Path("images") / "AM_Holder.png"
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -480,7 +481,10 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant= True)
     def path_1_1_1(self):
         return str(self.__eq_1_int_1_am_1)
-                  
+    
+    @pyqtProperty(str, constant= True)
+    def amHolder(self):
+        return str(self.__am_holder)
 
 if __name__ == "__main__":
     gui = GUI()

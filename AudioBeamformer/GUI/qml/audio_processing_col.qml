@@ -12,6 +12,7 @@ Item{
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
+    anchors.leftMargin: -10
     visible: audio_processing_button.checked
 
     // Audio processing settings
@@ -358,6 +359,18 @@ Item{
             }
             sourceSize.width: 1206
             sourceSize.height: 122
+        }
+        Image{
+            anchors.right: parent.right
+            visible: ad_modulation_am.checked
+            anchors.top: parent.top
+            fillMode: Image.PreserveAspectFit 
+            sourceSize.width: 300
+            sourceSize.height: 122
+            source: backend.amHolder
+            anchors.topMargin:-102
+            anchors.rightMargin: 15
+
         }
        
 

@@ -34,6 +34,7 @@
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
 from tkinter.messagebox import NO
+from cv2 import dft
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
@@ -43,6 +44,7 @@ import os
 import sys
 import numpy as np
 import ast
+import matplotlib.pyplot as plt
 
 class AudioProcessing:
     def __init__(self):
@@ -53,7 +55,7 @@ class AudioProcessing:
         self.__black_list_input_device = ["pulse","loopin","default"]
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         # Device index
-        if(sys.platform == 'linux'):
+        if(sys.platform == 'linux'):  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
             channels = self.getChannels()
@@ -85,7 +87,7 @@ class AudioProcessing:
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
         self._equalizer_filter = np.ones(self.equ_window_size)
-
+        self.generatePlots()
 
     def begin(self):
             self.getChannels()
@@ -120,6 +122,16 @@ class AudioProcessing:
         if self._stream:
             self._stream.close()
             self.__stream_running = False
+
+    def generatePlots(self):
+        for key in self.__equalizer_profile_list.keys():
+            y_val = []
+            x_val = []
+            for freq_band in self.__equalizer_profile_list[key].keys():
+                x_val.append(freq_band[0])
+                x_val.append(freq_band[1])
+                y_val.append(self.__equalizer_profile_list[key][freq_band]["band_gain"])
+                y_val.append(self.__equalizer_profile_list[key][freq_band]["band_gain"])
 
     def getChannels(self):
         channelInfo = []

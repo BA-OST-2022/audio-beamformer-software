@@ -57,12 +57,12 @@ class Beamsteering():
         self._currentPattern = 0
         self._PatternHoldTime = 1
         self._enableChannel = np.ones(19)
-        self.__window_types = {"rect": self.rectWindow,
-                             "cosine": self.cosineWindow,
-                             "hann": self.hannWindow,
-                             "hamming": self.hammingWindow,
-                             "blackman": self.blackmanWindow,
-                             "cheby": self.chebyWindow}
+        self.__window_types = {"Rectangle": self.rectWindow,
+                             "Cosine": self.cosineWindow,
+                             "Hann": self.hannWindow,
+                             "Hamming": self.hammingWindow,
+                             "Blackman": self.blackmanWindow,
+                             "Dolph-Chebyshev": self.chebyWindow}
         self._initialized = False
         self.__distance = 0.01475
         self.__speed_of_sound = 343.2
@@ -90,7 +90,7 @@ class Beamsteering():
 
     def generatePlots(self):
         pass
-    
+
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
         if value==0:
