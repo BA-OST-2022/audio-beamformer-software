@@ -1,6 +1,6 @@
- import QtQuick 2.15
+import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
@@ -17,7 +17,7 @@ Item{
     // Audio processing settings
     Row{
         id: audio_processing_settings_row
-        height: main_window.height/3*2
+        height: 198
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -323,6 +323,18 @@ Item{
     // Flow-Chart
     Item{
         id: flow_chart_item
+        anchors.top: audio_processing_settings_row.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        Image{
+            anchors.top: parent.top
+            fillMode: Image.PreserveAspectFit
+            source: "images/All_active.png"
+            sourceSize.width: 1206
+            sourceSize.height: 122
+        }
+       
 
     }
 }
