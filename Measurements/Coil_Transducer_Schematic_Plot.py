@@ -40,7 +40,7 @@ print(len(imps))
 #                               , coil_mag["Frequency"])
 
 # Calculate schematic
-imp = imps[0] | imps[1] | imps[2]  | imps[3]  | imps[4]  | imps[5]  | imps[6] | imps[7]  
+imp = imps[0]
 imp_tot = imp 
 
 # Plot Coil
@@ -55,8 +55,7 @@ mag =np.real(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi))
 fig,ax = plt.subplots()
 ax_p = ax.twinx()
 #ax.plot(imp_tot.frequency,imp_tot.magnitude,"orange",label = "With Coil")
-ax.plot(imp.frequency,np.real(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi)),"blue",label = "Transducers")
-ax.plot(f*1000,c["Mag_dB"])
+ax.plot(imp.frequency,np.abs(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi)),"blue",label = "Transducers")
 ax.set_xlim((25000,55000))
 # ax_p.plot(imp_tot.frequency,imp_tot.angle,"orange",linestyle="-.")
 # ax_p.plot(imp.frequency,imp.angle,"blue",linestyle="-.")
