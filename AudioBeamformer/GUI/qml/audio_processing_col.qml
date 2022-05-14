@@ -330,7 +330,32 @@ Item{
         Image{
             anchors.top: parent.top
             fillMode: Image.PreserveAspectFit
-            source: "images/All_active.png"
+            source: {
+                if (ap_equalizer_switch.checked && ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_1_1
+                }
+                else if (!ap_equalizer_switch.checked && ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_0_1_1
+                }
+                else if (ap_equalizer_switch.checked && ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_1_0_1
+                }
+                else if (ap_equalizer_switch.checked && !ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_1_0
+                }
+                else if (ap_equalizer_switch.checked && !ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_0_1_0
+                }
+                else if (!ap_equalizer_switch.checked && !ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_0_0
+                }
+                else if (!ap_equalizer_switch.checked && !ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_0_0_0
+                }
+                else{
+                     backend.path_0_0_1
+                }
+            }
             sourceSize.width: 1206
             sourceSize.height: 122
         }

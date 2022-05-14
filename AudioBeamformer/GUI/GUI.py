@@ -170,6 +170,14 @@ class MainWindow(QObject):
         self.__enableChannels = np.ones(19)
         self.__mutePath = Path("images") / "Mute_grey.png"
         self.__unmutePath = Path("images") / "Unmute_grey.png"
+        self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.png"
+        self.__eq_0_int_1_am_1 = Path("images") / "eq_0_int_1_AM.png"
+        self.__eq_0_int_0_am_1 = Path("images") / "eq_0_int_0_AM.png"
+        self.__eq_1_int_0_am_1 = Path("images") / "eq_1_int_0_AM.png"
+        self.__eq_1_int_1_am_0 = Path("images") / "All_active_MAM.png"
+        self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.png"
+        self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
+        self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -441,10 +449,37 @@ class MainWindow(QObject):
     def getUnmuteImagePath(self):
         return str(self.__unmutePath)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_0_0(self):
+        return str(self.__eq_0_int_0_am_0)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_0_1(self):
+        return str(self.__eq_0_int_0_am_1)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_1_0(self):
+        return str(self.__eq_0_int_1_am_0)
 
-        
+    @pyqtProperty(str, constant= True)
+    def path_0_1_1(self):
+        return str(self.__eq_0_int_1_am_1)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_0_0(self):
+            return str(self.__eq_1_int_0_am_0)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_0_1(self):
+        return str(self.__eq_1_int_0_am_1)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_1_0(self):
+            return str(self.__eq_1_int_1_am_0)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_1_1(self):
+        return str(self.__eq_1_int_1_am_1)
                   
 
 if __name__ == "__main__":
