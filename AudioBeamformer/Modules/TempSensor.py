@@ -43,7 +43,7 @@ class TempSensor():
     # TMP112 Register Map
     TMP112_REG_TEMP					= 0x00
     TMP112_REG_CONFIG				= 0x01
-    TMP112_REG_THIGH				= 0x02
+    TMP112_REG_THIGH				    = 0x02
     TMP112_REG_TLOW					= 0x03
 
     # TMP112 Configuration Register
@@ -56,7 +56,7 @@ class TempSensor():
     TMP112_REG_CONFIG_FQ_4			= 0x1000 # Fault Queue = 4
     TMP112_REG_CONFIG_FQ_6			= 0x1800 # Fault Queue = 6
     TMP112_REG_CONFIG_RES			= 0x6000 # 12-bits Resolution
-    TMP112_REG_CONFIG_OS			= 0x8000 # One-shot enabled
+    TMP112_REG_CONFIG_OS			    = 0x8000 # One-shot enabled
     TMP112_REG_CONFIG_CR_0_25		= 0x0000 # Conversion Rate = 0.25 Hz
     TMP112_REG_CONFIG_CR_1			= 0x0040 # Conversion Rate = 1 Hz
     TMP112_REG_CONFIG_CR_4			= 0x0080 # Conversion Rate = 4 Hz

@@ -43,7 +43,7 @@ if LINUX:
 
 class ToFSensor():
     def __init__(self, updateRate=15):      
-        self._i2cBusID = 0                      # TODO: Change to /dev/i2c-20
+        self._i2cBusID = 10                     # Represents /dev/i2c-10
         
         self._initialized = False
         self._driver = None
