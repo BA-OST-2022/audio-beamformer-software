@@ -141,7 +141,7 @@ class Beamsteering():
         if (self._activeSource == 0):
             if self._leds:
                 self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
-            self._angleToSteer = self._calc_angle_face() # Needs to be adjusted
+            self._angleToSteer = self._calc_angle_face() 
         # Manual
         elif (self._activeSource == 1):
             if self._leds:
@@ -179,8 +179,9 @@ class Beamsteering():
 
     def calculateSpeedOfSound(self):
         if not self._sensors == None:
-            #self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
-            #return self.__speed_of_sound
+            self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
+            if self.__speed_of_sound:
+                return self.__speed_of_sound
             return 343.3
         else:
             return 343.3

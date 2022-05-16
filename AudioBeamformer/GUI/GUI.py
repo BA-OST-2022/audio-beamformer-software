@@ -439,6 +439,7 @@ class MainWindow(QObject):
     def getMuteEnable(self, enable):
         if not self._sensors == None:
             self._sensors.setMute(enable)
+            self._audio_processing.setOutputEnable(not enable)
         else:
             print(f"Mute enable: {enable}")
 
