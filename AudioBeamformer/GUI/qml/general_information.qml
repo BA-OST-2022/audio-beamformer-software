@@ -63,23 +63,21 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gi_gauge_background.width
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gi_gauge_background.width
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gi_gauge_background.width
+                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width
+                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width
+                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width
                     }
             }
 
             Item{
-                id: gi_gauge_holder
-                anchors.top: parent.top
+                id: ap_gauge_holder
                 anchors.bottom: main_mute_button.top
+                anchors.top: parent.top
                 anchors.left: parent.left
-                width: 20
-                anchors.topMargin: 5
-                anchors.bottomMargin: 5
+                width: 15
                 // Background Rectangle
                 Rectangle{
-                    id: gi_gauge_background
+                    id: gauge_background
                     width: parent.height
                     height: parent.width
                     anchors.verticalCenter: parent.verticalCenter
@@ -91,24 +89,24 @@ Item{
                     }
                 }
                 Rectangle{
-                    id: gi_source_gauge_base
+                    id: ap_source_gauge_base
                     height: parent.height*0.6
                     width: parent.width
-                    anchors.bottom:gi_gauge_holder.bottom
+                    anchors.bottom:ap_gauge_holder.bottom
                     color: "#38f56e"
                 }
                 Rectangle{
-                    id: gi_source_gauge_middle
+                    id: ap_source_gauge_middle
                     height: parent.height*0.2
                     width: parent.width
-                    anchors.bottom:gi_source_gauge_base.top
+                    anchors.bottom:ap_source_gauge_base.top
                     color: "#f59738"
                 }
                 Rectangle{
-                    id: gi_source_gauge_top
+                    id: ap_source_gauge_top
                     height: parent.height
                     width: parent.width
-                    anchors.bottom:gi_source_gauge_middle.top
+                    anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"
                 }
             }
