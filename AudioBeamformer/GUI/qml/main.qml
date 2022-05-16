@@ -43,7 +43,7 @@ Item{
             id: channel_button
             anchors.left: parent.left
             anchors.right: parent.right
-            text: qsTr("Channels")
+            text: "Channels";
             height: menu_buttons.height/3
             autoExclusive: true
             checkable: true
