@@ -163,6 +163,7 @@ class Beamsteering():
                 leds_display = delay / max(delay)
             else:
                 leds_display = np.ones(19) * 0.5
+            leds_display = np.clip(leds_display,0,1)
             self._leds.setBrightness(leds_display)
 
         else:

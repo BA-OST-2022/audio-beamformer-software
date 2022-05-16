@@ -63,9 +63,9 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width
-                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gi_gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gi_gauge_background.width
+                    gi_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gi_gauge_background.width
                     }
             }
 
@@ -79,7 +79,7 @@ Item{
                 anchors.bottomMargin: 5
                 // Background Rectangle
                 Rectangle{
-                    id: gauge_background
+                    id: gi_gauge_background
                     width: parent.height
                     height: parent.width
                     anchors.verticalCenter: parent.verticalCenter
