@@ -164,7 +164,8 @@ class Beamsteering():
             else:
                 leds_display = np.ones(19) * 0.5
             leds_display = np.clip(leds_display,0,1)
-            self._leds.setBrightness(leds_display)
+            leds_display = np.ones((19, 3)) * np.array([1,0,0]) * leds_display 
+            self._leds.setChannelColors(leds_display)
 
         else:
             print(delay[0])
