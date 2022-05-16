@@ -34,7 +34,6 @@
 # For Equalizer and Filter
 from importlib.abc import SourceLoader
 from tkinter.messagebox import NO
-from cv2 import dft
 from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
@@ -44,7 +43,6 @@ import os
 import sys
 import numpy as np
 import ast
-import matplotlib.pyplot as plt
 
 class AudioProcessing:
     def __init__(self):
@@ -269,6 +267,7 @@ class AudioProcessing:
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain * self._output_enable
+        self.setSourceLevel(indata_oneCh)
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.__previousWindow,
                                     indata_oneCh))
