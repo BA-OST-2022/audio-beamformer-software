@@ -50,18 +50,16 @@ class PowerSupply():
         self._hvEnPin = 27                    # Raspberry Pi GPIO Number
         
         vRef = 1.23                           # Reference Voltage in V
-        rTop = 100E3                          # Top Resistor in Ohm
-        rBot = 3.15E3                         # Bottom Resistor in Ohm
+        rTop = 39E3                          # Top Resistor in Ohm
+        rBot = 2.15E3                         # Bottom Resistor in Ohm
         rPot = 9650                           # Dig. Pot. Resistance in Ohm
         
         self._initialized = False
         self._maxVolume = 1.0                 # Default is max volume
         self._vMax = (vRef / rBot) * (rBot + rTop)
         self._vMin = (vRef / (rBot + rPot)) * (rBot + rPot + rTop)
-        self._lut = np.array([10.84, 11.12, 11.65, 12.26, 12.98, 13.75, 14.63,
-                              15.64, 16.89, 18.30, 19.98, 22.16, 24.74, 28.05,
-                              32.72, 38.88, 40.22])
-        self._x_lut = np.arange(10, 44, 2)
+        self._lut = np.array([8.50, 8.51, 8.52, 8.53, 8.54, 8.55, 8.56, 8.57, 8.58, 8.59, 8.60, 9.03, 9.76, 10.65, 11.75, 13.13, 14.92, 17.35, 20.80])
+        self._x_lut = np.arange(5, 24, 1)
         self._func_digPot = interpolate.interp1d(self._lut,self._x_lut,
                                                  fill_value="extrapolate")
         if DEBUG:
@@ -120,7 +118,7 @@ class PowerSupply():
         voltage = self._func_digPot(voltage)   # Compensate non-linearity
         real = min(self._vMax, max(self._vMin, voltage))
         data = int(((real - self._vMin) / (self._vMax - self._vMin)) * 255)
-        if LINUX:
+        if LINUX and self._initialized:
             self._spi.writebytes([0x11, data])
         if DEBUG:
             print(f"Target: {voltage:.1f} V, "
@@ -132,7 +130,7 @@ powerSupply = PowerSupply()
 
 if __name__ == '__main__':
     powerSupply.begin()
-    powerSupply.setVolume(0.5)
+    # powerSupply.setVolume(0.5)
     powerSupply.enableOutput(True)
     import time
     time.sleep(1)
