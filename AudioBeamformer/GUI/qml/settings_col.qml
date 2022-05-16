@@ -172,14 +172,14 @@ Item{
                     height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:se_source_gauge_base.top
-                    color: "#f59738"
+                    color: "#38f56e"
                 }
                 Rectangle{
                     id: se_source_gauge_top
                     height: parent.height
                     width: parent.width
                     anchors.bottom:se_source_gauge_middle.top
-                    color: "#f54b38"
+                    color: "#38f56e"
                 }
             }
 

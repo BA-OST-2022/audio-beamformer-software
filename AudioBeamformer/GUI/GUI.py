@@ -168,8 +168,17 @@ class MainWindow(QObject):
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
         self.__enableChannels = np.ones(19)
-        self.__mutePath = Path("images") / "Mute.png"
-        self.__unmutePath = Path("images") / "Unmute.png"
+        self.__mutePath = Path("images") / "Mute_grey.png"
+        self.__unmutePath = Path("images") / "Unmute_grey.png"
+        self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.png"
+        self.__eq_0_int_1_am_1 = Path("images") / "eq_0_int_1_AM.png"
+        self.__eq_0_int_0_am_1 = Path("images") / "eq_0_int_0_AM.png"
+        self.__eq_1_int_0_am_1 = Path("images") / "eq_1_int_0_AM.png"
+        self.__eq_1_int_1_am_0 = Path("images") / "All_active_MAM.png"
+        self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.png"
+        self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
+        self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
+        self.__am_holder = Path("images") / "AM_Holder.png"
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -201,9 +210,9 @@ class MainWindow(QObject):
     @pyqtSlot(float)
     def getSourceGain(self, gain):
         if not self._audio_processing == None:
-            self._audio_processing.setGain((self._gainSourceMax-1)*gain + 1)
+            self._audio_processing.setGain(10**(24*(gain-0.5)/20))
         else:
-            print(f"Gain value: {(self._gainSourceMax-1)*gain + 1}")
+            print(f"Gain value: {10**(24*(gain-0.5)/20)}")
     
     # Audio processing Equalizer
     @pyqtProperty(list, constant=True)
@@ -430,6 +439,7 @@ class MainWindow(QObject):
     def getMuteEnable(self, enable):
         if not self._sensors == None:
             self._sensors.setMute(enable)
+            self._audio_processing.setOutputEnable(not enable)
         else:
             print(f"Mute enable: {enable}")
 
@@ -441,11 +451,41 @@ class MainWindow(QObject):
     def getUnmuteImagePath(self):
         return str(self.__unmutePath)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_0_0(self):
+        return str(self.__eq_0_int_0_am_0)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_0_1(self):
+        return str(self.__eq_0_int_0_am_1)
 
+    @pyqtProperty(str, constant= True)
+    def path_0_1_0(self):
+        return str(self.__eq_0_int_1_am_0)
 
-        
-                  
+    @pyqtProperty(str, constant= True)
+    def path_0_1_1(self):
+        return str(self.__eq_0_int_1_am_1)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_0_0(self):
+            return str(self.__eq_1_int_0_am_0)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_0_1(self):
+        return str(self.__eq_1_int_0_am_1)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_1_0(self):
+            return str(self.__eq_1_int_1_am_0)
+
+    @pyqtProperty(str, constant= True)
+    def path_1_1_1(self):
+        return str(self.__eq_1_int_1_am_1)
+    
+    @pyqtProperty(str, constant= True)
+    def amHolder(self):
+        return str(self.__am_holder)
 
 if __name__ == "__main__":
     gui = GUI()

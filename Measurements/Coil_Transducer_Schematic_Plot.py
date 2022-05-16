@@ -10,20 +10,21 @@ from Impedance import Impedance
 import pandas as pd
 import numpy as np
 
-path_angle = "Messungen_FB_TS_BA/02_Meas/Ang_Z"
-path_magnitude = "Messungen_FB_TS_BA/02_Meas/Mag_Z"
+path_angle = "../Messungen_FB_TS_BA/02_Meas/Ang_Z"
+path_magnitude = "../Messungen_FB_TS_BA/02_Meas/Mag_Z"
 
 impedanceCSV_transducer = ImpedanceCSV(path_magnitude, path_angle)
 impedanceCSV_transducer.setup_folders()
 impedanceCSV_transducer.loadValues()
 
 imps = []
-for i in range(5):
+for i in range(10):
     imp = Impedance((impedanceCSV_transducer.magnitudes[i])[" Formatted Data"]
                     ,(impedanceCSV_transducer.angle[i])[" Formatted Data"]
                     ,(impedanceCSV_transducer.angle[i])["Frequency"])
     imps.append(imp)
 
+print(len(imps))
 # coil_mag = pd.read_csv("Messungen_FB_TS_BA/001_MEAS/Coil_220u_25kHz_50kHz/MAG_Z_001.CSV")
 # coil_ang = pd.read_csv("Messungen_FB_TS_BA/001_MEAS/Coil_220u_25kHz_50kHz/ANG_Z_001.CSV")
 
@@ -48,16 +49,14 @@ f = np.arange(22,55.1,0.1)
 for i,p in enumerate(c["Mag_dB"]):
     print(f"({f[i]} ,{p})")
 
-
+mag =np.real(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi))
 
 # Plot 
 fig,ax = plt.subplots()
 ax_p = ax.twinx()
 #ax.plot(imp_tot.frequency,imp_tot.magnitude,"orange",label = "With Coil")
-ax.plot(imp.frequency,20*np.log10(np.real(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi))),"blue",label = "Transducers")
-ax.plot(f*1000,c["Mag_dB"])
+ax.plot(imp.frequency,np.abs(imp.magnitude*np.exp(complex(0,1)*imp.angle/180*np.pi)),"blue",label = "Transducers")
 ax.set_xlim((25000,55000))
-ax.set_ylim((25,85))
 # ax_p.plot(imp_tot.frequency,imp_tot.angle,"orange",linestyle="-.")
 # ax_p.plot(imp.frequency,imp.angle,"blue",linestyle="-.")
 ax.legend(loc='upper left')

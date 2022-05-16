@@ -218,5 +218,4 @@ Item{
         Component.onCompleted: capture.start()
         Component.onDestruction: capture.stop()
     }
-
 }

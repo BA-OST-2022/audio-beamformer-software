@@ -1,6 +1,6 @@
- import QtQuick 2.15
+import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls 2.3
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
@@ -12,12 +12,13 @@ Item{
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
+    anchors.leftMargin: -10
     visible: audio_processing_button.checked
 
     // Audio processing settings
     Row{
         id: audio_processing_settings_row
-        height: main_window.height/3*2
+        height: 198
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -73,13 +74,15 @@ Item{
                 anchors.top: ap_source_combobox.bottom
                 anchors.topMargin: 12
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Gain: " + ap_source_slider.value.toFixed(2)}
+                text: {"Gain: " + (24*(ap_source_slider.value -0.5)).toFixed(2) + "dB"}
             }
 
             Slider {
                 id: ap_source_slider
+                stepSize: 1/24
                 anchors.top: ap_source_label_gain.bottom
                 anchors.topMargin: -2
+                value: 0.5
                 y: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 onValueChanged: {
@@ -281,7 +284,7 @@ Item{
                 id: ap_interpolation_row_radio_button
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: ap_modulation_label_radio_label.bottom
-                anchors.topMargin: 8
+                anchors.topMargin: 5
                 RadioButton{
                     id: ad_modulation_am
                     text: qsTr("AM")
@@ -321,6 +324,55 @@ Item{
     // Flow-Chart
     Item{
         id: flow_chart_item
+        anchors.top: audio_processing_settings_row.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        Image{
+            anchors.top: parent.top
+            fillMode: Image.PreserveAspectFit
+            source: {
+                if (ap_equalizer_switch.checked && ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_1_1
+                }
+                else if (!ap_equalizer_switch.checked && ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_0_1_1
+                }
+                else if (ap_equalizer_switch.checked && ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_1_0_1
+                }
+                else if (ap_equalizer_switch.checked && !ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_1_0
+                }
+                else if (ap_equalizer_switch.checked && !ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_0_1_0
+                }
+                else if (!ap_equalizer_switch.checked && !ad_modulation_am.checked && ap_interpolation_switch.checked){
+                    backend.path_1_0_0
+                }
+                else if (!ap_equalizer_switch.checked && !ad_modulation_am.checked && !ap_interpolation_switch.checked){
+                    backend.path_0_0_0
+                }
+                else{
+                     backend.path_0_0_1
+                }
+            }
+            sourceSize.width: 1206
+            sourceSize.height: 122
+        }
+        Image{
+            anchors.right: parent.right
+            visible: ad_modulation_am.checked
+            anchors.top: parent.top
+            fillMode: Image.PreserveAspectFit 
+            sourceSize.width: 300
+            sourceSize.height: 122
+            source: backend.amHolder
+            anchors.topMargin:-102
+            anchors.rightMargin: 15
+
+        }
+       
 
     }
 }

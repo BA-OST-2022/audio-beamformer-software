@@ -32,7 +32,7 @@
 import threading
 import numpy as np
 import time
-
+from pathlib import Path
 DEBUG = False
 
 class Beamsteering():
@@ -57,16 +57,17 @@ class Beamsteering():
         self._currentPattern = 0
         self._PatternHoldTime = 1
         self._enableChannel = np.ones(19)
-        self.__window_types = {"rect": self.rectWindow,
-                             "cosine": self.cosineWindow,
-                             "hann": self.hannWindow,
-                             "hamming": self.hammingWindow,
-                             "blackman": self.blackmanWindow,
-                             "cheby": self.chebyWindow}
+        self.__window_types = {"Rectangle": self.rectWindow,
+                             "Cosine": self.cosineWindow,
+                             "Hann": self.hannWindow,
+                             "Hamming": self.hammingWindow,
+                             "Blackman": self.blackmanWindow,
+                             "Dolph-Chebyshev": self.chebyWindow}
         self._initialized = False
         self.__distance = 0.01475
         self.__speed_of_sound = 343.2
         self.__row_count = 19
+        self.__pathImages = Path("..") / "GUI" / "qml" / "images"
 
     def begin(self):
          if not self._initialized:
@@ -86,6 +87,9 @@ class Beamsteering():
                     self.setAngle()
                     self.calculateSpeedOfSound()
                     self.calculateDelay()
+
+    def generatePlots(self):
+        pass
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
@@ -114,38 +118,51 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def _calc_angle_face(self):
-        return 0
+        #************************************************************* ENTER VALUES HERE *****************************************************************************************
+        camera_angle_rad = 40 / 180 * np.pi
+        max_image_size_x = 1200
+        #*************************************************************************************************************************************************************************
+        angle = 0
+        if self._facetracking:
+            position = self._facetracking.getFocusLocation()
+            if not position:
+                print("No Image received")
+            else:
+                x_pos = position[0]
+                w = np.sin(np.pi/2 - camera_angle_rad) * max_image_size_x / 2 / np.sin(camera_angle_rad) 
+                x_diff = x_pos - (max_image_size_x // 2)
+                l = np.sqrt(w**2 + x_diff**2)
+                angle = np.arcsin(x_diff/l) * 180/ np.pi
+        print(angle)
+        return angle
 
     def setAngle(self):
         # Face Tracking
         if (self._activeSource == 0):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]))
-            self._angleToSteer = self._calc_angle_face() # Needs to be adjusted
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
+            self._angleToSteer = self._calc_angle_face() 
         # Manual
         elif (self._activeSource == 1):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153]))
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153])/ 255)
             self._angleToSteer = self._angleToSteer_manual
         else:
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24]))
+                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
-        print(self._angleToSteer)
 
     def calculateDelay(self):
-        print(np.arange(self.__row_count))
-        print(self.__distance)
-        print(self.__speed_of_sound)
-        print(self._angleToSteer)
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
-        print(delay)
         if (np.sin(self._angleToSteer/180*np.pi) < 0):
             delay = delay[::-1] * -1
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
             self._fpga_controller.update()
-            leds_display = delay / max(delay)
+            if not max(delay) == 0:
+                leds_display = delay / max(delay)
+            else:
+                leds_display = np.ones(19) * 0.5
             self._leds.setBrightness(leds_display)
 
         else:
@@ -162,8 +179,9 @@ class Beamsteering():
 
     def calculateSpeedOfSound(self):
         if not self._sensors == None:
-            #self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
-            #return self.__speed_of_sound
+            self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
+            if self.__speed_of_sound:
+                return self.__speed_of_sound
             return 343.3
         else:
             return 343.3
