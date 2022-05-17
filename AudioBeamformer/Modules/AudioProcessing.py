@@ -38,11 +38,16 @@ from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
 import sounddevice as sd
+from AudioPlayer import AudioPlayer
 # Other
 import os
 import sys
 import numpy as np
 import ast
+
+DEBUG = True
+LINUX = (sys.platform == 'linux')
+
 
 class AudioProcessing:
     def __init__(self):
@@ -53,7 +58,7 @@ class AudioProcessing:
         self.__black_list_input_device = ["pulse","loopin","default"]
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         # Device index
-        if(sys.platform == 'linux'):  
+        if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
             channels = self.getChannels()
@@ -62,7 +67,7 @@ class AudioProcessing:
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
             self._input_device = 0
-            self._output_device = 0
+            self._output_device = 2
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -78,6 +83,9 @@ class AudioProcessing:
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
         self.__stream_running = False
+        self._enableMagic = False
+        self._player = AudioPlayer(sampleRate=self._samplerate, blockSize=self._chunk_size)
+        
         # Equalizer initialization
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
         with open(self.__equalier_dict_path) as f:
@@ -97,7 +105,7 @@ class AudioProcessing:
         self._stream.close()
 
     def setupStream(self): 
-        if(sys.platform == 'linux'):
+        if LINUX or DEBUG:
             if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
                 channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
             else:
@@ -161,7 +169,7 @@ class AudioProcessing:
                             sourceList.append(default_val)
                         else:
                             sourceList.append(device["name"])
-        if(sys.platform == 'linux'):
+        if LINUX:
             ind = sourceList.index(default_val)
             sourceList.insert(0,sourceList.pop(ind))
             sourceIndexList.insert(0,sourceIndexList.pop(ind))
@@ -268,6 +276,9 @@ class AudioProcessing:
         data = data / 2147483648
         data = 1 - 1/2*data**2 - 1/8**data**4
         return data * 2147483648  * self._mam_gain
+    
+    def enableMagic(self, state):
+        self._enableMagic = state
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
@@ -283,6 +294,11 @@ class AudioProcessing:
             outdata_oneCh = np.float32(outdata_oneCh)
         else:
             outdata_oneCh = indata[:,0]
+            
+        if self._enableMagic:
+            pass
+            # TODO: Override audio here
+            
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
@@ -294,7 +310,13 @@ class AudioProcessing:
 
 
 if __name__ == '__main__':
+    import time
     audio_processing = AudioProcessing()
     print(audio_processing.getSourceList())
-    print(type(audio_processing))
+    audio_processing.enableMagic(True)
     
+    audio_processing.begin()
+    time.sleep(10)
+    audio_processing.end()
+    
+

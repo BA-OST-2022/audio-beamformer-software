@@ -225,7 +225,8 @@ class Sensors():
         return self._alertState and self._alertEnable
     
     def setVolume(self, volume):
-        self._rotaryEncoder.setEncoderValue(volume)
+        if self._rotaryEncoder:
+            self._rotaryEncoder.setEncoderValue(volume)
         if self._powerSupply:
             self._powerSupply.setVolume(volume)
     
