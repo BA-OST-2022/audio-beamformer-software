@@ -179,11 +179,11 @@ class Sensors():
                 if DEBUG:
                     print("Updated ToF Sensor Data")
                 
-            
+            mute = self.getMute() or (self._alertState and self._alertEnable)  
             if self._powerSupply:
-                self._powerSupply.enableOutput(not self.getMute())
+                self._powerSupply.enableOutput(not mute)
                 
-            if(self.getMute()):
+            if(mute):
                 self._ledColor = self.COLOR_MUTE
             else:
                 self._ledColor = self.COLOR_RUN
@@ -223,6 +223,9 @@ class Sensors():
         if not(0.0 <= sensitivity <= 1.0):
             raise ValueError("Sensitivity out of bound: 0.0 .. 1.0")
         self._alertSensitivity = sensitivity
+        
+    def getAlertState(self):
+        return self._alertState
     
     def setVolume(self, volume):
         self._rotaryEncoder.setEncoderValue(volume)
@@ -244,8 +247,7 @@ class Sensors():
 
     
     def getMute(self):
-        muteButton = self._rotaryEncoder.getButtonState()
-        return muteButton or (self._alertState and self._alertEnable)    
+        return self._rotaryEncoder.getButtonState()   
     
     
     def enableMagic(self, state):
