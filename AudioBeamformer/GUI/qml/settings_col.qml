@@ -46,7 +46,7 @@ Item{
             Switch{
                 id: se_led_switch
                 anchors.topMargin: 5
-                enable: true
+                checked: true
                 anchors.top: se_led_switch_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 onReleased: {
