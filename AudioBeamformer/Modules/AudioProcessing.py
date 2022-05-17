@@ -270,8 +270,9 @@ class AudioProcessing:
         return data * 2147483648  * self._mam_gain
 
     def callback(self, indata, outdata, frames, time, status):
-        indata_oneCh = indata[:,0] * self._tot_gain * self._output_enable
+        indata_oneCh = indata[:,0] * self._tot_gain 
         self.setSourceLevel(indata_oneCh)
+        indata_oneCh *= self._output_enable
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.__previousWindow,
                                     indata_oneCh))
