@@ -487,6 +487,14 @@ class MainWindow(QObject):
     def amHolder(self):
         return str(self.__am_holder)
 
+    @pyqtProperty(bool)
+    def getAlertState(self):
+        if self._sensors:
+            return self._sensors.getAlertState() 
+        else:
+            return False
+
+
 if __name__ == "__main__":
     gui = GUI()
     gui.run()
