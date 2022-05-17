@@ -186,7 +186,11 @@ class AudioProcessing:
         indata = indata /2147483648
         rms = np.sqrt(np.mean(indata**2))
         if not rms < 0.00001:
-            self.__current_source_level = 10*np.log10(np.sqrt(np.mean(indata**2)))
+            level = 10*np.log10(np.sqrt(np.mean(indata**2)))
+        else:
+            level = -50
+        if level:
+            self.__current_source_level = level
         else:
             self.__current_source_level = -50
 

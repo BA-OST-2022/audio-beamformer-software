@@ -141,17 +141,40 @@ class Beamsteering():
         # Face Tracking
         if (self._activeSource == 0):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
+                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
+                pass
             self._angleToSteer = self._calc_angle_face() 
         # Manual
         elif (self._activeSource == 1):
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153])/ 255)
+                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153])/ 255)
+                pass
             self._angleToSteer = self._angleToSteer_manual
         else:
             if self._leds:
-                self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
+                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
+                pass
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
+            
+        min_angle = -45
+        max_angle = 45
+        start_color = np.array([1,1,1])
+        end_color = np.array([0,0,1])
+        color_gradient = (start_color - end_color)/19
+        
+        main_led = int(self._angleToSteer / (-max_angle + min_angle) * 19) 
+        leds_display = np.ones((19,3))
+        leds_display[main_led] = 1
+        for i,elem in enumerate(leds_display):
+            distance = np.abs(i - main_led)
+            leds_display[i,:] = start_color - distance * color_gradient
+        print(leds_display)
+        self._leds.setChannelColors(leds_display)
+        
+        # main_led = 9 + int(self._angleToSteer / (max_angle - min_angle) * 19) 
+        # leds_display = np.ones((19,3))
+        # leds_display[main_led,:] = 1
+        # self._leds.setChannelColors(leds_display)
 
     def calculateDelay(self):
         delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
@@ -160,13 +183,13 @@ class Beamsteering():
         if not DEBUG:
             self._fpga_controller.setChannelDelay(delay)
             self._fpga_controller.update()
-            if not max(delay) == 0:
-                leds_display = delay / max(delay)
-            else:
-                leds_display = np.ones(19) * 0.5
-            leds_display = np.clip(leds_display,0,1)
-            leds_display = np.ones((19, 3)) * np.array([1,0,0]) * leds_display 
-            self._leds.setChannelColors(leds_display)
+            # if not max(delay) == 0:
+            #     leds_display = delay / max(delay)
+            # else:
+            #     leds_display = np.ones(19) * 0.5
+            # leds_display = np.clip(leds_display,0,1)
+            # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
+            # self._leds.setChannelColors(leds_display)
 
         else:
             print(delay[0])
