@@ -289,8 +289,7 @@ class AudioProcessing:
 
 
 if __name__ == '__main__':
-    audio_processing = AudioProcessing(input_device_index = 7,
-                                       output_device_index = 8,
-                                       samplerate=48000)
+    audio_processing = AudioProcessing()
+    print(audio_processing.getSourceList())
     print(type(audio_processing))
     
