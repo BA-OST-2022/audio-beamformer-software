@@ -44,7 +44,7 @@ Item{
                 anchors.topMargin: 8
                 anchors.top: ap_source_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Input Source")
+                text: qsTr("Input Device")
             }
 
             ComboBox {
@@ -74,7 +74,7 @@ Item{
                 anchors.top: ap_source_combobox.bottom
                 anchors.topMargin: 12
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Gain: " + (24*(ap_source_slider.value -0.5)).toFixed(2) + "dB"}
+                text: {"Gain: " + (24*(ap_source_slider.value -0.5)).toFixed(1) + " dB"}
             }
 
             Slider {

@@ -40,7 +40,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
@@ -346,9 +346,7 @@ class MainWindow(QObject):
     @pyqtProperty(float)
     def ToFDistanceLevel(self):
         if not self._sensors == None:
-            distanceLevel = self._sensors.getDistanceLevel()
-            if distanceLevel:
-                return self._sensors.getDistanceLevel()
+            return self._sensors.getDistanceLevel()
         return 1.0
 
     @pyqtSlot(int)

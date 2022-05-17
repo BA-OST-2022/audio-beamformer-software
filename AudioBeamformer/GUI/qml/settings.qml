@@ -145,9 +145,7 @@ Item{
                 running: true
                 repeat: true
                  onTriggered: {
-                    se_source_gauge_base.height = Math.min(backend.ToFDistanceLevel , 0.6)* se_gauge_background.width
-                    se_source_gauge_middle.height = Math.min(backend.ToFDistanceLevel-0.6,0.2)* se_gauge_background.width
-                    se_source_gauge_top.height = Math.min(backend.ToFDistanceLevel-0.8,0.2)* se_gauge_background.width
+                    se_source_gauge_base.height = backend.ToFDistanceLevel* se_gauge_background.width
                 }
             }
 
@@ -174,25 +172,12 @@ Item{
                 }
                 Rectangle{
                     id: se_source_gauge_base
-                    height: parent.height*0.6
+                    height: 0
                     width: parent.width
                     anchors.bottom:se_gauge_holder.bottom
                     color: "#37d417"
                 }
-                Rectangle{
-                    id: se_source_gauge_middle
-                    height: parent.height*0.2
-                    width: parent.width
-                    anchors.bottom:se_source_gauge_base.top
-                    color: "#ffd70f"
-                }
-                Rectangle{
-                    id: se_source_gauge_top
-                    height: parent.height
-                    width: parent.width
-                    anchors.bottom:se_source_gauge_middle.top
-                    color: "red"
-                }
+                
             }
 
         }

@@ -116,7 +116,7 @@ Item{
                 anchors.topMargin: 5
                 visible: se_tof_switch.checked
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Sensitivity: " + se_tof_level_slider.value.toFixed(2)}
+                text: {"Sensitivity: " + (se_tof_level_slider.value * 100).toFixed(0) + " %"}
             }
 
             Slider {
@@ -136,9 +136,7 @@ Item{
                 running: true
                 repeat: true
                  onTriggered: {
-                    se_source_gauge_base.height = Math.min(backend.ToFDistanceLevel , 0.6)* se_gauge_background.width
-                    se_source_gauge_middle.height = Math.min(backend.ToFDistanceLevel-0.6,0.2)* se_gauge_background.width
-                    se_source_gauge_top.height = Math.min(backend.ToFDistanceLevel-0.8,0.2)* se_gauge_background.width
+                    se_source_gauge_base.height = backend.ToFDistanceLevel * se_gauge_background.width
                 }
             }
 
@@ -164,25 +162,12 @@ Item{
                 }
                 Rectangle{
                     id: se_source_gauge_base
-                    height: parent.height*0.6
-                    width: parent.width
-                    anchors.bottom:se_gauge_holder.bottom
-                    color: "#38f56e"
-                }
-                Rectangle{
-                    id: se_source_gauge_middle
-                    height: parent.height*0.2
-                    width: parent.width
-                    anchors.bottom:se_source_gauge_base.top
-                    color: "#38f56e"
-                }
-                Rectangle{
-                    id: se_source_gauge_top
                     height: parent.height
                     width: parent.width
-                    anchors.bottom:se_source_gauge_middle.top
-                    color: "#38f56e"
+                    anchors.bottom:se_gauge_holder.bottom
+                    color: "#80DEEA"
                 }
+
             }
 
         }
@@ -198,7 +183,7 @@ Item{
                 anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Max. Volume: " + se_volume_level_slider.value.toFixed(2)}
+                text: {"Max. Volume: " + (se_volume_level_slider.value * 100).toFixed(0) + " %"}
             }
 
             Slider {
@@ -337,7 +322,7 @@ Item{
         anchors.bottomMargin: 5
         Label{
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Channel enable")
+                    text: qsTr("Channel enable") * 100 + " %"
             }
         CheckBox{
             id: channel_1

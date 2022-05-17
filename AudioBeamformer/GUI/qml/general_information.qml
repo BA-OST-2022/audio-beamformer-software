@@ -8,6 +8,7 @@ import QtQuick.Extras 1.4
 Item{
     anchors.fill: parent
         Rectangle{
+        id: alert_rect
         visible: backend.getAlertState
         anchors.fill: parent
         color: "red"
@@ -23,6 +24,7 @@ Item{
         running: true
         repeat: true
         onTriggered: {
+            alert_rect.visible = backend.getAlertState
             main_mute_button.checked = backend.muteEnable;
             main_volume_slider.value = backend.mainGainValue;
         }
@@ -115,7 +117,7 @@ Item{
                 }
                 Rectangle{
                     id: ap_source_gauge_top
-                    height: parent.height
+                    height: parent.height*0.2
                     width: parent.width
                     anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"

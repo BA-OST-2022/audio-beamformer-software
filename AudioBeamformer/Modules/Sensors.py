@@ -38,7 +38,7 @@ import re, subprocess
 import numpy as np
 import psutil
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -79,7 +79,7 @@ class Sensors():
         self._alertEnable = True
         self._alertState = False
         self._alertSensitivity = 0.5
-        self._distanceLevel = None
+        self._distanceLevel = 0.0
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         self._shutdownCallback  = None
@@ -107,7 +107,7 @@ class Sensors():
             self._runInitialization = True
             self._updateRate = updateRate
             self._runThread = True
-            self.update()
+            threading.Timer(0, self.update).start()  
     
     
     def end(self):
@@ -137,7 +137,7 @@ class Sensors():
             self._rotaryEncoder.begin()
             self._tempSensorAmbient.begin()
             self._tempSensorSystem.begin()
-            # self._tofSensor.begin()       # This takes up to 10s
+            self._tofSensor.begin()       # This takes up to 10s
             self._hmi.setButtonColor(self.COLOR_RUN)
             self._readyState = True
             if DEBUG:
@@ -149,26 +149,6 @@ class Sensors():
             else:
                 return
             
-            if(time.time() - self._timeTemp > 1 / self._updateRateTemp):
-                self._timeTemp = time.time()
-                self._ambientTemp = self._tempSensorAmbient.getTemperature()
-                self._systemTemp = self._tempSensorSystem.getTemperature()
-                self._cpuTemp = self._getCpuTemperature()
-                if not np.isnan(self._systemTemp):
-                    fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
-                    self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
-                if DEBUG:
-                    print("Updated Temperatures")
-            
-            if(time.time() - self._timeLed > 1 / self._updateRateLed):
-                self._timeLed = time.time()
-                if(self._enableMagic):
-                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
-                    self._ledColor = np.array([r, g, b])
-                self._hmi.setButtonColor(self._ledColor)
-                if DEBUG:
-                    print("Update LED Color")
-                
             if(self._tofSensor.update()):
                 self._distanceMap = self._tofSensor.getDistance()
                 event = self._checkDistanceMap(self._distanceMap)
@@ -178,7 +158,7 @@ class Sensors():
                     self._alertState = False
                 if DEBUG:
                     print("Updated ToF Sensor Data")
-                
+                    
             mute = self.getMute() or self.getAlertState()
             if self._powerSupply:
                 self._powerSupply.enableOutput(not mute)
@@ -187,6 +167,23 @@ class Sensors():
                 self._ledColor = self.COLOR_MUTE
             else:
                 self._ledColor = self.COLOR_RUN
+            
+            
+            if(time.time() - self._timeTemp > 1 / self._updateRateTemp):
+                self._timeTemp = time.time()
+                self._ambientTemp = self._tempSensorAmbient.getTemperature()
+                self._systemTemp = self._tempSensorSystem.getTemperature()
+                self._cpuTemp = self._getCpuTemperature()
+                if not np.isnan(self._systemTemp):
+                    fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
+                    self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
+            
+            if(time.time() - self._timeLed > 1 / self._updateRateLed):
+                self._timeLed = time.time()
+                if(self._enableMagic):
+                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
+                    self._ledColor = np.array([r, g, b])
+                self._hmi.setButtonColor(self._ledColor)
             
     
     def getReadyState(self):
@@ -280,18 +277,17 @@ class Sensors():
         distance_foreground_on = 1200
         distance_foreground_off = 1500
 
-        sens = self._alertSensitivity * row_size * column_size
+        sens = max(1,(1 - self._alertSensitivity) * row_size * column_size)
         mask = np.ones((row_size,column_size))
         foreground_map_on = distanceMap <= distance_foreground_on
         foreground_map_off = distanceMap <= distance_foreground_off
-        element_foreground_on = convolve2d(mask,foreground_map_on,"same") >= sens
-        element_foreground_off = convolve2d(mask,foreground_map_off,"same") >= sens
+        element_foreground_on = convolve2d(mask,foreground_map_on,"same") >= sens 
+        element_foreground_off = convolve2d(mask,foreground_map_off,"same") >= sens 
 
         self._distanceLevel = np.mean(element_foreground_on)
-
         mute_channel = np.any(element_foreground_on)
 
-        if mute_channel and not np.any(element_foreground_off):
+        if not mute_channel and not np.any(element_foreground_off):
             mute_channel = False
             return self.EVENT_FREE
         if mute_channel:
@@ -304,5 +300,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(5)
+    time.sleep(100)
     sensors.end()
