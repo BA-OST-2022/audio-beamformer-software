@@ -8,6 +8,7 @@ import QtQuick.Extras 1.4
 Item{
     anchors.fill: parent
         Rectangle{
+        visible: backend.getAlertState
         anchors.fill: parent
         color: "red"
         radius: 10
