@@ -66,8 +66,8 @@ class AudioProcessing:
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._input_device = 0
-            self._output_device = 2
+            self._input_device = 10
+            self._output_device = 11
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -279,6 +279,10 @@ class AudioProcessing:
     
     def enableMagic(self, state):
         self._enableMagic = state
+        if(state):
+            self._player.begin("files/magic.wav")
+        else:
+            self._player.end()
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
@@ -296,8 +300,7 @@ class AudioProcessing:
             outdata_oneCh = indata[:,0]
             
         if self._enableMagic:
-            pass
-            # TODO: Override audio here
+            outdata_oneCh = self._player.getData()[:,0]
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
