@@ -179,7 +179,7 @@ class Sensors():
                 if DEBUG:
                     print("Updated ToF Sensor Data")
                 
-            mute = self.getMute() or (self._alertState and self._alertEnable)  
+            mute = self.getMute() or self.getAlertState()
             if self._powerSupply:
                 self._powerSupply.enableOutput(not mute)
                 
@@ -225,7 +225,7 @@ class Sensors():
         self._alertSensitivity = sensitivity
         
     def getAlertState(self):
-        return self._alertState
+        return self._alertState and self._alertEnable
     
     def setVolume(self, volume):
         self._rotaryEncoder.setEncoderValue(volume)
