@@ -71,12 +71,12 @@ class Beamsteering():
         self._currentPattern = 0
         self._PatternHoldTime = 1
         # Window
-        self.__window_types = {"Rectangle": self.rectWindow,
-                             "Cosine": self.cosineWindow,
-                             "Hann": self.hannWindow,
-                             "Hamming": self.hammingWindow,
-                             "Blackman": self.blackmanWindow,
-                             "Dolph-Chebyshev": self.chebyWindow}
+        self.__window_types = {"Rectangle": self.rectWindow(),
+                             "Cosine": self.cosineWindow(),
+                             "Hann": self.hannWindow(),
+                             "Hamming": self.hammingWindow(),
+                             "Blackman": self.blackmanWindow(),
+                             "Dolph-Chebyshev": self.chebyWindow()}
         self._activeWindow = "Rectangle"
         # LED 
         self._start_color = np.array([1,0.4,0])
@@ -189,13 +189,16 @@ class Beamsteering():
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
     
     def calculateDelay(self):
+        # If angle below 1 degree set delay to zero
         if abs(self._angleToSteer) >= 1:
             delay = np.arange(self.__row_count) * (self.__distance / self.getSpeedOfSound()) * np.sin(self._angleToSteer/180*np.pi)
+            # Make all delays positive
             if (np.sin(self._angleToSteer/180*np.pi) < 0):
                 delay = delay[::-1] * -1
         else:
             delay = np.zeros(self.__row_count)
-            
+        
+        # Check if delay allowed
         maxDelay = self._fpga_controller.getMaxChannelDelay()
         if np.any(delay >= maxDelay):
             print(f"Wrong angle: {delay}")
@@ -205,7 +208,7 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def calculateGains(self):
-        gains = self.__window_types[self._activeWindow]()
+        gains = self.__window_types[self._activeWindow]
         if not DEBUG:
             self._fpga_controller.setChannelGain(np.array(gains))
             self._fpga_controller.update()
@@ -218,14 +221,16 @@ class Beamsteering():
             if not np.isnan(temp):
                 return 331.5 + 0.607 * temp
             return 343.3
-    
-    def getWindowProfileList(self):
-        self.__window_list = list(self.__window_types.keys())
-        return list(self.__window_types.keys())
 
     def setWindowProfile(self, profile):
         self._activeWindow = self.__window_list[profile]
         self.calculateGains()
+
+    def getWindowProfileList(self):
+        self.__window_list = list(self.__window_types.keys())
+        return list(self.__window_types.keys())
+
+    # Window types
 
     def rectWindow(self):
         gains = [1] * self.__row_count

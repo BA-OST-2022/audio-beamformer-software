@@ -89,6 +89,7 @@ Item{
                 onValueChanged: {
                     backend.getSourceGain(ap_source_slider.value)
                 }
+
             }
             
             // Timer for Gauge
@@ -320,6 +321,23 @@ Item{
                     onValueChanged: {
                         backend.getMAMGain(ap_modulation_slider.value)
                     }
+                    /*
+                    Row {
+                    anchors.top: parent.bottom
+                    anchors.topMargin: -21
+                    width: 170
+                    spacing: ap_modulation_slider.width / 12 - 2
+                    Repeater {
+                        id: repeater_ap_source
+                        model: 12
+                        Rectangle {
+                            id: repeat_rectangle_ap_source
+                            width: 2; height: 7
+                            }
+                        }
+                    
+                    }
+                    */
             }
         }
     }
