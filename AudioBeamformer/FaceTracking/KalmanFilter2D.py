@@ -22,6 +22,8 @@ class KalmanFilter2D:
                            [0.0, R]])
         
         self.lifetime = 5
+        self.rawBox = []
+        
 
     def _predict(self):
         """
