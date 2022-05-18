@@ -309,7 +309,7 @@ Item{
                 anchors.top: ap_interpolation_row_radio_button.bottom
                 anchors.topMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"MAM Distortion: " + ap_modulation_slider.value.toFixed(2)}
+                text: {"MAM Distortion: " + (ap_modulation_slider.value * 100).toFixed() + " %"}
             }
             Slider {
                     id: ap_modulation_slider

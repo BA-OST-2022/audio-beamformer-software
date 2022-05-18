@@ -207,7 +207,19 @@ class FaceTracking():
             z_k = np.asarray(centers[center_index])
             x_k = self.faces[face_index].get_position()
             
-            self.faces[face_index].rawBox = boxes[center_index]
+            weight = 0.25
+            box = np.array(boxes[center_index], dtype=np.float64)
+            if len(self.faces[face_index].floatBox) == 0:
+                self.faces[face_index].floatBox = box
+            
+            self.faces[face_index].floatBox *= (1 - weight)
+            self.faces[face_index].floatBox += weight * box
+            box = self.faces[face_index].floatBox
+            w = abs(box[2] - box[0]) // 2
+            h = abs(box[3] - box[1]) // 2
+            cx = self.faces[face_index].get_position()[0]
+            cy = self.faces[face_index].get_position()[1]
+            self.faces[face_index].rawBox = np.array([cx - w, cy - h, cx + w, cy + h], dtype=np.int32)
 
 
             # dist = np.linalg.norm(z_k - x_k)
@@ -310,7 +322,7 @@ if __name__ == "__main__":
         if not ret:
             break
         img = faceTracking.runDetection(frame)
-        print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
+        # print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
 
         cv2.imshow("FaceTracking [ESC to quit]", img)
         key = cv2.waitKey(1)
