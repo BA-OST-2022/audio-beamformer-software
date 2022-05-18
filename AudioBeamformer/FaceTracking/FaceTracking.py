@@ -185,7 +185,7 @@ class FaceTracking():
                 if i == self._focus:
                     color = self.colorActive
                 if not self._enableMagic:
-                    if self.showDot:
+                    if self._showDot:
                         cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=color, thickness=20)
                     if self._showRoundRect:
                         rounded_rectangle(img, (box[0], box[1]), (box[3], box[2]), radius=0.3, color=color, thickness=4)
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     VIDEO_FILE = "dance2.mp4"
     USE_CAMERA = True
     
-    faceTracking.enableMagic(True)
+    # faceTracking.enableMagic(True)
     
     if USE_CAMERA:
         cap = cv2.VideoCapture(0)
