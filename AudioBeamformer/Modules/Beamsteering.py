@@ -50,6 +50,8 @@ class Beamsteering():
         # Constants
         self.__distance = 0.01475
         self.__row_count = 19
+        #   Camera angle in degree
+        self.__max_angle_camera = 40
         # Var init
         self._initialized = False
         self._runThread = False
@@ -76,6 +78,11 @@ class Beamsteering():
                              "Blackman": self.blackmanWindow,
                              "Dolph-Chebyshev": self.chebyWindow}
         self._activeWindow = "Rectangle"
+        # LED 
+        self._start_color = np.array([1,0.4,0])
+        self._end_color = np.array([0.05,0.2,0.95])
+        #self._start_color = np.array([1,0.3,0])
+        #self._end_color = np.array([0.5,0.87,0.92])
         # Mute channel
         self._enableChannel = np.ones(self.__row_count)
 
@@ -92,8 +99,10 @@ class Beamsteering():
     def update(self):
         if(self._initialized):
             if(self._runThread):
+                # Update rate for the LEDS
                 threading.Timer(1.0 / self._ledsUpdateRate, self.update).start()
                 self.setLEDS()
+                # Update rate for the angle
                 if(time.time() - self._timeTemp > 1 / self._updateRate):
                     self._timeTemp = time.time()
                     if(self._beamsteeringEnable):
@@ -102,6 +111,7 @@ class Beamsteering():
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
+        # If beamsteering is being turne of set angle to zero and calculate delay
         if value==0:
             self._angleToSteer = 0
             self.calculateDelay()
@@ -127,36 +137,35 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def _calc_angle_face(self):
-        #************************************************************* ENTER VALUES HERE *****************************************************************************************
-        camera_angle_rad = 40 
+        # TODO Measure camera angle
         max_image_size_x = 680
-        #*************************************************************************************************************************************************************************
+        
         angle = 0
+        # If facetracking found
         if self._facetracking:
+            # Get position from facetracking
             position = self._facetracking.getFocusLocation()
+            # If position avaiable
             if len(position) > 1:
-                x_pos = -position[0] + max_image_size_x/2
-                # w = np.sin(np.pi/2 - camera_angle_rad/ 180 * np.pi) * max_image_size_x / 2 / np.sin(camera_angle_rad/ 180 * np.pi) 
-                # x_diff = x_pos - (max_image_size_x // 2)
-                # l = np.sqrt(w**2 + x_diff**2)
-                # angle = np.arcsin(x_diff/l) * 180/ np.pi
-                distance = max_image_size_x / (2*np.tan(camera_angle_rad/ 180 * np.pi))
+                # Zero at center
+                x_pos = max_image_size_x/2-position[0]
+                # Calculate angle
+                distance = max_image_size_x / (2*np.tan(self.__max_angle_camera/ 180 * np.pi))
                 angle = np.arctan(x_pos / distance)* 180 / np.pi
         return angle
 
     def setLEDS(self):
+        #TODO Check if works with self.__max_angle_camera
         min_angle = -45
         max_angle = 45
-        start_color = np.array([1,0.4,0])
-        #start_color = np.array([1,0.3,0])
-        #end_color = np.array([0.5,0.87,0.92])
-        end_color = np.array([0.05,0.2,0.95])
+        # Where should the peak be
         peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
-        color_gradient = (end_color - start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
+        # Calc difference vector and scale
+        color_gradient = (self.end_color - self._start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
         leds_display = np.ones((self.__row_count,3))
         for i,elem in enumerate(leds_display):
             distance = np.abs(i - peak)
-            leds_display[i,:] = start_color + distance * color_gradient
+            leds_display[i,:] = self._start_color + distance * color_gradient
         self._leds.setChannelColors(np.abs(leds_display))
 
     def setAngle(self):
@@ -185,8 +194,6 @@ class Beamsteering():
         delay = np.clip(delay, 0, maxDelay)
         self._fpga_controller.setChannelDelay(delay)
         self._fpga_controller.update()
-    
-
     
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
