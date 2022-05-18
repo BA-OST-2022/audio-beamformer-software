@@ -155,10 +155,11 @@ class Beamsteering():
             
         min_angle = -45
         max_angle = 45
-        start_color = np.array([1,0.5,0])
-        end_color = np.array([0.5,0.87,0.92])
+        start_color = np.array([1,0.4,0])
+        #start_color = np.array([1,0.3,0])
+        #end_color = np.array([0.5,0.87,0.92])
+        end_color = np.array([0.05,0.2,0.95])
         peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
-        print(peak)
         color_gradient = (end_color - start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
         leds_display = np.ones((self.__row_count,3))
         for i,elem in enumerate(leds_display):

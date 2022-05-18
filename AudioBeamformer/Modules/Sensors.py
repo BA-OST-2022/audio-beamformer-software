@@ -38,7 +38,7 @@ import re, subprocess
 import numpy as np
 import psutil
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -158,6 +158,8 @@ class Sensors():
                     self._alertState = False
                 if DEBUG:
                     print("Updated ToF Sensor Data")
+            
+            self._alertState  = (time.time() * 1000) % 2000 > 1000
                     
             mute = self.getMute() or self.getAlertState()
             if self._powerSupply:
@@ -183,7 +185,9 @@ class Sensors():
                 if(self._enableMagic):
                     r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
                     self._ledColor = np.array([r, g, b])
+                time.sleep(0.2)
                 self._hmi.setButtonColor(self._ledColor)
+                
             
     
     def getReadyState(self):
