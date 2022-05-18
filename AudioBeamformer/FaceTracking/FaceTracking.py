@@ -58,6 +58,59 @@ def closest_pairs(array1, array2):
     return pairs, unassigned
 
 
+def rounded_rectangle(src, top_left, bottom_right, radius=1, color=255, thickness=1, line_type=cv2.LINE_AA):
+
+    #  corners:
+    #  p1 - p2
+    #  |     |
+    #  p4 - p3
+
+    p1 = top_left
+    p2 = (bottom_right[1], top_left[1])
+    p3 = (bottom_right[1], bottom_right[0])
+    p4 = (top_left[0], bottom_right[0])
+
+    height = abs(bottom_right[0] - top_left[1])
+
+    if radius > 1:
+        radius = 1
+
+    corner_radius = int(radius * (height/2))
+
+    if thickness < 0:
+
+        #big rect
+        top_left_main_rect = (int(p1[0] + corner_radius), int(p1[1]))
+        bottom_right_main_rect = (int(p3[0] - corner_radius), int(p3[1]))
+
+        top_left_rect_left = (p1[0], p1[1] + corner_radius)
+        bottom_right_rect_left = (p4[0] + corner_radius, p4[1] - corner_radius)
+
+        top_left_rect_right = (p2[0] - corner_radius, p2[1] + corner_radius)
+        bottom_right_rect_right = (p3[0], p3[1] - corner_radius)
+
+        all_rects = [
+        [top_left_main_rect, bottom_right_main_rect], 
+        [top_left_rect_left, bottom_right_rect_left], 
+        [top_left_rect_right, bottom_right_rect_right]]
+
+        [cv2.rectangle(src, rect[0], rect[1], color, thickness) for rect in all_rects]
+
+    # draw straight lines
+    cv2.line(src, (p1[0] + corner_radius, p1[1]), (p2[0] - corner_radius, p2[1]), color, abs(thickness), line_type)
+    cv2.line(src, (p2[0], p2[1] + corner_radius), (p3[0], p3[1] - corner_radius), color, abs(thickness), line_type)
+    cv2.line(src, (p3[0] - corner_radius, p4[1]), (p4[0] + corner_radius, p3[1]), color, abs(thickness), line_type)
+    cv2.line(src, (p4[0], p4[1] - corner_radius), (p1[0], p1[1] + corner_radius), color, abs(thickness), line_type)
+
+    # draw arcs
+    cv2.ellipse(src, (p1[0] + corner_radius, p1[1] + corner_radius), (corner_radius, corner_radius), 180.0, 0, 90, color ,thickness, line_type)
+    cv2.ellipse(src, (p2[0] - corner_radius, p2[1] + corner_radius), (corner_radius, corner_radius), 270.0, 0, 90, color , thickness, line_type)
+    cv2.ellipse(src, (p3[0] - corner_radius, p3[1] - corner_radius), (corner_radius, corner_radius), 0.0, 0, 90,   color , thickness, line_type)
+    cv2.ellipse(src, (p4[0] + corner_radius, p4[1] - corner_radius), (corner_radius, corner_radius), 90.0, 0, 90,  color , thickness, line_type)
+
+    return src
+
+
 class FaceTracking():
     def __init__(self, lifetime):
         self.fd = FaceDetector()
@@ -70,9 +123,12 @@ class FaceTracking():
         self.faces = []
         self.lifetime = lifetime
         
-        self.colorActive = ()
+        self.colorActive = (0xEA, 0xDE, 0x80)
+        self.colorInactive = (0x60, 0x60, 0x60)
 
         self.focus = 0
+        self.showDot = False
+        self.showRoundRect = True
     
     def __del__(self):
         self.fd.__del__()
@@ -96,6 +152,8 @@ class FaceTracking():
 
             z_k = np.asarray(centers[center_index])
             x_k = self.faces[face_index].get_position()
+            
+            self.faces[face_index].rawBox = boxes[center_index]
 
 
             # dist = np.linalg.norm(z_k - x_k)
@@ -119,16 +177,20 @@ class FaceTracking():
         if self.focus + 1 > len(self.faces):
             self.focus = 0
 
-        for i, fac in enumerate(self.faces):
-            if np.max(np.linalg.eig(fac.P[:2, :2])[0]) < 1000:
-                if i == self.focus and fac.lifetime >= self.lifetime / 2:
-                    cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=(255, 0, 0), thickness=20)
-                elif fac.lifetime >= self.lifetime / 2:
-                    cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=(0, 0, 255), thickness=20)
-        for box in boxes:
-            cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
-        
+        for i, fac in enumerate(self.faces): 
+            if (np.max(np.linalg.eig(fac.P[:2, :2])[0]) < 1000) and (fac.lifetime >= self.lifetime / 2):
+                box = fac.rawBox
+                color = self.colorInactive
+                if i == self.focus:
+                    color = self.colorActive
+                if self.showDot:
+                    cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=color, thickness=20)
+                if self.showRoundRect:
+                    rounded_rectangle(img, (box[0], box[1]), (box[3], box[2]), radius=0.3, color=color, thickness=4)
+                else:
+                    cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=color, thickness=4)
         return img
+    
     
     def getDetectionCount(self):
         return len(self.faces)
@@ -149,30 +211,24 @@ class FaceTracking():
             return []
     
 
-
-
 faceTracking = FaceTracking(lifetime=15)
 
 if __name__ == "__main__": 
     VIDEO_FILE = "dance2.mp4"
-    USE_VIDEO = True
+    USE_CAMERA = True
     
-    if USE_VIDEO:
+    if USE_CAMERA:
+        cap = cv2.VideoCapture(0)
+    else:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         cap = cv2.VideoCapture(os.path.join(dir_path, "demos", VIDEO_FILE))
-    else:
-        cap = cv2.VideoCapture(0)  # Use Camera
-
 
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
         img = faceTracking.runDetection(frame)
-
-        print(faceTracking.getDetectionCount())
-        print(faceTracking.getFocusLocation())
-
+        print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
 
         cv2.imshow("FaceTracking [ESC to quit]", img)
         key = cv2.waitKey(1)

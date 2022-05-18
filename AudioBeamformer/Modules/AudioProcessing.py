@@ -69,8 +69,8 @@ class AudioProcessing:
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._input_device = 0
-            self._output_device = 2
+            self._input_device = 0 #10
+            self._output_device = 3 #11
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -319,7 +319,7 @@ if __name__ == '__main__':
     import time
     audio_processing = AudioProcessing()
     print(audio_processing.getSourceList())
-    audio_processing.enableMagic(True)
+    # audio_processing.enableMagic(True)
     
     audio_processing.begin()
     time.sleep(10)
