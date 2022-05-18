@@ -34,7 +34,6 @@ import sys
 import cv2
 import numpy as np
 import os
-from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/FaceTracking")
