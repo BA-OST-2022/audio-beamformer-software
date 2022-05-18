@@ -1,3 +1,35 @@
+###############################################################################
+# file    FaceTracking.py
+###############################################################################
+# brief   This module analyses image data and runs a face detection algorithm
+###############################################################################
+# author  Luca Jost & Florian Baumgartner & Thierry Schwaller
+# version 1.0
+# date    2022-05-08
+###############################################################################
+# MIT License
+#
+# Copyright (c) 2022 ICAI Interdisciplinary Center for Artificial Intelligence
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+###############################################################################
+
 import sys
 import cv2
 import numpy as np
@@ -37,6 +69,8 @@ class FaceTracking():
 
         self.faces = []
         self.lifetime = lifetime
+        
+        self.colorActive = ()
 
         self.focus = 0
     
@@ -119,11 +153,16 @@ class FaceTracking():
 
 faceTracking = FaceTracking(lifetime=15)
 
-if __name__ == "__main__":
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = "dance3.mp4"
+if __name__ == "__main__": 
+    VIDEO_FILE = "dance2.mp4"
+    USE_VIDEO = True
+    
+    if USE_VIDEO:
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        cap = cv2.VideoCapture(os.path.join(dir_path, "demos", VIDEO_FILE))
+    else:
+        cap = cv2.VideoCapture(0)  # Use Camera
 
-    cap = cv2.VideoCapture(os.path.join(dir_path, filename))
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -135,11 +174,12 @@ if __name__ == "__main__":
         print(faceTracking.getFocusLocation())
 
 
-        cv2.imshow("frame", img)
+        cv2.imshow("FaceTracking [ESC to quit]", img)
         key = cv2.waitKey(1)
-
         if key == ord('s'):
             faceTracking.setFocus(faceTracking.getFocus() + 1)
+        if cv2.waitKey(1) == 27:  # ESC
+            break
     
     cap.release()
     cv2.destroyAllWindows()
