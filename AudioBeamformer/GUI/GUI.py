@@ -129,12 +129,7 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
-            # TODO: Check if magic... do stuff
-            
-            # if DEBUG:
-            #     print(f"Count: {self._faceTracking.getDetectionCount()}")
-            #     print(f"Focus: {self._faceTracking.getFocus()}")
-            #     print(f"Location: {self._faceTracking.getFocusLocation()}")
+            self._faceTracking.enableMagic(self._enableMagic)
             return self._faceTracking.runDetection(src)
         return src
 
