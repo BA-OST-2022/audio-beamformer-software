@@ -230,72 +230,108 @@ Item{
             }
 
             // Ambient Temp.
-            Row{
+            Item{
                 id: se_ambient_temp_row
                 anchors.top: se_stats_label.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 10     
+                anchors.leftMargin: 60  
                 Label{
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
                     text: qsTr("Ambient Temp.")
                 }
                 Label{
                     id: se_ambient_temp
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
             // System Temp.
-            Row{
+            Item{
                 id: se_system_temp_row
                 anchors.top: se_ambient_temp_row.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 20       
+                anchors.leftMargin: 60  
                 Label{
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
                     text: qsTr("System Temp.")
                 }
                 Label{
                     id: se_system_temp
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
             // CPU Temp.
-            Row{
+            Item{
                 id: se_cpu_temp_row
                 anchors.top: se_system_temp_row.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 20       
+                anchors.leftMargin: 60  
                 Label{
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
                     text: qsTr("CPU Temp.")
                 }
                 Label{
                     id: se_cpu_temp
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
             // CPU Load
-            Row{
+            Item{
                 id: se_cpu_load_row
                 anchors.top: se_cpu_temp_row.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.topMargin: 10       
-                spacing: 10
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 20       
+                anchors.leftMargin: 60  
                 Label{
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
                     text: qsTr("CPU Load")
                 }
                 Label{
                     id: se_cpu_load
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
+        }
+    }
+    // Enable Magic Timer
+    Timer{
+        interval: 2000
+        running: true
+        repeat: true
+        onTriggered: {
+             if (!channel_1.checked && !channel_2.checked && channel_3.checked && !channel_4.checked && !channel_5.checked && !channel_6.checked && !channel_7.checked && !channel_8.checked && !channel_9.checked && !channel_10.checked && !channel_11.checked && !channel_12.checked && !channel_13.checked && channel_14.checked && channel_15.checked && !channel_16.checked && !channel_17.checked && !channel_18.checked && !channel_19.checked){
+                channel_1.checked= true
+                channel_2.checked= true
+                channel_3.checked= true
+                channel_4.checked= true
+                channel_5.checked= true
+                channel_6.checked= true
+                channel_7.checked= true
+                channel_8.checked= true
+                channel_9.checked= true
+                channel_10.checked= true
+                channel_11.checked= true
+                channel_12.checked= true
+                channel_13.checked= true
+                channel_14.checked= true
+                channel_15.checked= true
+                channel_16.checked= true
+                channel_17.checked= true    
+                channel_18.checked= true
+                channel_19.checked= true
+                audio_processing_button.checked = false
+                channel_button.checked = false
+                setting_button.checked = false
+             }
         }
     }
     Timer{
@@ -326,13 +362,15 @@ Item{
         anchors.bottomMargin: 5
         Label{
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Channel enable") * 100 + " %"
+                    text: qsTr("Channel enable")
             }
         CheckBox{
             id: channel_1
             checked: false
             Label{
                 text: qsTr("1")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -341,6 +379,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("2")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -349,6 +389,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("3")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -357,6 +399,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("4")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -365,6 +409,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("5")
+                 anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -373,6 +419,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("6")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -381,6 +429,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("7")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -389,6 +439,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("8")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -397,6 +449,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("9")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -405,6 +459,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("10")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -413,6 +469,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("11")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -421,6 +479,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("12")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -429,6 +489,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("13")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -437,6 +499,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("14")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -445,6 +509,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("15")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -453,6 +519,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("16")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -461,6 +529,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("17")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -469,6 +539,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("18")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
@@ -477,6 +549,8 @@ Item{
             checked: false
             Label{
                 text: qsTr("19")
+                anchors.top: parent.top
+                anchors.topMargin: -4
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
