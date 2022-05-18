@@ -61,6 +61,7 @@ class LEDs():
         self._enableChannels = True
         self._enableCamera = True
         self._enableMagic = False
+        self._enableAlert = False
         self._ringColors = np.zeros((self._ringCount, 3))
         self._channelColors = np.zeros((self._channelCount, 3))
         self._cameraAnimation = self.OFF
@@ -104,6 +105,9 @@ class LEDs():
     
     def enableMagic(self, state):
         self._enableMagic = state
+        
+    def enableAlert(self, state):
+        self._enableAlert = state
       
     def setBrightness(self, brightness):
         self._brightness = np.clip(brightness * 31, 0, 31)
@@ -155,6 +159,9 @@ class LEDs():
                     if self._enableMagic:
                         val = time() / 3 + i / self._channelCount
                         r, g, b = [int(c * 255) for c in hsv_to_rgb(val, 1, 1)]
+                    if self._enableAlert:   # Show Red only
+                        r = 255
+                        g = b = 0
                     self._strip.set_pixel(i, r, g, b)
                     self._strip.set_pixel(i + self._channelCount, r, g, b)
                 
@@ -167,6 +174,9 @@ class LEDs():
                     if self._enableMagic:
                         val = time() / 3 + i / self._ringCount
                         r, g, b = [int(c * 255) for c in hsv_to_rgb(val, 1, 1)]
+                    if self._enableAlert:   # Show Red only
+                        r = 255
+                        g = b = 0
                     self._strip.set_pixel(i + self._channelCount * 2, r, g, b)
                 
                 self._strip.show()
