@@ -32,6 +32,7 @@
 
 import sys
 import numpy as np
+import time
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -44,6 +45,7 @@ if LINUX:
 class ToFSensor():
     def __init__(self, updateRate=15):      
         self._i2cBusID = 10                     # Represents /dev/i2c-10
+        self._maxRetry = 5                      # Max number of init retrying
         
         self._initialized = False
         self._driver = None
@@ -59,18 +61,27 @@ class ToFSensor():
     def begin(self):
         # TODO RETRY LOOP
         if not self._initialized:
-            self._initialized = True
             if LINUX:
-                self._driver = VL53L5CX(bus_id=self._i2cBusID)
-                if not self._driver.is_alive():
-                    raise IOError("VL53L5CX Device is not alive")
-                self._driver.init()             # This takes up to 10s
-                self._driver.set_ranging_mode(VL53L5CX_RANGING_MODE_CONTINUOUS)
-                self._driver.set_sharpener_percent(0)
-                self._driver.set_target_order(VL53L5CX_TARGET_ORDER_STRONGEST)
-                self._driver.set_resolution(self._resolution**2)
-                self._driver.set_ranging_frequency_hz(self._updateRate)
-                self._driver.start_ranging()
+                retryCount = 0
+                while not self._initialized:
+                    try:
+                        self._driver = VL53L5CX(bus_id=self._i2cBusID)
+                        if not self._driver.is_alive():
+                            raise IOError("VL53L5CX Device is not alive")
+                        self._driver.init()             # This takes up to 10s
+                        self._driver.set_ranging_mode(VL53L5CX_RANGING_MODE_CONTINUOUS)
+                        self._driver.set_sharpener_percent(0)
+                        self._driver.set_target_order(VL53L5CX_TARGET_ORDER_STRONGEST)
+                        self._driver.set_resolution(self._resolution**2)
+                        self._driver.set_ranging_frequency_hz(self._updateRate)
+                        self._driver.start_ranging()
+                    except Exception():
+                        retryCount += 1
+                        print("Failed to init ToF-Sensor, try again...")
+                        time.sleep(1)  # Wait and try again some time later
+                        if retryCount >= self._maxRetry:
+                            raise Exception("Could not initialize ToF-Sensor")
+            self._initialized = True
                 
     
     def end(self):
@@ -96,7 +107,7 @@ class ToFSensor():
                                             i % self._resolution] = val
                     return True
             except:
-                print("ToF Error!!!")
+                print("Failed to read data from ToF-Sensor, try again next time...")
         return False
     
     
@@ -110,7 +121,6 @@ class ToFSensor():
     
     
 if __name__ == '__main__':
-    import time
     import cv2
     
     SCALEUP = 50
