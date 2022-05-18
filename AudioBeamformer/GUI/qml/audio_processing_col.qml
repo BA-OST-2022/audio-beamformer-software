@@ -4,6 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
+import QtCharts 2.15
 
  // Audio processing
 Item{
@@ -374,7 +375,6 @@ Item{
 
         }
        
-
     }
 
 }
