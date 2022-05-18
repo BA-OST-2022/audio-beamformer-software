@@ -312,6 +312,7 @@ Item{
             Slider {
                     id: ap_modulation_slider
                     visible: ad_modulation_mam.checked
+                    value: 1
                     anchors.top: ap_modulation_slider_label.bottom
                     anchors.topMargin: 0
                     anchors.horizontalCenter: parent.horizontalCenter

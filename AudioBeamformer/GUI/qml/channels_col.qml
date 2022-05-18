@@ -45,6 +45,7 @@ Item{
 
             Switch{
                     id: ch_beamsteering_switch
+                    checked: true
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ch_enable_label.bottom
                     anchors.topMargin: 5
@@ -103,12 +104,14 @@ Item{
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
-                    text: {"Angle: " + ch_beamsteering_angle_slider.value.toFixed(2)}
+                    text: {"Angle: " + (ch_beamsteering_angle_slider.value - 0.5).toFixed(2) +  "°"}
+                    // Add max and min angle
                 }
 
             Slider {
                 id: ch_beamsteering_angle_slider
-                 anchors.top: ch_beamsteering_angle_slider_button.bottom
+                anchors.top: ch_beamsteering_angle_slider_button.bottom
+                value: 0.5
                 anchors.topMargin: -2
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
@@ -185,7 +188,7 @@ Item{
     CVItem 
     {
         id: imageWriter
-        x: 800
+        x: 750
         y: 10
         anchors.fill: parent
         image: capture.image

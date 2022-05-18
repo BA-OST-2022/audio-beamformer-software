@@ -111,6 +111,8 @@ class FaceTracking():
     def getFocusLocation(self):
         if len(self.faces) > 0:
             return self.faces[self.focus].get_position()
+        else:
+            return []
     
 
 

@@ -38,7 +38,6 @@ from scipy.interpolate import interp1d
 from scipy.signal import butter, windows, kaiserord, lfilter, firwin, freqz, firwin2, convolve
 # Audio In / Output Handling
 import sounddevice as sd
-from AudioPlayer import AudioPlayer
 # Other
 import os
 import sys
@@ -47,6 +46,10 @@ import ast
 
 DEBUG = True
 LINUX = (sys.platform == 'linux')
+sys.path.insert(0, os.path.dirname(__file__)) 
+sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
+
+from AudioPlayer import AudioPlayer
 
 
 class AudioProcessing:

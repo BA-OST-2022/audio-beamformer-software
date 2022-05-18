@@ -42,7 +42,7 @@ class Beamsteering():
                  facetracking = None,
                  fpgaControl = None,
                  leds=None):
-        self._beamsteeringEnable = False
+        self._beamsteeringEnable = True
         self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
         self._activeSource = 0
         self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
@@ -120,21 +120,20 @@ class Beamsteering():
     
     def _calc_angle_face(self):
         #************************************************************* ENTER VALUES HERE *****************************************************************************************
-        camera_angle_rad = 40 / 180 * np.pi
-        max_image_size_x = 1200
+        camera_angle_rad = 45 
+        max_image_size_x = 680
         #*************************************************************************************************************************************************************************
         angle = 0
         if self._facetracking:
             position = self._facetracking.getFocusLocation()
-            if not position:
-                print("No Image received")
-            else:
-                x_pos = position[0]
-                w = np.sin(np.pi/2 - camera_angle_rad) * max_image_size_x / 2 / np.sin(camera_angle_rad) 
-                x_diff = x_pos - (max_image_size_x // 2)
-                l = np.sqrt(w**2 + x_diff**2)
-                angle = np.arcsin(x_diff/l) * 180/ np.pi
-        print(angle)
+            if len(position) > 1:
+                x_pos = -position[0] + max_image_size_x/2
+                # w = np.sin(np.pi/2 - camera_angle_rad/ 180 * np.pi) * max_image_size_x / 2 / np.sin(camera_angle_rad/ 180 * np.pi) 
+                # x_diff = x_pos - (max_image_size_x // 2)
+                # l = np.sqrt(w**2 + x_diff**2)
+                # angle = np.arcsin(x_diff/l) * 180/ np.pi
+                distance = max_image_size_x / (2*np.tan(camera_angle_rad/ 180 * np.pi))
+                angle = np.arctan(x_pos / distance)* 180 / np.pi
         return angle
 
     def setAngle(self):
@@ -160,16 +159,14 @@ class Beamsteering():
         max_angle = 45
         start_color = np.array([1,1,1])
         end_color = np.array([0,0,1])
-        color_gradient = (start_color - end_color)/19
+        color_gradient = (end_color - start_color)/19
         
-        main_led = int(self._angleToSteer / (-max_angle + min_angle) * 19) 
+        peak = self._angleToSteer / (max_angle - min_angle) * 19 + 9
         leds_display = np.ones((19,3))
-        leds_display[main_led] = 1
         for i,elem in enumerate(leds_display):
-            distance = np.abs(i - main_led)
-            leds_display[i,:] = start_color - distance * color_gradient
-        print(leds_display)
-        self._leds.setChannelColors(leds_display)
+            distance = np.abs(i - peak)
+            leds_display[i,:] = start_color + distance * color_gradient
+        self._leds.setChannelColors(np.abs(leds_display))
         
         # main_led = 9 + int(self._angleToSteer / (max_angle - min_angle) * 19) 
         # leds_display = np.ones((19,3))
@@ -177,28 +174,35 @@ class Beamsteering():
         # self._leds.setChannelColors(leds_display)
 
     def calculateDelay(self):
-        delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
-        if (np.sin(self._angleToSteer/180*np.pi) < 0):
-            delay = delay[::-1] * -1
-        if not DEBUG:
-            self._fpga_controller.setChannelDelay(delay)
-            self._fpga_controller.update()
-            # if not max(delay) == 0:
-            #     leds_display = delay / max(delay)
-            # else:
-            #     leds_display = np.ones(19) * 0.5
-            # leds_display = np.clip(leds_display,0,1)
-            # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
-            # self._leds.setChannelColors(leds_display)
-
+        if abs(self._angleToSteer) >= 1:
+            delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
+            if (np.sin(self._angleToSteer/180*np.pi) < 0):
+                delay = delay[::-1] * -1
         else:
-            print(delay[0])
-            print(f"Delay: {delay}")
+            delay = np.zeros(self.__row_count)
+            
+        if not any(i >= 0.00065472 for i in delay):
+            if not DEBUG:
+                self._fpga_controller.setChannelDelay(delay)
+                self._fpga_controller.update()
+                # if not max(delay) == 0:
+                #     leds_display = delay / max(delay)
+                # else:
+                #     leds_display = np.ones(19) * 0.5
+                # leds_display = np.clip(leds_display,0,1)
+                # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
+                # self._leds.setChannelColors(leds_display)
+    
+            else:
+                print(delay[0])
+                print(f"Delay: {delay}")
+        else:
+            print("Wrong angle")
     
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
         if not DEBUG:
-            # self._fpga_controller.setChannelGain(np.array(gains))
+            self._fpga_controller.setChannelGain(np.array(gains))
             self._fpga_controller.update()
         else:
             print(f"Gains: {np.array(gains)}")

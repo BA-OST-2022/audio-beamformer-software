@@ -6,6 +6,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
 import PyCVQML 1.0
 import Filters 1.0
+import QtCharts 2.15
 
 Item{
     id: settings_main_row
@@ -45,8 +46,8 @@ Item{
 
             Switch{
                 id: se_led_switch
-                anchors.topMargin: 5
                 checked: true
+                anchors.topMargin: 5
                 anchors.top: se_led_switch_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 onReleased: {
@@ -62,7 +63,7 @@ Item{
                 anchors.topMargin: 5
                 anchors.top: se_led_switch.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Brightness: " + se_leds_level_slider.value.toFixed(2)}
+                text: {"Brightness: " + (se_leds_level_slider.value*100).toFixed(0) + "%"}
             }
 
             Slider {
@@ -102,6 +103,7 @@ Item{
 
             Switch{
                 id: se_tof_switch
+                checked: true
                 anchors.top: se_tof_switch_label.bottom
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -121,6 +123,7 @@ Item{
 
             Slider {
                 id: se_tof_level_slider
+                value: 0.5
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: se_tof_level_slider_label.bottom
                 anchors.topMargin: -2
@@ -189,6 +192,7 @@ Item{
             Slider {
                 id: se_volume_level_slider
                 anchors.horizontalCenter: parent.horizontalCenter
+                value: 1
                 anchors.top: se_volume_label.bottom
                 anchors.topMargin: -2
                 onValueChanged: {
