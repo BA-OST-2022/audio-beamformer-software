@@ -277,8 +277,8 @@ class AudioProcessing:
 
     def MAMModulation(self,data):
         data = data / 2147483648
-        data = 1 - 1/2*data**2 - 1/8**data**4
-        return data * 2147483648  * self._mam_gain
+        data_out = 1 - 1/2*data**2 - 1/8**data**4
+        return data_out * 2147483648  * self._mam_gain
     
     def enableMagic(self, state):
         self._enableMagic = state
@@ -302,8 +302,8 @@ class AudioProcessing:
         else:
             outdata_oneCh = indata[:,0]
             
-        if self._enableMagic:
-            outdata_oneCh = self._player.getData()[:,0]
+        # if self._enableMagic:
+        #     outdata_oneCh = self._player.getData()[:,0]
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)

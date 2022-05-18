@@ -42,37 +42,47 @@ class Beamsteering():
                  facetracking = None,
                  fpgaControl = None,
                  leds=None):
-        self._beamsteeringEnable = True
-        self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
-        self._activeSource = 0
-        self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
-        self._activePattern = np.linspace(-45,45,10)
-        self._activeWindow = "rect"
+        # Module init
         self._fpga_controller = fpgaControl
         self._sensors = sensors
         self._facetracking = facetracking
         self._leds = leds
+        # Constants
+        self.__distance = 0.01475
+        self.__row_count = 19
+        # Var init
+        self._initialized = False
+        self._runThread = False
+        self._updateRate = 2
+        self._ledsUpdateRate = 20
+        self._timeTemp = 0
+        # Beamsteering 
+        self._beamsteeringEnable = True
+        self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
+        self._currSteerSource = 0
         self._angleToSteer = 0
         self._angleToSteer_faceTracking = 0
         self._angleToSteer_manual = 0
+        #   Pattern
+        self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
+        self._activePattern = np.linspace(-45,45,10)
         self._currentPattern = 0
         self._PatternHoldTime = 1
-        self._enableChannel = np.ones(19)
+        # Window
         self.__window_types = {"Rectangle": self.rectWindow,
                              "Cosine": self.cosineWindow,
                              "Hann": self.hannWindow,
                              "Hamming": self.hammingWindow,
                              "Blackman": self.blackmanWindow,
                              "Dolph-Chebyshev": self.chebyWindow}
-        self._initialized = False
-        self.__distance = 0.01475
-        self.__row_count = 19
-        self.__pathImages = Path("..") / "GUI" / "qml" / "images"
+        self._activeWindow = "Rectangle"
+        # Mute channel
+        self._enableChannel = np.ones(self.__row_count)
+
 
     def begin(self):
          if not self._initialized:
             self._initialized = True
-            self._updateRate = 2
             self._runThread = True
             self.update()
 
@@ -82,13 +92,13 @@ class Beamsteering():
     def update(self):
         if(self._initialized):
             if(self._runThread):
-                threading.Timer(1.0 / self._updateRate, self.update).start()
-                if(self._beamsteeringEnable):
-                    self.setAngle()
-                    self.calculateDelay()
-
-    def generatePlots(self):
-        pass
+                threading.Timer(1.0 / self._ledsUpdateRate, self.update).start()
+                self.setLEDS()
+                if(time.time() - self._timeTemp > 1 / self._updateRate):
+                    self._timeTemp = time.time()
+                    if(self._beamsteeringEnable):
+                        self.setAngle()
+                        self.calculateDelay()
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
@@ -97,7 +107,7 @@ class Beamsteering():
             self.calculateDelay()
 
     def setBeamsteeringSource(self, source):
-        self._activeSource = source
+        self._currSteerSource = source
 
     def setBeamsteeringAngle(self, angle):
         self._angleToSteer_manual = angle
@@ -134,43 +144,32 @@ class Beamsteering():
                 angle = np.arctan(x_pos / distance)* 180 / np.pi
         return angle
 
-    def setAngle(self):
-        # Face Tracking
-        if (self._activeSource == 0):
-            if self._leds:
-                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([58,222,129]) / 255)
-                pass
-            self._angleToSteer = self._calc_angle_face() 
-        # Manual
-        elif (self._activeSource == 1):
-            if self._leds:
-                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([222,58,153])/ 255)
-                pass
-            self._angleToSteer = self._angleToSteer_manual
-        else:
-            if self._leds:
-                #self._leds.setChannelColors( np.ones((19, 3)) * np.array([237,130,24])/ 255)
-                pass
-            self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
-            
+    def setLEDS(self):
         min_angle = -45
         max_angle = 45
-        start_color = np.array([1,0.5,0])
-        end_color = np.array([0.5,0.87,0.92])
+        start_color = np.array([1,0.4,0])
+        #start_color = np.array([1,0.3,0])
+        #end_color = np.array([0.5,0.87,0.92])
+        end_color = np.array([0.05,0.2,0.95])
         peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
-        print(peak)
         color_gradient = (end_color - start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
         leds_display = np.ones((self.__row_count,3))
         for i,elem in enumerate(leds_display):
             distance = np.abs(i - peak)
             leds_display[i,:] = start_color + distance * color_gradient
         self._leds.setChannelColors(np.abs(leds_display))
-        
-        # main_led = 9 + int(self._angleToSteer / (max_angle - min_angle) * 19) 
-        # leds_display = np.ones((19,3))
-        # leds_display[main_led,:] = 1
-        # self._leds.setChannelColors(leds_display)
 
+    def setAngle(self):
+        # Face Tracking
+        if (self._currSteerSource == 0):
+            self._angleToSteer = self._calc_angle_face() 
+        # Manual
+        elif (self._currSteerSource == 1):
+            self._angleToSteer = self._angleToSteer_manual
+        # Pattern
+        else:
+            self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
+    
     def calculateDelay(self):
         if abs(self._angleToSteer) >= 1:
             delay = np.arange(self.__row_count) * (self.__distance / self.getSpeedOfSound()) * np.sin(self._angleToSteer/180*np.pi)
@@ -182,20 +181,11 @@ class Beamsteering():
         maxDelay = self._fpga_controller.getMaxChannelDelay()
         if np.any(delay >= maxDelay):
             print(f"Wrong angle: {delay}")
-            
-        
         
         delay = np.clip(delay, 0, maxDelay)
         self._fpga_controller.setChannelDelay(delay)
         self._fpga_controller.update()
-            
-        # if not max(delay) == 0:
-        #     leds_display = delay / max(delay)
-        # else:
-        #     leds_display = np.ones(19) * 0.5
-        # leds_display = np.clip(leds_display,0,1)
-        # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
-        # self._leds.setChannelColors(leds_display)
+    
 
     
     def calculateGains(self):

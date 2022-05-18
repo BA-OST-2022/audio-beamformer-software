@@ -96,9 +96,10 @@ class HMI():
     def begin(self):
         if not self._initialized:
             self._initialized = True
-            self._writeReg(HMI.PCA9633_LEDOUT, 0x00)  # All Outputs are off
-            self._writeReg(HMI.PCA9633_MODE1, 0x00)   # set sleep = 0, turn on oscillator, disable allcall and subaddrs
-            self._writeReg(HMI.PCA9633_MODE2, 0x14)   # Enable Push-Pull Outputs and invert PWM
+            init = {HMI.PCA9633_LEDOUT: 0x00,   # All Outputs are off
+                    HMI.PCA9633_MODE1: 0x00,    # set sleep = 0, turn on oscillator, disable allcall and subaddrs
+                    HMI.PCA9633_MODE2: 0x14}    # Enable Push-Pull Outputs and invert PWM
+            self._writeRegs(init) 
             self.setFanSpeed(0)
             self.setButtonColor(np.zeros((1, 3)))
             if LINUX:
@@ -132,9 +133,10 @@ class HMI():
             color = np.vstack(color).T    # Transpose Vector if neccessary
         if(np.shape(color) != (1, 3)):
             raise ValueError("Color data format incorrect: (1, 3)")
-        self._pwmWrite(self._pinLedR, int(self._gamma(color.T[0]) * 255))
-        self._pwmWrite(self._pinLedG, int(self._gamma(color.T[1]) * 255))
-        self._pwmWrite(self._pinLedB, int(self._gamma(color.T[2]) * 255))
+        data = {self._pinLedR: int(self._gamma(color.T[0]) * 255),
+                self._pinLedG: int(self._gamma(color.T[1]) * 255),
+                self._pinLedB: int(self._gamma(color.T[2]) * 255)}
+        self._pwmWriteMultiple(data)
     
     
     def setFanSpeed(self, speed):
@@ -153,6 +155,20 @@ class HMI():
         self._writeReg(HMI.PCA9633_LEDOUT, self._outputState)
 
     
+    def _pwmWriteMultiple(self, data):
+        regs = {}
+        for pin in data:
+            if not(0 <= pin <= 3):
+                raise ValueError("Pin not available: 0 .. 3")
+            if not(0 <= data[pin] <= 255):
+                raise ValueError("PWM Value out of bound: 0 .. 255")
+            self._outputState &= ~(0x03 << (pin * 2))   # Clear bits first
+            self._outputState |= 0x02 << (pin * 2)      # Output in PWM mode
+            regs[HMI.PCA9633_LEDOUT] = self._outputState
+            regs[HMI.PCA9633_PWM0 + pin]= int(data[pin])
+        self._writeRegs(regs)
+        
+
     def _pwmWrite(self, pin, value):
         if not(0 <= pin <= 3):
             raise ValueError("Pin not available: 0 .. 3")
@@ -161,14 +177,27 @@ class HMI():
             
         self._outputState &= ~(0x03 << (pin * 2))   # Clear bits first
         self._outputState |= 0x02 << (pin * 2)      # Output in PWM mode
-        self._writeReg(HMI.PCA9633_LEDOUT, self._outputState);
-        self._writeReg(HMI.PCA9633_PWM0 + pin, int(value));
+        regs = {HMI.PCA9633_LEDOUT: self._outputState,
+                HMI.PCA9633_PWM0 + pin: int(value)}
+        self._writeRegs(regs)
+        
+        
+    def _writeRegs(self, regs):
+        if LINUX and self._initialized:
+            with SMBus(self._i2cBusID) as bus:
+                for reg in regs:
+                    bus.write_byte_data(self._deviceAddress, reg, regs[reg], True)
+                return
+            print("I2C Error!")
+            
+            # write = self.i2c_msg.write(self.i2c_address, buf)
+            # self._i2c_bus.i2c_rdwr(write)
 
 
     def _writeReg(self, reg, data):
         if LINUX and self._initialized:
             with SMBus(self._i2cBusID) as bus:
-                bus.write_byte_data(self._deviceAddress, reg, data)
+                bus.write_byte_data(self._deviceAddress, reg, data, True)
                 
     def _gamma(self, val):
         return np.clip(np.power(val, self._GAMMA_CORRECT_FACTOR), 0.0, 1.0)
@@ -186,12 +215,12 @@ if __name__ == '__main__':
     
     hmi = HMI()
     hmi.begin()
-    hmi.setButtonColor(np.array([0.5, 0.0, 1]))  # R, G, B
+    hmi.setButtonColor(np.array([1.0, 0.5, 0.0]))  # R, G, B
     hmi.setFanSpeed(1.0)
-    time.sleep(5)
-    hmi.setButtonColor(np.array([0.0, 1.0, 1]))  # R, G, B
+    time.sleep(2)
+    hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))  # R, G, B
     hmi.setFanSpeed(0.5)
-    time.sleep(5)
+    time.sleep(2)
     
     hmi.setButtonColor()                       # No argument means off
     hmi.end()

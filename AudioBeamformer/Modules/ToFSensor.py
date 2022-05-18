@@ -93,10 +93,10 @@ class ToFSensor():
                         if(val == 0):
                             val = 4000  
                         self._distanceData[i // self._resolution,
-                                           i % self._resolution] = val
+                                            i % self._resolution] = val
                     return True
             except:
-                pass
+                print("ToF Error!!!")
         return False
     
     
