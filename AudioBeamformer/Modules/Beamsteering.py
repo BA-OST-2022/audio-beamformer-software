@@ -167,6 +167,15 @@ class Beamsteering():
             distance = np.abs(i - peak)
             leds_display[i,:] = self._start_color + distance * color_gradient
         self._leds.setChannelColors(np.abs(leds_display))
+        
+        if self._currSteerSource != 0:  #Turn off LEDs if not in camera mode
+            self._leds.setCameraAnimation(self._leds.OFF)
+        else:
+            if self._facetracking.getDetectionCount() == 0:
+                self._leds.setCameraAnimation(self._leds.SEARCHING)
+            else:
+                self._leds.setCameraAnimation(self._leds.TRACKING)
+    
 
     def setAngle(self):
         # Face Tracking
