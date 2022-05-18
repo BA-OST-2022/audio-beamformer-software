@@ -34,6 +34,7 @@ import sys
 import cv2
 import numpy as np
 import os
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/FaceTracking")
@@ -228,7 +229,8 @@ class FaceTracking():
                     else:
                         cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=color, thickness=4)
                 else:
-                    overlay = cv2.imread('magic.png', cv2.IMREAD_UNCHANGED)
+                    file = os.path.join(os.path.dirname(__file__), "magic.png")
+                    overlay = cv2.imread(file, cv2.IMREAD_UNCHANGED)
                     targetWidth = abs(box[2] - box[0])
                     targetHeight = abs(box[3] - box[1])
                     imageWidth = np.shape(overlay)[0]
@@ -244,8 +246,9 @@ class FaceTracking():
                         
                     x = int(fac.get_position()[0] - width // 2)
                     y = int(fac.get_position()[1] - height // 2)
-                    overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)
-                    img = overlay_transparent(img, overlay, x, y)
+                    if width > 0 and height > 0:
+                        overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)
+                        img = overlay_transparent(img, overlay, x, y)
 
        
         return img
