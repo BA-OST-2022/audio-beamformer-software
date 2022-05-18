@@ -59,28 +59,28 @@ class ToFSensor():
     
     
     def begin(self):
-        # TODO RETRY LOOP
-        if not self._initialized:
+        retryCount = 0
+        while not self._initialized:
             if LINUX:
-                retryCount = 0
-                while not self._initialized:
-                    try:
-                        self._driver = VL53L5CX(bus_id=self._i2cBusID)
-                        if not self._driver.is_alive():
-                            raise IOError("VL53L5CX Device is not alive")
-                        self._driver.init()             # This takes up to 10s
-                        self._driver.set_ranging_mode(VL53L5CX_RANGING_MODE_CONTINUOUS)
-                        self._driver.set_sharpener_percent(0)
-                        self._driver.set_target_order(VL53L5CX_TARGET_ORDER_STRONGEST)
-                        self._driver.set_resolution(self._resolution**2)
-                        self._driver.set_ranging_frequency_hz(self._updateRate)
-                        self._driver.start_ranging()
-                    except Exception():
-                        retryCount += 1
-                        print("Failed to init ToF-Sensor, try again...")
-                        time.sleep(1)  # Wait and try again some time later
-                        if retryCount >= self._maxRetry:
-                            raise Exception("Could not initialize ToF-Sensor")
+                try:
+                    self._driver = VL53L5CX(bus_id=self._i2cBusID)
+                    if not self._driver.is_alive():
+                        raise IOError("VL53L5CX Device is not alive")
+                    self._driver.init()             # This takes up to 10s
+                    self._driver.set_ranging_mode(VL53L5CX_RANGING_MODE_CONTINUOUS)
+                    self._driver.set_sharpener_percent(0)
+                    self._driver.set_target_order(VL53L5CX_TARGET_ORDER_STRONGEST)
+                    self._driver.set_resolution(self._resolution**2)
+                    self._driver.set_ranging_frequency_hz(self._updateRate)
+                    self._driver.start_ranging()
+                except Exception as e:
+                    retryCount += 1
+                    print("Failed to init ToF-Sensor, try again...")
+                    print(e)
+                    time.sleep(1)  # Wait and try again some time later
+                    if retryCount >= self._maxRetry:
+                        raise Exception("Could not initialize ToF-Sensor")
+                        
             self._initialized = True
                 
     

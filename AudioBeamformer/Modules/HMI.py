@@ -37,7 +37,7 @@ DEBUG = True
 LINUX = (sys.platform == 'linux')
 
 if LINUX:
-    from smbus2 import SMBus
+    from smbus2 import SMBus, i2c_msg
     import RPi.GPIO as GPIO
     
 
@@ -87,6 +87,8 @@ class HMI():
         self._deviceAddress = deviceAddresse
         self._outputState = 0x00
         self._buttonCallback = None
+        if LINUX:
+            self._i2c_msg = i2c_msg
         
     
     def __del__(self):
@@ -103,7 +105,8 @@ class HMI():
             self.setFanSpeed(0)
             self.setButtonColor(np.zeros((1, 3)))
             if LINUX:
-                GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
+                GPIO.setwarnings(False)         # Disable Pull-up Warning
+                GPIO.setmode(GPIO.BCM)          # Use RaspberryPi GPIO Numbers
                 GPIO.setup(self._gpioButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)
                 try:
                     GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)  
@@ -152,7 +155,7 @@ class HMI():
         self._outputState &= ~(0x03 << (pin * 2))   # Output fully off
         if(state):
             self._outputState |= 0x01 << (pin * 2)  # Output fully on
-        self._writeReg(HMI.PCA9633_LEDOUT, self._outputState)
+        self._writeRegs({HMI.PCA9633_LEDOUT: self._outputState})
 
     
     def _pwmWriteMultiple(self, data):
@@ -184,21 +187,13 @@ class HMI():
         
     def _writeRegs(self, regs):
         if LINUX and self._initialized:
+            buf = []
+            for reg in regs:
+                buf.append(self._i2c_msg.write(self._deviceAddress, [reg, regs[reg]]))
             with SMBus(self._i2cBusID) as bus:
-                for reg in regs:
-                    bus.write_byte_data(self._deviceAddress, reg, regs[reg], True)
-                return
-            print("I2C Error!")
-            
-            # write = self.i2c_msg.write(self.i2c_address, buf)
-            # self._i2c_bus.i2c_rdwr(write)
+                bus.i2c_rdwr(*buf)
 
-
-    def _writeReg(self, reg, data):
-        if LINUX and self._initialized:
-            with SMBus(self._i2cBusID) as bus:
-                bus.write_byte_data(self._deviceAddress, reg, data, True)
-                
+   
     def _gamma(self, val):
         return np.clip(np.power(val, self._GAMMA_CORRECT_FACTOR), 0.0, 1.0)
     
@@ -217,10 +212,10 @@ if __name__ == '__main__':
     hmi.begin()
     hmi.setButtonColor(np.array([1.0, 0.5, 0.0]))  # R, G, B
     hmi.setFanSpeed(1.0)
-    time.sleep(2)
+    time.sleep(5)
     hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))  # R, G, B
     hmi.setFanSpeed(0.5)
-    time.sleep(2)
+    time.sleep(5)
     
     hmi.setButtonColor()                       # No argument means off
     hmi.end()

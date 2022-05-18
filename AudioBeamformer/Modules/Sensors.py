@@ -38,7 +38,7 @@ import re, subprocess
 import numpy as np
 import psutil
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -84,7 +84,6 @@ class Sensors():
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         self._shutdownCallback  = None
-        self._shutDownEvent = False
         
         self._updateRateTemp = 2                # Update rate in Hz
         self._updateRateLed = 20                # Update rate in Hz
@@ -111,12 +110,11 @@ class Sensors():
             threading.Timer(0, self.update).start()  
     
     
-    def end(self):
+    def end(self, shutdown=False):
         self._readyState = False
         self._runThread = False
         if(self._initialized):
-            self._initialized = False
-            if self._shutDownEvent:
+            if shutdown:
                 self._hmi.setButtonColor(self.COLOR_BOOT)
             else:
                 self._hmi.setButtonColor()
@@ -124,6 +122,7 @@ class Sensors():
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
             self._tofSensor.end()
+            self._initialized = False
         
     
     def update(self):
@@ -265,7 +264,6 @@ class Sensors():
         if DEBUG:
             print("Shutdown Event occurred")
         if self._shutdownCallback:
-            self._shutDownEvent = True
             self._shutdownCallback(True)
     
     
@@ -310,5 +308,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(100)
+    time.sleep(10000)
     sensors.end()

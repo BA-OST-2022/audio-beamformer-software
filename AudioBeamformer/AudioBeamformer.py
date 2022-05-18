@@ -72,7 +72,7 @@ class AudioBeamformer():
         powerSupply.end()
         fpgaControl.end()
         self.beamsteering.end()
-        self.sensors.end()
+        self.sensors.end(shutdown)
         self.audio_processing.end()
         print("Main Application terminated...")
         if shutdown:

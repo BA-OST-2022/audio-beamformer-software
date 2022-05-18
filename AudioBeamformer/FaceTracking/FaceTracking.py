@@ -246,7 +246,7 @@ class FaceTracking():
                     x = int(fac.get_position()[0] - width // 2)
                     y = int(fac.get_position()[1] - height // 2)
                     if width > 0 and height > 0:
-                        overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)
+                        overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)  # TODO: Implement faster version!
                         img = overlay_transparent(img, overlay, x, y)
 
        
