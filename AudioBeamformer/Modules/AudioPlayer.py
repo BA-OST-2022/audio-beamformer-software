@@ -1,18 +1,35 @@
-#!/usr/bin/env python3
-"""Play an audio file using a limited amount of memory.
+###############################################################################
+# file    AudioPlayer.py
+###############################################################################
+# brief   This module handles asynchronous playing of audio wav files
+###############################################################################
+# author  Florian Baumgartner & Thierry Schwaller
+# version 1.0
+# date    2022-05-18
+###############################################################################
+# MIT License
+#
+# Copyright (c) 2022 ICAI Interdisciplinary Center for Artificial Intelligence
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+###############################################################################
 
-The soundfile module (https://PySoundFile.readthedocs.io/) must be
-installed for this to work.  NumPy is not needed.
-
-In contrast to play_file.py, which loads the whole file into memory
-before starting playback, this example program only holds a given number
-of audio blocks in memory and is therefore able to play files that are
-larger than the available RAM.
-
-A similar example could of course be implemented using NumPy,
-but this example shows what can be done when NumPy is not available.
-
-"""
 import queue
 import sys
 import threading
@@ -93,28 +110,6 @@ if __name__ == '__main__':
             raise sd.CallbackStop
         else:
             outdata[:] = data
-            
-            
-    
-    # def callback(self, indata, outdata, frames, time, status):
-    #     indata_oneCh = indata[:,0] * self._tot_gain 
-    #     self.setSourceLevel(indata_oneCh)
-    #     indata_oneCh *= self._output_enable
-    #     if self._equalizer_enable:
-    #         indata_oneCh = np.hstack((self.__previousWindow,
-    #                                 indata_oneCh))
-            
-    #         outdata_oneCh = np.convolve(indata_oneCh,
-    #                                     self._equalizer_filter,
-    #                                     "valid")
-    #         outdata_oneCh = np.float32(outdata_oneCh)
-    #     else:
-    #         outdata_oneCh = indata[:,0]
-    #     # Modulation
-    #     second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
-    #     # Stich output together
-    #     outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
-    #     self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
     
     
     stream = sd.Stream(samplerate=SAMPLE_RATE,
