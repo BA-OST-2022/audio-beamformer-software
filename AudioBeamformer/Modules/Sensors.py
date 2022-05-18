@@ -52,7 +52,7 @@ from colorsys import hsv_to_rgb
 
 
 class Sensors():
-    def __init__(self, powerSupply=None):  
+    def __init__(self, powerSupply=None, leds=None):  
         self.SRC_AMBIENT = 0
         self.SRC_SYSTEM = 1
         self.SRC_CPU = 2
@@ -70,6 +70,7 @@ class Sensors():
         self._tofSensor = ToFSensor()
         self._rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
         self._powerSupply = powerSupply
+        self._leds = leds
         
         self._initialized = False
         self._runInitialization = False
@@ -161,9 +162,13 @@ class Sensors():
             
             self._alertState  = (time.time() * 1000) % 2000 > 1000
                     
+            
             mute = self.getMute() or self.getAlertState()
             if self._powerSupply:
                 self._powerSupply.enableOutput(not mute)
+                
+            if self._leds:
+                self._leds.enableAlert(self.getAlertState())
                 
             if(mute):
                 self._ledColor = self.COLOR_MUTE

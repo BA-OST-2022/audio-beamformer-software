@@ -50,7 +50,7 @@ from FaceTracking.FaceTracking import faceTracking
 class AudioBeamformer():
     def __init__(self):
         self.audio_processing = AudioProcessing()
-        self.sensors = Sensors(powerSupply)
+        self.sensors = Sensors(powerSupply, leds)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
                                          fpgaControl, leds)
         self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,

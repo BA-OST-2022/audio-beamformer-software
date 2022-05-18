@@ -126,9 +126,10 @@ class FaceTracking():
         self.colorActive = (0xEA, 0xDE, 0x80)
         self.colorInactive = (0x60, 0x60, 0x60)
 
-        self.focus = 0
-        self.showDot = False
-        self.showRoundRect = True
+        self._focus = 0
+        self._showDot = False
+        self._showRoundRect = True
+        self._enableMagic = False
     
     def __del__(self):
         self.fd.__del__()
@@ -174,21 +175,25 @@ class FaceTracking():
         if pop_index != -1:    
             self.faces.pop(face_index)
         
-        if self.focus + 1 > len(self.faces):
-            self.focus = 0
+        if self._focus + 1 > len(self.faces):
+            self._focus = 0
 
         for i, fac in enumerate(self.faces): 
             if (np.max(np.linalg.eig(fac.P[:2, :2])[0]) < 1000) and (fac.lifetime >= self.lifetime / 2):
                 box = fac.rawBox
                 color = self.colorInactive
-                if i == self.focus:
+                if i == self._focus:
                     color = self.colorActive
-                if self.showDot:
-                    cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=color, thickness=20)
-                if self.showRoundRect:
-                    rounded_rectangle(img, (box[0], box[1]), (box[3], box[2]), radius=0.3, color=color, thickness=4)
+                if not self._enableMagic:
+                    if self.showDot:
+                        cv2.circle(img, tuple([int(x) for x in fac.get_position()]), radius=0, color=color, thickness=20)
+                    if self._showRoundRect:
+                        rounded_rectangle(img, (box[0], box[1]), (box[3], box[2]), radius=0.3, color=color, thickness=4)
+                    else:
+                        cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=color, thickness=4)
                 else:
-                    cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=color, thickness=4)
+                    print("do magic")
+       
         return img
     
     
@@ -197,18 +202,21 @@ class FaceTracking():
     
     def setFocus(self, focus):
         if focus + 1 > len(self.faces):
-            self.focus = 0
+            self._focus = 0
         else:
-            self.focus = focus
+            self._focus = focus
     
     def getFocus(self):
-        return self.focus
+        return self._focus
     
     def getFocusLocation(self):
         if len(self.faces) > 0:
-            return self.faces[self.focus].get_position()
+            return self.faces[self._focus].get_position()
         else:
             return []
+        
+    def enableMagic (self, state):
+        self._enableMagic = state
     
 
 faceTracking = FaceTracking(lifetime=15)
@@ -216,6 +224,8 @@ faceTracking = FaceTracking(lifetime=15)
 if __name__ == "__main__": 
     VIDEO_FILE = "dance2.mp4"
     USE_CAMERA = True
+    
+    faceTracking.enableMagic(True)
     
     if USE_CAMERA:
         cap = cv2.VideoCapture(0)
