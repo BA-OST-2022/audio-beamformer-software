@@ -112,6 +112,10 @@ class FPGAControl():
         if not any([0 <= d <= self._tick_length * 2046 for d in delay]):
             raise ValueError(f"Delay between 0 and {self._tick_length*2046} s")
         self._delay = delay
+        
+    
+    def getMaxChannelDelay(self):
+        return self._tick_length * 2046
     
     
     def setInterpolation(self, interpolation):

@@ -66,7 +66,6 @@ class Beamsteering():
                              "Dolph-Chebyshev": self.chebyWindow}
         self._initialized = False
         self.__distance = 0.01475
-        self.__speed_of_sound = 343.2
         self.__row_count = 19
         self.__pathImages = Path("..") / "GUI" / "qml" / "images"
 
@@ -86,7 +85,6 @@ class Beamsteering():
                 threading.Timer(1.0 / self._updateRate, self.update).start()
                 if(self._beamsteeringEnable):
                     self.setAngle()
-                    self.calculateSpeedOfSound()
                     self.calculateDelay()
 
     def generatePlots(self):
@@ -175,29 +173,30 @@ class Beamsteering():
 
     def calculateDelay(self):
         if abs(self._angleToSteer) >= 1:
-            delay = np.arange(self.__row_count) * self.__distance / self.__speed_of_sound * np.sin(self._angleToSteer/180*np.pi)
+            delay = np.arange(self.__row_count) * (self.__distance / self.getSpeedOfSound()) * np.sin(self._angleToSteer/180*np.pi)
             if (np.sin(self._angleToSteer/180*np.pi) < 0):
                 delay = delay[::-1] * -1
         else:
             delay = np.zeros(self.__row_count)
             
-        if not any(i >= 0.00065472 for i in delay):
-            if not DEBUG:
-                self._fpga_controller.setChannelDelay(delay)
-                self._fpga_controller.update()
-                # if not max(delay) == 0:
-                #     leds_display = delay / max(delay)
-                # else:
-                #     leds_display = np.ones(19) * 0.5
-                # leds_display = np.clip(leds_display,0,1)
-                # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
-                # self._leds.setChannelColors(leds_display)
-    
-            else:
-                print(delay[0])
-                print(f"Delay: {delay}")
-        else:
-            print("Wrong angle")
+        maxDelay = self._fpga_controller.getMaxChannelDelay()
+        if np.any(delay >= maxDelay):
+            print(f"Wrong angle: {delay}")
+            
+        
+        
+        delay = np.clip(delay, 0, maxDelay)
+        self._fpga_controller.setChannelDelay(delay)
+        self._fpga_controller.update()
+            
+        # if not max(delay) == 0:
+        #     leds_display = delay / max(delay)
+        # else:
+        #     leds_display = np.ones(19) * 0.5
+        # leds_display = np.clip(leds_display,0,1)
+        # leds_display = np.ones((19, 3)) * np.array([1,0,0]) * np.column_stack((leds_display,leds_display,leds_display)) 
+        # self._leds.setChannelColors(leds_display)
+
     
     def calculateGains(self):
         gains = self.__window_types[self._activeWindow]()
@@ -207,13 +206,11 @@ class Beamsteering():
         else:
             print(f"Gains: {np.array(gains)}")
 
-    def calculateSpeedOfSound(self):
-        if not self._sensors == None:
-            self.__speed_of_sound = 331.5 + 0.607*self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
-            if self.__speed_of_sound:
-                return self.__speed_of_sound
-            return 343.3
-        else:
+    def getSpeedOfSound(self):
+        if self._sensors:
+            temp = self._sensors.getTemperature(self._sensors.SRC_AMBIENT)
+            if not np.isnan(temp):
+                return 331.5 + 0.607 * temp
             return 343.3
     
     def getWindowProfileList(self):
