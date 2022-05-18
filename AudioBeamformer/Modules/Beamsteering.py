@@ -118,7 +118,7 @@ class Beamsteering():
     
     def _calc_angle_face(self):
         #************************************************************* ENTER VALUES HERE *****************************************************************************************
-        camera_angle_rad = 45 
+        camera_angle_rad = 40 
         max_image_size_x = 680
         #*************************************************************************************************************************************************************************
         angle = 0
@@ -155,12 +155,12 @@ class Beamsteering():
             
         min_angle = -45
         max_angle = 45
-        start_color = np.array([1,1,1])
-        end_color = np.array([0,0,1])
-        color_gradient = (end_color - start_color)/19
-        
-        peak = self._angleToSteer / (max_angle - min_angle) * 19 + 9
-        leds_display = np.ones((19,3))
+        start_color = np.array([1,0.5,0])
+        end_color = np.array([0.5,0.87,0.92])
+        peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
+        print(peak)
+        color_gradient = (end_color - start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
+        leds_display = np.ones((self.__row_count,3))
         for i,elem in enumerate(leds_display):
             distance = np.abs(i - peak)
             leds_display[i,:] = start_color + distance * color_gradient
