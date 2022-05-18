@@ -327,6 +327,7 @@ class MainWindow(QObject):
     def getEnableLED(self, enable):
         if not self._leds == None:
             self._leds.enableChannels(enable)
+            self._leds.enableCamera(enable)
         else:
             print(f"LEDs enable: {enable}")
 

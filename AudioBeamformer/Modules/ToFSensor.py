@@ -52,6 +52,7 @@ class ToFSensor():
         self._updateRate = updateRate           # Update-Rate in Hz
         self._resolution = 8                    # 4x4 or 8x8 zones
         self._distanceData = np.ones((self._resolution, self._resolution))*4E3
+        self._errorCount = 0
         
     
     def __del__(self):
@@ -60,8 +61,8 @@ class ToFSensor():
     
     def begin(self):
         retryCount = 0
-        while not self._initialized:
-            if LINUX:
+        if LINUX:
+            while not self._initialized:
                 try:
                     self._driver = VL53L5CX(bus_id=self._i2cBusID)
                     if not self._driver.is_alive():
@@ -73,6 +74,8 @@ class ToFSensor():
                     self._driver.set_resolution(self._resolution**2)
                     self._driver.set_ranging_frequency_hz(self._updateRate)
                     self._driver.start_ranging()
+                    self._errorCount = 0
+                    break   # Successful
                 except Exception as e:
                     retryCount += 1
                     print("Failed to init ToF-Sensor, try again...")
@@ -80,7 +83,6 @@ class ToFSensor():
                     time.sleep(1)  # Wait and try again some time later
                     if retryCount >= self._maxRetry:
                         raise Exception("Could not initialize ToF-Sensor")
-                        
             self._initialized = True
                 
     
@@ -95,7 +97,6 @@ class ToFSensor():
         if LINUX:
             try:
                 if self._driver.check_data_ready():
-                    # TODO try catch
                     ranging_data = self._driver.get_ranging_data()
                     for i in range(self._resolution**2):
                         val = 4000
@@ -105,9 +106,14 @@ class ToFSensor():
                             val = 4000  
                         self._distanceData[i // self._resolution,
                                             i % self._resolution] = val
+                    self._errorCount = 0
                     return True
             except:
-                print("Failed to read data from ToF-Sensor, try again next time...")
+                self._errorCount += 1
+                if self._errorCount > 10:
+                    print("Failed to read data from ToF-Sensor, reinitialize...")
+                    self._initialized = False
+                    self.begin()
         return False
     
     

@@ -115,11 +115,12 @@ class HMI():
                     GPIO.add_event_detect(self._gpioButton, GPIO.FALLING, callback=self._buttonPress, bouncetime = 1000)
                 
     
-    def end(self):
+    def end(self, turnOffLed=True):
         if(self._initialized):
+            if turnOffLed:
+                self.setButtonColor()
             self.setFanSpeed(0)
             self._initialized = False
-            # Do not turn off LED, since it can be used as stanby 
             if LINUX:
                 try:
                     GPIO.remove_event_detect(self._gpioButton)

@@ -58,7 +58,7 @@ class FPGAControl():
         self._fpga_count = int(np.ceil(channel_count / channel_per_fpga))
         self._gain = np.ones(self._channel_count)
         self._delay = np.ones(self._channel_count) * 0
-        self._enable_channel = [True] * self._channel_count
+        self._enable_channel = [False] * self._channel_count
         self._interpolation = 64              # Interpolation: 1, 2, 4, ..., 64
         self._modulation_type = self.DSB      # Modulation type: DSB, MAM
         self._sigma_delta_coeff = 2**13       # coeff value: 2^0 ... 2^15
@@ -78,6 +78,7 @@ class FPGAControl():
                 self._spi = spidev.SpiDev()
                 self._spi.open(bus=self._spiBus, device=self._spiCs)
                 self._spi.max_speed_hz = self._spiFreq
+                GPIO.setwarnings(False)
                 GPIO.setmode(GPIO.BCM)        # Use RaspberryPi GPIO Numbers
                 GPIO.setup(self._syncPin, GPIO.OUT, initial=GPIO.LOW)
                 time.sleep(0.01)              # 10ms Sync-Pulse
@@ -87,6 +88,8 @@ class FPGAControl():
     
     def end(self):
         if(self._initialized):
+            self._enable_channel = [False] * self._channel_count
+            self.update()
             self._initialized = False
             if LINUX:
                 self._spi.close()

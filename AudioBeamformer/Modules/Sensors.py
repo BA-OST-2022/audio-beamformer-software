@@ -118,10 +118,12 @@ class Sensors():
                 self._hmi.setButtonColor(self.COLOR_BOOT)
             else:
                 self._hmi.setButtonColor()
-            self._hmi.end()
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
             self._tofSensor.end()
+            if shutdown:
+                self._hmi.setButtonColor(self.COLOR_BOOT)
+            self._hmi.end(not shutdown)  # Turn off LED if not shutdown
             self._initialized = False
         
     
@@ -158,8 +160,6 @@ class Sensors():
                     self._alertState = False
                 if DEBUG:
                     print("Updated ToF Sensor Data")
-            
-            # self._alertState  = (time.time() * 1000) % 2000 > 1000
                     
             
             mute = self.getMute() or self.getAlertState()
@@ -175,6 +175,13 @@ class Sensors():
                 self._ledColor = self.COLOR_RUN
             
             
+            if(time.time() - self._timeLed > 1 / self._updateRateLed):
+                self._timeLed = time.time()
+                if(self._enableMagic):
+                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
+                    self._ledColor = np.array([r, g, b])
+                self._hmi.setButtonColor(self._ledColor)
+                
             if(time.time() - self._timeTemp > 1 / self._updateRateTemp):
                 self._timeTemp = time.time()
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
@@ -183,14 +190,6 @@ class Sensors():
                 if not np.isnan(self._systemTemp):
                     fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
                     self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
-            
-            if(time.time() - self._timeLed > 1 / self._updateRateLed):
-                self._timeLed = time.time()
-                if(self._enableMagic):
-                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
-                    self._ledColor = np.array([r, g, b])
-                time.sleep(0.2)
-                self._hmi.setButtonColor(self._ledColor)
                 
             
     

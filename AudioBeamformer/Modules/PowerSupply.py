@@ -67,8 +67,7 @@ class PowerSupply():
         
     
     def __del__(self):
-        pass
-        # self.end()
+        self.end()
     
     
     def begin(self):
@@ -85,8 +84,9 @@ class PowerSupply():
                 
     
     def end(self):
-        self.enableOutput(False)
         if(self._initialized):
+            self.enableOutput(False)
+            self.setVolume(0.0)
             self._initialized = False
             if LINUX:
                 self._spi.close()
