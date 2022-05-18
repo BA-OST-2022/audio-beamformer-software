@@ -160,7 +160,7 @@ class Sensors():
                 if DEBUG:
                     print("Updated ToF Sensor Data")
             
-            self._alertState  = (time.time() * 1000) % 2000 > 1000
+            # self._alertState  = (time.time() * 1000) % 2000 > 1000
                     
             
             mute = self.getMute() or self.getAlertState()

@@ -161,7 +161,7 @@ class Beamsteering():
         # Where should the peak be
         peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
         # Calc difference vector and scale
-        color_gradient = (self.end_color - self._start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
+        color_gradient = (self._end_color - self._start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
         leds_display = np.ones((self.__row_count,3))
         for i,elem in enumerate(leds_display):
             distance = np.abs(i - peak)
