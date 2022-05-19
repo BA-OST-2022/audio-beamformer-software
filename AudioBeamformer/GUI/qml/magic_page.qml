@@ -18,9 +18,6 @@ Item{
     anchors.leftMargin: -10
     visible: !audio_processing_button.checked && !channel_button.checked && !setting_button.checked
 
-    Rectangle{
-        anchors.fill: parent
-    }
 
     CVItem 
     {
@@ -30,14 +27,5 @@ Item{
         anchors.fill: parent
         image: capture.image
     }
-    CVCapture
-    {
-        id: capture
-        width: 400
-        height: 300
-        index: 0
-        //filters: capture_image
-        Component.onCompleted: capture.start()
-        Component.onDestruction: capture.stop()
-    }
+
 }
