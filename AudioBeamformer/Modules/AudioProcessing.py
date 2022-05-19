@@ -277,7 +277,8 @@ class AudioProcessing:
     def enableMagic(self, state):
         self._enableMagic = state
         if(state):
-            self._player.begin("files/magic.wav")
+            path = os.path.join(os.path.dirname(__file__), "Files/magic.wav")
+            self._player.begin(path)
         else:
             self._player.end()
 
