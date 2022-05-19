@@ -74,9 +74,9 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width  * main_volume_slider.value * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width * main_volume_slider.value  * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width * main_volume_slider.value  * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_base.height = Math.min(((backend.sourceGainValue * 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50, 0.68)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_middle.height = Math.min(((backend.sourceGainValue* 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.68,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_top.height = Math.min(((backend.sourceGainValue* 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.8,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
                     }
             }
 
