@@ -182,9 +182,9 @@ class Beamsteering():
             leds_display *= self._COLOR_DEAFULT
         
         # Window Brightness Overlay
-        leds_display *= self._gains
+        leds_display *= np.column_stack((self._gains,self._gains, self._gains))
         # Channel Enable Overlay
-        leds_display *= self._enableChannel
+        leds_display *= np.column_stack((self._enableChannel,self._enableChannel, self._enableChannel))
         
         self._leds.setChannelColors(leds_display)            
         
