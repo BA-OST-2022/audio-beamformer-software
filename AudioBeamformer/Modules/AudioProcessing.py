@@ -288,7 +288,8 @@ class AudioProcessing:
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
-        print(status)
+        if status:
+            print(status)
         self.setSourceLevel(indata_oneCh)
         indata_oneCh *= self._output_enable
         if self._equalizer_enable:
@@ -303,7 +304,12 @@ class AudioProcessing:
             outdata_oneCh = indata[:,0]
             
         if self._enableMagic:
-             outdata_oneCh = self._player.getData()[:,0]
+            data = self._player.getData()[:,0]
+            if np.shape(data) == np.shape(outdata_oneCh):
+                outdata_oneCh = self._player.getData()[:,0]
+            else:
+                outdata_oneCh = 0
+                print("No data yet to play")
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)

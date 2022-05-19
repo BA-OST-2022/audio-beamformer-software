@@ -10,9 +10,11 @@ import PyCVQML 1.0
 Item{
     id: main_row
     anchors.fill: parent
+    
     Component.onCompleted:{
         backend.getEnableChannels([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
     }
+    
     // Buttons
     Column{
         id: menu_buttons

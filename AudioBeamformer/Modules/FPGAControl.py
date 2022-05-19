@@ -99,6 +99,8 @@ class FPGAControl():
         if(len(channels) != self._channel_count):
             raise ValueError("Channel count does not match")
         self._enable_channel = channels
+        if DEBUG:
+            print(f"Channel enable: {self._enable_channel}")
     
     
     def setChannelGain(self, gain):

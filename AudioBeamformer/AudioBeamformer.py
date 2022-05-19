@@ -49,6 +49,7 @@ from FaceTracking.FaceTracking import faceTracking
 
 class AudioBeamformer():
     def __init__(self):
+        self.terminating = False
         self.audio_processing = AudioProcessing(fpgaControl)
         self.sensors = Sensors(powerSupply, leds)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
@@ -68,17 +69,19 @@ class AudioBeamformer():
         self.gui.run()  # This functioncall is blocking and must be at the end
         
     def end(self, shutdown=False):
-        leds.end()
-        powerSupply.end()
-        fpgaControl.end()
-        self.beamsteering.end()
-        self.sensors.end(shutdown)
-        self.audio_processing.end()
-        print("Main Application terminated...")
-        if shutdown:
-            print("Shut down system...")
-            if LINUX:
-                os.system("sudo shutdown -h now")  
+        if not self.terminating:
+            self.terminating = True
+            leds.end()
+            powerSupply.end()
+            fpgaControl.end()
+            self.beamsteering.end()
+            self.sensors.end(shutdown)
+            self.audio_processing.end()
+            print("Main Application terminated...")
+            if shutdown:
+                print("Shut down system...")
+                if LINUX:
+                    os.system("sudo shutdown -h now")  
 
 
 
