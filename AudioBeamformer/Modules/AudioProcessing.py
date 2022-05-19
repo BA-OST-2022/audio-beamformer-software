@@ -277,9 +277,9 @@ class AudioProcessing:
         return data
 
     def MAMModulation(self,data):
-        data = data / 2147483648
+        data = data / np.iinfo(np.int32).max
         data_out = 1 - 1/2*data**2 - 1/8*data**4
-        return data_out * 2147483648 * self._mam_gain 
+        return data_out * np.iinfo(np.int32).max  * self._mam_gain
     
     def enableMagic(self, state):
         self._enableMagic = state
@@ -309,7 +309,7 @@ class AudioProcessing:
             outdata_oneCh = np.float32(outdata_oneCh)
         else:
             outdata_oneCh = indata[:,0]
-            
+
         if self._enableMagic:
             data = self._player.getData()[:,0]
             if np.shape(data) == np.shape(outdata_oneCh):
