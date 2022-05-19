@@ -331,6 +331,7 @@ Item{
                 audio_processing_button.checked = false
                 channel_button.checked = false
                 setting_button.checked = false
+                backend.enableMagicMode(true)
              }
         }
     }
