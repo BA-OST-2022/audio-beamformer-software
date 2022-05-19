@@ -255,6 +255,7 @@ class AudioProcessing:
                 self._fpga_controller.setInterpolation(self._interpolation_factor)
             else:
                 self._fpga_controller.setInterpolation(1)
+            self._fpga_controller.update()
 
     def setInterpolationFactor(self,factor):
         self._interpolation_factor = factor
@@ -266,6 +267,7 @@ class AudioProcessing:
                 self._fpga_controller.setModulationType(self._fpga_controller.DSB)
             elif self._modulation_index == 1:   # MAM
                 self._fpga_controller.setModulationType(self._fpga_controller.MAM)
+            self._fpga_controller.update()
 
     
     def setMAMMix(self,gain):
