@@ -11,25 +11,7 @@ Item{
     id: main_row
     anchors.fill: parent
     Component.onCompleted:{
-            channel_1.checked= true
-                channel_2.checked= true
-                channel_3.checked= true
-                channel_4.checked= true
-                channel_5.checked= true
-                channel_6.checked= true
-                channel_7.checked= true
-                channel_8.checked= true
-                channel_9.checked= true
-                channel_10.checked= true
-                channel_11.checked= true
-                channel_12.checked= true
-                channel_13.checked= true
-                channel_14.checked= true
-                channel_15.checked= true
-                channel_16.checked= true
-                channel_17.checked= true    
-                channel_18.checked= true
-                channel_19.checked= true
+        backend.getEnableChannels([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
     }
     // Buttons
     Column{
