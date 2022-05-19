@@ -59,7 +59,7 @@ class Beamsteering():
         self._ledsUpdateRate = 12
         self._timeTemp = 0
         # Beamsteering 
-        self._beamsteeringEnable = True
+        self._beamsteeringEnable = False
         self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
         self._currSteerSource = 0
         self._angleToSteer = 0

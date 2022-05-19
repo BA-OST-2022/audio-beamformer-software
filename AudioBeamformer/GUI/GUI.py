@@ -173,7 +173,7 @@ class MainWindow(QObject):
         self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
-
+        self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
 
 
     @pyqtProperty(bool)
@@ -488,6 +488,10 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant= True)
     def amHolder(self):
         return str(self.__am_holder)
+
+    @pyqtProperty(str, constant=True)
+    def loadingImage(self):
+        return str(self.__loadingImage)
 
     @pyqtProperty(bool)
     def getAlertState(self):
