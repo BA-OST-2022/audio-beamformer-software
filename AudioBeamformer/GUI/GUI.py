@@ -40,7 +40,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
@@ -82,8 +82,6 @@ class GUI:
         self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
-        
-        # self._enableMagic = False
         
     def run(self):
         PyCVQML.registerTypes()

@@ -182,10 +182,10 @@ class Beamsteering():
             leds_display *= self._COLOR_DEAFULT
         
         # Window Brightness Overlay
-        leds_display *= np.column_stack((self._gains,self._gains, self._gains))
+        leds_display *= np.abs(np.column_stack((self._gains,self._gains, self._gains)))
         # Channel Enable Overlay
         leds_display *= np.column_stack((self._enableChannel,self._enableChannel, self._enableChannel))
-        
+
         self._leds.setChannelColors(leds_display)            
         
         if self._currSteerSource != 0:  # Turn off LEDs if not in camera mode

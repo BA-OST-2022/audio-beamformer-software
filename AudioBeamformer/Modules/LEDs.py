@@ -119,6 +119,8 @@ class LEDs():
     def setChannelColors(self, colors):
         if(np.shape(colors) != (self._channelCount, 3)):
             raise ValueError("Channel color data format incorrect")
+        if np.any(colors > 1.0) or np.any(colors < 0.0):
+            raise ValueError("Color Value out of bound")
         self._channelColors = colors
     
     def setCameraAnimation(self, animation):
