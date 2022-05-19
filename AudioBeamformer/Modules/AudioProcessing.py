@@ -234,12 +234,6 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-        #fig, ax = plt.subplots()
-        #ax.stem(taps)
-        
-        #w,h = freqz(taps)
-        #fig, ax =plt.subplots()
-        #ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
         return taps
 
     def equalizerPlot(self):
@@ -302,8 +296,8 @@ class AudioProcessing:
         else:
             outdata_oneCh = indata[:,0]
             
-        # if self._enableMagic:
-        #     outdata_oneCh = self._player.getData()[:,0]
+        if self._enableMagic:
+             outdata_oneCh = self._player.getData()[:,0]
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
