@@ -55,7 +55,7 @@ from AudioPlayer import AudioPlayer
 class AudioProcessing:
     def __init__(self):
         # Adjustable values
-        self._chunk_size = 4096
+        self._chunk_size = 8192
         self._samplerate = 44100
         self.equ_window_size = 123
         self.__black_list_input_device = ["pulse","loopin","default"]
