@@ -87,7 +87,7 @@ class AudioProcessing:
         self.__equalizerList = []
         self.__stream_running = False
         self._enableMagic = False
-        self._player = AudioPlayer(sampleRate=self._samplerate, blockSize=self._chunk_size)
+        self._player = None
         
         # Equalizer initialization
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
@@ -278,9 +278,13 @@ class AudioProcessing:
         self._enableMagic = state
         if(state):
             path = os.path.join(os.path.dirname(__file__), "Files/magic.wav")
+            self._player = AudioPlayer(sampleRate=self._samplerate,
+                                       blockSize=self._chunk_size)
             self._player.begin(path)
         else:
-            self._player.end()
+            if self._player:
+                self._player.end()
+                self._player = None
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
