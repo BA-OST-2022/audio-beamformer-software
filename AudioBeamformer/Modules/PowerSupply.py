@@ -54,6 +54,7 @@ class PowerSupply():
         rBot = 2.15E3                         # Bottom Resistor in Ohm
         rPot = 9650                           # Dig. Pot. Resistance in Ohm
         
+        self._volume = 0
         self._initialized = False
         self._maxVolume = 1.0                 # Default is max volume
         self._vMax = (vRef / rBot) * (rBot + rTop)
@@ -103,7 +104,8 @@ class PowerSupply():
     def setVolume(self, volume):
         if not (0 <= volume <= 1.0):
             raise ValueError("Volume out of bound: 0.0 ... 1.0")
-        volume *= self._maxVolume
+        self._volume = volume
+        volume = self._volume * self._maxVolume
         vTarget = self._vMin + (self._vMax - self._vMin) * volume
         self._setOutputVoltage(vTarget)
 
@@ -112,6 +114,7 @@ class PowerSupply():
         if not (0 <= maxVolume <= 1.0):
             raise ValueError("Max Volume out of bound: 0.0 ... 1.0")
         self._maxVolume = maxVolume
+        self.setVolume(self._volume)
 
     
     def _setOutputVoltage(self, voltage):
