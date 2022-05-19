@@ -44,7 +44,7 @@ import sys
 import numpy as np
 import ast
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -71,7 +71,7 @@ class AudioProcessing:
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
             self._input_device = 0 #10
-            self._output_device = 3 #11
+            self._output_device = 2 #11
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -106,7 +106,7 @@ class AudioProcessing:
             self.startStream()
 
     def end(self):
-        self._stream.close()
+        self.endStream()
 
     def setupStream(self): 
         if LINUX or DEBUG:
@@ -149,13 +149,18 @@ class AudioProcessing:
         sd._terminate()
         sd._initialize()
         for p,i in enumerate(sd.query_devices()):
-            print(f"{p} Name: {i['name']},API: {i['hostapi']} ,In {i['max_input_channels']}, Out {i['max_output_channels']}") 
             channelInfo.append((p,
                                 i['name'],
                                 i['max_input_channels'],
                                 i['hostapi'],
                                 i['max_output_channels']))
         return channelInfo
+    
+    def printChannels(self):
+        for i, p in enumerate(self.getChannels()):
+            name = p[1].replace("\r\n", "")
+            print(f"{i:2} - API: {p[3]}, In: {p[2]}, Out: {p[4]}, Name: {name}")
+        print()
 
     def getSourceList(self): 
         if self.__stream_running:
@@ -180,6 +185,7 @@ class AudioProcessing:
         self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
+        
 
     def setSource(self, source_index):
         if self.__stream_running:
@@ -257,9 +263,9 @@ class AudioProcessing:
     def setModulationType(self, modType):
         self._modulation_index = modType
         if self._fpga_controller:
-            if self._modulation_index == 0:
+            if self._modulation_index == 0:     # AM
                 self._fpga_controller.setModulationType(self._fpga_controller.DSB)
-            elif self._modulation_index == 1:
+            elif self._modulation_index == 1:   # MAM
                 self._fpga_controller.setModulationType(self._fpga_controller.MAM)
 
     
@@ -305,8 +311,9 @@ class AudioProcessing:
             
         if self._enableMagic:
             data = self._player.getData()[:,0]
+            print(np.shape(data), np.shape(outdata_oneCh))
             if np.shape(data) == np.shape(outdata_oneCh):
-                outdata_oneCh = self._player.getData()[:,0]
+                outdata_oneCh = data
             else:
                 outdata_oneCh = 0
                 print("No data yet to play")
@@ -324,8 +331,9 @@ class AudioProcessing:
 if __name__ == '__main__':
     import time
     audio_processing = AudioProcessing()
+    audio_processing.printChannels()
     print(audio_processing.getSourceList())
-    # audio_processing.enableMagic(True)
+    audio_processing.enableMagic(True)
     
     audio_processing.begin()
     time.sleep(10)
