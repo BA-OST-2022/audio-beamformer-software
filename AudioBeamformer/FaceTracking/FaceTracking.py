@@ -165,7 +165,7 @@ class FaceTracking():
     def __init__(self, lifetime):
         self.fd = FaceDetector()
 
-        self.Ts = 1/15
+        self.Ts = 1/5
         self.R = 507
         self.Qp = 10
         self.Qv = 0.01
@@ -280,7 +280,7 @@ class FaceTracking():
                         t1 = time.time()
                         img = overlay_transparent(img, overlay, x, y)
                         t2 = time.time()
-                        print(t1 - t, t2 - t1)
+                        # print(t1 - t, t2 - t1)
 
        
         return img
