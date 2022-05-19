@@ -23,7 +23,7 @@ Item{
             id: main_mute_button
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
-
+            checked: true
             text: qsTr("Mute")
             height: 80
             width: 100
