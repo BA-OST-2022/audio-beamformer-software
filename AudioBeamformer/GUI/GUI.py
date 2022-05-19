@@ -83,7 +83,7 @@ class GUI:
         self._sensors = sensors
         self._leds = leds
         
-        self._enableMagic = False
+        # self._enableMagic = False
         
     def run(self):
         PyCVQML.registerTypes()
@@ -129,7 +129,6 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
-            self._faceTracking.enableMagic(self._enableMagic)
             return self._faceTracking.runDetection(src)
         return src
 
@@ -491,8 +490,6 @@ class MainWindow(QObject):
     # Magic Mode
     @pyqtSlot(bool)
     def enableMagicMode(self, enable):
-        self._enableMagic = enable
-        
         if self._audio_processing:
             self._audio_processing.enableMagic(enable)
 
