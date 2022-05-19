@@ -83,7 +83,7 @@ class GUI:
         self._sensors = sensors
         self._leds = leds
         
-        self._enableMagic = False    # TODO: Set this variable on event
+        self._enableMagic = False
         
     def run(self):
         PyCVQML.registerTypes()
@@ -487,6 +487,26 @@ class MainWindow(QObject):
             return self._sensors.getAlertState() 
         else:
             return False
+
+    # Magic Mode
+    @pyqtSlot(bool)
+    def enableMagicMode(self, enable):
+        self._enableMagic = enable
+        
+        if self._audio_processing:
+            self._audio_processing.enableMagic(enable)
+
+        if self._faceTracking:
+            self._faceTracking.enableMagic(enable)
+
+        if self._leds:
+            self._leds.enableMagic(enable)
+
+        if self._sensors:
+            self._sensors.enableMagic(enable)
+
+        
+
 
 
 if __name__ == "__main__":

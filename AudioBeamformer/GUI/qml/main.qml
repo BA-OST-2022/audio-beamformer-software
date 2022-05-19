@@ -37,6 +37,9 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: {audio_processing_button.checked ? "#303030" :"#c8c8c8"}
             }
+            onClicked:{
+                backend.enableMagicMode(false)
+            }
             radius: 8
         }
 
@@ -56,6 +59,9 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: {channel_button.checked ? "#303030" :"#c8c8c8"}
             }
+            onClicked:{
+                backend.enableMagicMode(false)
+            }
         }
 
         RoundButton{
@@ -73,6 +79,9 @@ Item{
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: {setting_button.checked ? "#303030" :"#c8c8c8"}
+            }
+            onClicked:{
+                backend.enableMagicMode(false)
             }
         }
     }
