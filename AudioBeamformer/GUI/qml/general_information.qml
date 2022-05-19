@@ -18,15 +18,7 @@ Item{
         anchors.bottomMargin: -5
 
     }
-    Timer{
-        interval: 50
-        running: true
-        repeat: true
-        onTriggered: {
-            main_mute_button.checked = backend.muteEnable;
-            main_volume_slider.value = backend.mainGainValue;
-        }
-    }
+
     RoundButton{
             id: main_mute_button
             anchors.bottom: parent.bottom
@@ -67,16 +59,18 @@ Item{
             backend.getMainGain(main_volume_slider.value)
             }
     }
-     // Timer for Gauge
+     // Timer for Gauge and mute
             Timer {
                 // Every 50ms
-                interval: 50
+                interval: 100
                 running: true
                 repeat: true
                 onTriggered: {
                     ap_source_gauge_base.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50, 0.68)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
                     ap_source_gauge_middle.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.68,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
                     ap_source_gauge_top.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.8,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    main_mute_button.checked = backend.muteEnable;
+                    main_volume_slider.value = backend.mainGainValue;
                     }
             }
 
