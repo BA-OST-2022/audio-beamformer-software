@@ -71,7 +71,7 @@ class LEDs():
     def __del__(self):
         self.end()
     
-    def begin(self, framerate = 30):
+    def begin(self, framerate = 20):
         if not self._initialized:
             self._initialized = True
             self._updateRate = framerate
