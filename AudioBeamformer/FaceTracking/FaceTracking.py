@@ -34,6 +34,7 @@ import sys
 import cv2
 import numpy as np
 import os
+import time
 
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/FaceTracking")
@@ -274,8 +275,12 @@ class FaceTracking():
                     x = int(fac.get_position()[0] - width // 2)
                     y = int(fac.get_position()[1] - height // 2)
                     if width > 0 and height > 0:
+                        t = time.time()
                         overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)
+                        t1 = time.time()
                         img = overlay_transparent(img, overlay, x, y)
+                        t2 = time.time()
+                        print(t1 - t, t2 - t1)
 
        
         return img
@@ -309,7 +314,7 @@ if __name__ == "__main__":
     VIDEO_FILE = "dance2.mp4"
     USE_CAMERA = True
     
-    # faceTracking.enableMagic(True)
+    faceTracking.enableMagic(True)
     
     if USE_CAMERA:
         cap = cv2.VideoCapture(0)
@@ -321,6 +326,8 @@ if __name__ == "__main__":
         ret, frame = cap.read()
         if not ret:
             break
+        if sys.platform == 'linux':
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
         img = faceTracking.runDetection(frame)
         # print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
 
