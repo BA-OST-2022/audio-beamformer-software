@@ -65,6 +65,7 @@ class AudioBeamformer():
         self.sensors.registerShutdownCallback(self.end)
         self.beamsteering.begin()
         self.audio_processing.begin()
+        self.audio_processing.printChannels()
         self.gui.registerTerminateCallback(self.end)
         self.gui.run()  # This functioncall is blocking and must be at the end
         
