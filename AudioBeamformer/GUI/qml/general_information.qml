@@ -95,21 +95,21 @@ Item{
                 }
                 Rectangle{
                     id: ap_source_gauge_base
-                    height: parent.height*0.6
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_gauge_holder.bottom
                     color: "#38f56e"
                 }
                 Rectangle{
                     id: ap_source_gauge_middle
-                    height: parent.height*0.2
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_source_gauge_base.top
                     color: "#f59738"
                 }
                 Rectangle{
                     id: ap_source_gauge_top
-                    height: parent.height
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"
