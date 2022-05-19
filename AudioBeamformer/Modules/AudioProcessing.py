@@ -75,11 +75,11 @@ class AudioProcessing:
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
-        self._equalizer_enable = False
+        self._equalizer_enable = True
         self._modulation_index = 0
-        self._mam_gain = 1
-        self._enable_interpolation = False
-        self._interpolation_factor = 0
+        self._mam_gain = 0.2
+        self._enable_interpolation = True
+        self._interpolation_factor = 64
         self._stream = None
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
         self.__current_source_level = 0

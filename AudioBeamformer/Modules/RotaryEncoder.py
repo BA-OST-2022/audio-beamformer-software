@@ -134,7 +134,7 @@ class RotaryEncoder():
         
         self._encoder = None
         self._encoderValue = 0.0
-        self._buttonState = False
+        self._buttonState = True
         
     
     def __del__(self):

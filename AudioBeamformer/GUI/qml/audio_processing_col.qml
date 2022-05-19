@@ -173,6 +173,7 @@ Item{
             }
             Switch{
                     id: ap_equalizer_switch
+                    checked: true
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ap_equalizer_enable_label.bottom
                     anchors.topMargin: 4
@@ -228,6 +229,7 @@ Item{
 
             Switch{
                     id: ap_interpolation_switch
+                    checked: true
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ap_interpolation_enable_label.bottom
                     anchors.topMargin: 4
@@ -253,8 +255,9 @@ Item{
                     width: ap_source_slider.width
                     anchors.topMargin: 8
                     model: [2,4,8,16,32,64]
+                    currentIndex: 5
                     onCurrentIndexChanged: {
-                        backend.getInterpolationLevel(ap_interpolation_combobox.currentIndex)
+                        backend.getInterpolationLevel(ap_interpolation_combobox.currentValue)
                     }
             }
 
@@ -313,7 +316,7 @@ Item{
             Slider {
                     id: ap_modulation_slider
                     visible: ad_modulation_mam.checked
-                    value: 1
+                    value: 0.2
                     anchors.top: ap_modulation_slider_label.bottom
                     anchors.topMargin: 0
                     anchors.horizontalCenter: parent.horizontalCenter

@@ -45,7 +45,7 @@ Item{
 
             Switch{
                     id: ch_beamsteering_switch
-                    checked: true
+                    checked: false
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ch_enable_label.bottom
                     anchors.topMargin: 5
@@ -124,6 +124,7 @@ Item{
         // Window
         Item{
             id: channel_window_item
+
             height: channel_settings_row.height
             width: channel_settings_row.width/4.5
             // Title
@@ -145,6 +146,7 @@ Item{
 
             Switch{
                 id: ch_window_switch
+                checked: true
                 anchors.top: ch_window_switch_label.bottom
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
