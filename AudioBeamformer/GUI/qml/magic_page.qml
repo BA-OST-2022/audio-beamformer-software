@@ -5,6 +5,8 @@ import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
 import QtCharts 2.15
+import PyCVQML 1.0
+import Filters 1.0
 
  // Audio processing
 Item{
