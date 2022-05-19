@@ -101,13 +101,17 @@ class Beamsteering():
             if(self._runThread):
                 # Update rate for the LEDS
                 threading.Timer(1.0 / self._ledsUpdateRate, self.update).start()
-                self.setLEDS()
-                # Update rate for the angle
-                if(time.time() - self._timeTemp > 1 / self._updateRate):
-                    self._timeTemp = time.time()
-                    if(self._beamsteeringEnable):
-                        self.setAngle()
-                        self.calculateDelay()
+            else:
+                return
+            
+            self.setAngle()
+            self.setLEDS()
+            # Update rate for the angle
+            if(time.time() - self._timeTemp > 1 / self._updateRate):
+                self._timeTemp = time.time()
+                if(self._beamsteeringEnable):
+                    
+                    self.calculateDelay()
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value
