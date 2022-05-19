@@ -16,6 +16,7 @@ ApplicationWindow{
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
+    /*
     Timer{
         id: main_timer
         interval: 300 
@@ -44,4 +45,25 @@ ApplicationWindow{
     Loader{
         source: "backend.qml"
     }
+    */
+    Timer{
+       id: main_timer
+       interval: 300 
+       running: true
+       repeat: true
+       onTriggered:{
+           if (backend.readyState){
+               main_timer.running = false
+               main_loader.source = "main.qml"
+           }
+       }
+   }
+   Loader{
+       id: main_loader
+       anchors.fill: parent
+       source: "loading.qml"
+   }
+   Loader{
+       source: "backend.qml"
+   }
 }

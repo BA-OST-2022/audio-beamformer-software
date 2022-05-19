@@ -15,6 +15,10 @@ Item{
     anchors.bottom: parent.bottom
     anchors.leftMargin: -10
     visible: audio_processing_button.checked
+    Component.onCompleted:{
+        //backend.getSource(0)
+        ap_source_combobox.model = backend.sourceList
+    }
 
     // Audio processing settings
     Row{
@@ -23,7 +27,8 @@ Item{
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-
+        
+        
         // Source 
         Item{
             id: audio_processing_source_item
@@ -127,6 +132,8 @@ Item{
                     id: ap_source_gauge_base
                     height: 0
                     width: parent.width
+                    anchors.left: ap_gauge_holder.left
+                    anchors.right: ap_gauge_holder.right
                     anchors.bottom:ap_gauge_holder.bottom
                     color: "#38f56e"
                 }

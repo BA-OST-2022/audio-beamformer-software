@@ -311,7 +311,6 @@ class AudioProcessing:
             
         if self._enableMagic:
             data = self._player.getData()[:,0]
-            print(np.shape(data), np.shape(outdata_oneCh))
             if np.shape(data) == np.shape(outdata_oneCh):
                 outdata_oneCh = data
             else:
