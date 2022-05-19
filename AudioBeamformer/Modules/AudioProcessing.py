@@ -53,13 +53,14 @@ from AudioPlayer import AudioPlayer
 
 
 class AudioProcessing:
-    def __init__(self):
+    def __init__(self, fpgaControl = None):
         # Adjustable values
         self._chunk_size = 8192
         self._samplerate = 44100
         self.equ_window_size = 123
         self.__black_list_input_device = ["pulse","loopin","default"]
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
+        self._fpga_controller = fpgaControl
         # Device index
         if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
@@ -244,24 +245,23 @@ class AudioProcessing:
         self._equalizer_filter = taps
 
     def enableInterpolation(self,enable):
-        # Call function from FPGA and enable interpolation
-        # FPGA.Interpolation(self._interpolation_factor)
-        self._enable_interpolation = enable
-        if enable:
-            #FPGA.enableInterpolation()
-            #FPGA.interpolationFactor(self._interpolation_factor)
-            pass
-        else:
-            #FPGA.disableInterpolation()
-            pass
-        pass
+        if self._fpga_controller:
+            if enable:
+                self._fpga_controller.setInterpolation(self._interpolation_factor)
+            else:
+                self._fpga_controller.setInterpolation(1)
 
     def setInterpolationFactor(self,factor):
         self._interpolation_factor = factor
 
-    def setModulationType(self, type):
-        print(type)
-        self._modulation_index = type
+    def setModulationType(self, modType):
+        self._modulation_index = modType
+        if self._fpga_controller:
+            if self._modulation_index == 0:
+                self._fpga_controller.setModulationType(self._fpga_controller.DSB)
+            elif self._modulation_index == 1:
+                self._fpga_controller.setModulationType(self._fpga_controller.MAM)
+
     
     def setMAMMix(self,gain):
         self._mam_gain = gain
