@@ -89,6 +89,8 @@ class LEDs():
 
     
     def end(self):
+        self._enableChannels = False
+        self._enableCamera = False
         self._runThread = False
         if(self._initialized):
             self._initialized = False
