@@ -174,6 +174,15 @@ class MainWindow(QObject):
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
 
+
+
+    @pyqtProperty(bool)
+    def readyState(self):
+        if self._sensors:
+            return self._sensors.getReadyState()    
+        else:
+            return True
+
     # Audio processing Source
     @pyqtProperty(list,constant=True)
     def sourceList(self):

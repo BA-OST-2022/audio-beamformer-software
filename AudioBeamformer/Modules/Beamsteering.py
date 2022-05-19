@@ -56,7 +56,7 @@ class Beamsteering():
         self._initialized = False
         self._runThread = False
         self._updateRate = 2
-        self._ledsUpdateRate = 20
+        self._ledsUpdateRate = 12
         self._timeTemp = 0
         # Beamsteering 
         self._beamsteeringEnable = True
