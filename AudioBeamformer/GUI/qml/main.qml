@@ -94,6 +94,16 @@ Item{
         anchors.bottom: parent.bottom
         width: 1200
 
+        CVCapture
+        {
+            id: capture
+            width: 400
+            height: 300
+            index: 0
+            Component.onCompleted: capture.start()
+            Component.onDestruction: capture.stop()
+        }
+
         Loader{
             anchors.fill: parent
             source: "audio_processing_col.qml"
