@@ -64,10 +64,14 @@ class Sensors():
         self.COLOR_MUTE = np.array([1.0, 0.0, 0.0])        # Red
         self.COLOR_STANDBY = np.array([0.62, 0.62, 0.0])   # Yellow (dark)
         
+        self._updateRateTemp = 2                           # Update rate in Hz
+        self._updateRateLed = 10                           # Update rate in Hz
+        self._updateRateToF = 3                            # Update rate in Hz                
+        
         self._tempSensorAmbient = TempSensor(0x48)
         self._tempSensorSystem = TempSensor(0x49)
         self._hmi = HMI(0x62)
-        self._tofSensor = ToFSensor()
+        self._tofSensor = ToFSensor(self._updateRateToF)
         self._rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
         self._powerSupply = powerSupply
         self._leds = leds
@@ -85,9 +89,6 @@ class Sensors():
         self._ledColor = np.zeros((1, 3))
         self._shutdownCallback  = None
         
-        self._updateRateTemp = 2                # Update rate in Hz
-        self._updateRateLed = 20                # Update rate in Hz
-        
         self._ambientTemp = float("NAN")
         self._systemTemp = float("NAN")
         self._cpuTemp = float("NAN")
@@ -95,6 +96,7 @@ class Sensors():
         
         self._timeTemp = 0
         self._timeLed = 0
+        self._timeToF = 0
         
     
     def __del__(self):
@@ -151,15 +153,17 @@ class Sensors():
             else:
                 return
             
-            if(self._tofSensor.update()):
-                self._distanceMap = self._tofSensor.getDistance()
-                event = self._checkDistanceMap(self._distanceMap)
-                if(event == self.EVENT_ALERT):
-                    self._alertState = True
-                if(event == self.EVENT_FREE):
-                    self._alertState = False
-                if DEBUG:
-                    print("Updated ToF Sensor Data")
+            if(time.time() - self._timeToF > 1 / self._updateRateToF):            
+                if(self._tofSensor.update()):
+                    self._timeToF = time.time()
+                    self._distanceMap = self._tofSensor.getDistance()
+                    event = self._checkDistanceMap(self._distanceMap)
+                    if(event == self.EVENT_ALERT):
+                        self._alertState = True
+                    if(event == self.EVENT_FREE):
+                        self._alertState = False
+                    if DEBUG:
+                        print("Updated ToF Sensor Data")
                     
             
             mute = self.getMute() or self.getAlertState()
