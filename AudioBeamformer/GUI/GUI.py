@@ -161,7 +161,7 @@ class MainWindow(QObject):
         self.window_list = []
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
-        self.__enableChannels = np.ones(19)
+        self.__enableChannels = np.zeros(19)
         self.__mutePath = Path("images") / "Mute_grey.png"
         self.__unmutePath = Path("images") / "Unmute_grey.png"
         self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.png"
@@ -409,7 +409,7 @@ class MainWindow(QObject):
     @pyqtSlot(list)
     def getEnableChannels(self, list):
         if not all(i==u for i,u in zip(self.__enableChannels,list)):
-            if not self._beamsteering == None:
+            if self._beamsteering:
                 self._beamsteering.setChannelEnable(list)
             else:
                 print(f"Channel Gains: {list}")
