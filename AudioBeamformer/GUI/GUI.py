@@ -159,6 +159,7 @@ class MainWindow(QObject):
         self.source_gain_value = 20
         self.beamsteering_pattern_list = []
         self.window_list = []
+        self._windowProfileIndex = 0
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
         self.__enableChannels = np.zeros(19)
@@ -174,6 +175,7 @@ class MainWindow(QObject):
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
+        
 
 
     @pyqtProperty(bool)
@@ -319,16 +321,20 @@ class MainWindow(QObject):
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
         if not self._beamsteering == None:
-            self._beamsteering.setWindowProfile(0)
+            if enable:
+                self._beamsteering.setWindowProfile(self._windowProfileIndex)
+            else:
+                self._beamsteering.setWindowProfile(0)
         else:
             print(f"Window enable: {enable}")
 
     @pyqtSlot(int)
     def getWindowType(self, type):
+        self._windowProfileIndex = type
         if not self._beamsteering == None:
-            self._beamsteering.setWindowProfile(type)
+            self._beamsteering.setWindowProfile(self._windowProfileIndex)
         else:
-            print(f"Window type: {type}")
+            print(f"Window type: {self._windowProfileIndex}")
 
     # Settings LEDS
     @pyqtSlot(int)

@@ -47,17 +47,26 @@ class Beamsteering():
         self._sensors = sensors
         self._facetracking = facetracking
         self._leds = leds
+        
         # Constants
         self.__distance = 0.01475
         self.__row_count = 19
+        
+        #   LED 
+        self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
+        self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
+        self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
+        
         #   Camera angle in degree
         self.__max_angle_camera = 40
+        
         # Var init
         self._initialized = False
         self._runThread = False
         self._updateRate = 2
         self._ledsUpdateRate = 12
         self._timeTemp = 0
+        
         # Beamsteering 
         self._beamsteeringEnable = False
         self._beamsteeringSources = {0: "Camera", 1: "Manual", 2: "Pattern"}
@@ -65,11 +74,13 @@ class Beamsteering():
         self._angleToSteer = 0
         self._angleToSteer_faceTracking = 0
         self._angleToSteer_manual = 0
+        
         #   Pattern
         self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
         self._activePattern = np.linspace(-45,45,10)
         self._currentPattern = 0
         self._PatternHoldTime = 1
+        
         # Window
         self.__window_types = {"Rectangle": self.rectWindow(),
                              "Cosine": self.cosineWindow(),
@@ -78,13 +89,8 @@ class Beamsteering():
                              "Blackman": self.blackmanWindow(),
                              "Dolph-Chebyshev": self.chebyWindow()}
         self._activeWindow = "Rectangle"
-        # LED 
-        self._start_color = np.array([1,0.4,0])
-        self._end_color = np.array([0.05,0.2,0.95])
-        #self._start_color = np.array([1,0.3,0])
-        #self._end_color = np.array([0.5,0.87,0.92])
-        # Mute channel
         self._enableChannel = np.ones(self.__row_count)
+        self._gains = np.ones(self.__row_count)
 
 
     def begin(self):
@@ -165,14 +171,24 @@ class Beamsteering():
         # Where should the peak be
         peak = self._angleToSteer / (max_angle - min_angle) * self.__row_count  + self.__row_count // 2
         # Calc difference vector and scale
-        color_gradient = (self._end_color - self._start_color)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
+        color_gradient = (self._COLOR_GRAD_LOW - self._COLOR_GRAD_PEAK)/ (np.ceil(np.abs(peak - self.__row_count // 2)) + self.__row_count // 2)
         leds_display = np.ones((self.__row_count,3))
-        for i,elem in enumerate(leds_display):
-            distance = np.abs(i - peak)
-            leds_display[i,:] = self._start_color + distance * color_gradient
-        self._leds.setChannelColors(np.abs(leds_display))
+        if self._beamsteeringEnable:
+            for i,elem in enumerate(leds_display):
+                distance = np.abs(i - peak)
+                leds_display[i,:] = self._COLOR_GRAD_PEAK + distance * color_gradient
+            leds_display = np.abs(leds_display)
+        else:
+            leds_display *= self._COLOR_DEAFULT
         
-        if self._currSteerSource != 0:  #Turn off LEDs if not in camera mode
+        # Window Brightness Overlay
+        leds_display *= self._gains
+        # Channel Enable Overlay
+        leds_display *= self._enableChannel
+        
+        self._leds.setChannelColors(leds_display)            
+        
+        if self._currSteerSource != 0:  # Turn off LEDs if not in camera mode
             self._leds.setCameraAnimation(self._leds.OFF)
         else:
             if self._facetracking.getDetectionCount() == 0:
@@ -212,12 +228,12 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def calculateGains(self):
-        gains = self.__window_types[self._activeWindow]
+        self._gains = np.array(self.__window_types[self._activeWindow])
         if not DEBUG:
-            self._fpga_controller.setChannelGain(np.array(gains))
+            self._fpga_controller.setChannelGain(self._gains)
             self._fpga_controller.update()
         else:
-            print(f"Gains: {np.array(gains)}")
+            print(f"Gains: {np.array(self._gains)}")
 
     def getSpeedOfSound(self):
         if self._sensors:
