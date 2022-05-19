@@ -103,7 +103,7 @@ class PowerSupply():
     def setVolume(self, volume):
         if not (0 <= volume <= 1.0):
             raise ValueError("Volume out of bound: 0.0 ... 1.0")
-        volume = min(volume, self._maxVolume)
+        volume *= self._maxVolume
         vTarget = self._vMin + (self._vMax - self._vMin) * volume
         self._setOutputVoltage(vTarget)
 

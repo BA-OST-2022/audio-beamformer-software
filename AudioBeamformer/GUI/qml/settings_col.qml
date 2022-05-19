@@ -63,7 +63,7 @@ Item{
                 anchors.topMargin: 5
                 anchors.top: se_led_switch.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Brightness: " + (se_leds_level_slider.value*100).toFixed(0) + "%"}
+                text: {"Brightness: " + (se_leds_level_slider.value*100).toFixed(0) + " %"}
             }
 
             Slider {

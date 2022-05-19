@@ -288,7 +288,8 @@ class AudioProcessing:
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
-        print(status)
+        if status:
+            print(status)
         self.setSourceLevel(indata_oneCh)
         indata_oneCh *= self._output_enable
         if self._equalizer_enable:
