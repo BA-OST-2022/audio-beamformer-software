@@ -123,7 +123,7 @@ class FaceDetector:
 if __name__ == "__main__":
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = "dance.mp4"
+    filename = "demos/dance.mp4"
 
     cap = cv2.VideoCapture(f"{dir_path}\{filename}")
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
             for i in range(boxes.shape[0]):
                 box = boxes[i, :]
                 cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
-                cv2.circle(frame, (centers[0].astype(np.int32),centers[1].astype(np.int32)), radius=0, color=(255, 0, 0), thickness=20)
+                cv2.circle(frame, (int(centers[0][0]), int(centers[0][1])), radius=5, color=(255, 0, 0), thickness=20)
             
             cv2.imshow('Face Detector', frame)
 

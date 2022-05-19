@@ -23,6 +23,7 @@ class KalmanFilter2D:
         
         self.lifetime = 5
         self.rawBox = []
+        self.floatBox = []
         
 
     def _predict(self):

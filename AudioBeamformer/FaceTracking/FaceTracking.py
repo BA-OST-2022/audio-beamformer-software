@@ -115,11 +115,14 @@ def overlay_transparent(background, overlay, x, y):
 
     background_width = background.shape[1]
     background_height = background.shape[0]
+    
+    h, w = overlay.shape[0], overlay.shape[1]
 
     if x >= background_width or y >= background_height:
         return background
 
-    h, w = overlay.shape[0], overlay.shape[1]
+    if x < -w or y < -h:
+        return background
 
     if x + w > background_width:
         w = background_width - x
@@ -127,7 +130,17 @@ def overlay_transparent(background, overlay, x, y):
 
     if y + h > background_height:
         h = background_height - y
-        overlay = overlay[:h]
+        overlay = overlay[:h, :]
+    
+    if x < 0:
+        w += x
+        overlay = overlay[:, -x:]
+        x = 0
+        
+    if y < 0:
+        h += y
+        overlay = overlay[-y:, :]
+        y = 0
 
     if overlay.shape[2] < 4:
         overlay = np.concatenate(
@@ -166,6 +179,10 @@ class FaceTracking():
         self._showDot = False
         self._showRoundRect = True
         self._enableMagic = False
+        self._overlayPaths = ["elvis.png", "elvis_glasses.png", "elvis_smoke.png", "elvis_boss.png", "elvis_hut.png"]
+        self._overlayPaths = [os.path.join(os.path.dirname(__file__), "demos", i) for i in self._overlayPaths]
+        self._magicOverlay = [cv2.imread(file, cv2.IMREAD_UNCHANGED) for file in self._overlayPaths]
+        
     
     def __del__(self):
         self.fd.__del__()
@@ -190,7 +207,19 @@ class FaceTracking():
             z_k = np.asarray(centers[center_index])
             x_k = self.faces[face_index].get_position()
             
-            self.faces[face_index].rawBox = boxes[center_index]
+            weight = 0.25
+            box = np.array(boxes[center_index], dtype=np.float64)
+            if len(self.faces[face_index].floatBox) == 0:
+                self.faces[face_index].floatBox = box
+            
+            self.faces[face_index].floatBox *= (1 - weight)
+            self.faces[face_index].floatBox += weight * box
+            box = self.faces[face_index].floatBox
+            w = abs(box[2] - box[0]) // 2
+            h = abs(box[3] - box[1]) // 2
+            cx = self.faces[face_index].get_position()[0]
+            cy = self.faces[face_index].get_position()[1]
+            self.faces[face_index].rawBox = np.array([cx - w, cy - h, cx + w, cy + h], dtype=np.int32)
 
 
             # dist = np.linalg.norm(z_k - x_k)
@@ -228,12 +257,11 @@ class FaceTracking():
                     else:
                         cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=color, thickness=4)
                 else:
-                    file = os.path.join(os.path.dirname(__file__), "magic.png")
-                    overlay = cv2.imread(file, cv2.IMREAD_UNCHANGED)
+                    overlay = self._magicOverlay[i % len(self._magicOverlay)]
                     targetWidth = abs(box[2] - box[0])
                     targetHeight = abs(box[3] - box[1])
-                    imageWidth = np.shape(overlay)[0]
-                    imageHeight = np.shape(overlay)[1]
+                    imageWidth = np.shape(overlay)[1]
+                    imageHeight = np.shape(overlay)[0]
                     ratioWidth = targetWidth / imageWidth
                     ratioHeight = targetHeight / imageHeight
                     
@@ -246,7 +274,7 @@ class FaceTracking():
                     x = int(fac.get_position()[0] - width // 2)
                     y = int(fac.get_position()[1] - height // 2)
                     if width > 0 and height > 0:
-                        overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)  # TODO: Implement faster version!
+                        overlay = cv2.resize(overlay, (width, height), interpolation = cv2.INTER_AREA)
                         img = overlay_transparent(img, overlay, x, y)
 
        
@@ -294,7 +322,7 @@ if __name__ == "__main__":
         if not ret:
             break
         img = faceTracking.runDetection(frame)
-        print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
+        # print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
 
         cv2.imshow("FaceTracking [ESC to quit]", img)
         key = cv2.waitKey(1)
