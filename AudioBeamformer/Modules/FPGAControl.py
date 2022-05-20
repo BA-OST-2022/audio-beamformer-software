@@ -60,7 +60,7 @@ class FPGAControl():
         self._delay = np.ones(self._channel_count) * 0
         self._enable_channel = [False] * self._channel_count
         self._interpolation = 64              # Interpolation: 1, 2, 4, ..., 64
-        self._modulation_type = self.DSB      # Modulation type: DSB, MAM
+        self._modulation_type = self.MAM      # Modulation type: DSB, MAM
         self._sigma_delta_coeff = 2**13       # coeff value: 2^0 ... 2^15
         self._sigma_delta_freq = 6.25E6       # Frequency in Hz
         self._tick_length = 2 / self._sigma_delta_freq
