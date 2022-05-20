@@ -35,7 +35,8 @@ import sys
 import datetime
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtQuick, QtQml
-from PyQt5.QtGui  import QGuiApplication
+#from PyQt5.QtGui  import QGuiApplication
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
@@ -48,13 +49,13 @@ sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
 os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-app = QGuiApplication.instance()
+app = QApplication.instance()
 if app == None:
-    app = QGuiApplication(sys.argv)
-if not QGuiApplication.instance():
-    app = QGuiApplication(sys.argv)
+    app = QApplication(sys.argv)
+if not QApplication.instance():
+    app = QApplication(sys.argv)
 else:
-    app = QGuiApplication.instance()
+    app = QApplication.instance()
 engine = QQmlApplicationEngine()
 
 # Important: Must be imported after creating Qt instance, this is a known bug.
