@@ -8,6 +8,7 @@ import QtQuick.Extras 1.4
 Item{
     anchors.fill: parent
         Rectangle{
+        id: alert_rect
         visible: backend.getAlertState
         anchors.fill: parent
         color: "red"
@@ -71,6 +72,7 @@ Item{
                     ap_source_gauge_top.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.8,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
                     main_mute_button.checked = backend.muteEnable;
                     main_volume_slider.value = backend.mainGainValue;
+                    alert_rect.visible = backend.getAlertState;
                     }
             }
 
