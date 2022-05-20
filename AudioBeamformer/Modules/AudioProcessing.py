@@ -278,7 +278,7 @@ class AudioProcessing:
 
     def MAMModulation(self,data):
         data = data / np.iinfo(np.int32).max
-        data_out = 1 - 1/2*data**2 - 1/8**data**4
+        data_out = 1 - 1/2*data**2 - 1/8*data**4
         return data_out * np.iinfo(np.int32).max  * self._mam_gain
     
     def enableMagic(self, state):
