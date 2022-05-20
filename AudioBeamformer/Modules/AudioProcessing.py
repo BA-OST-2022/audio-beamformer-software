@@ -76,7 +76,7 @@ class AudioProcessing:
         self._tot_gain = 1
         self._output_enable = 1
         self._equalizer_enable = True
-        self._modulation_index = 0
+        self._modulation_index = 1
         self._mam_gain = 0.2
         self._enable_interpolation = True
         self._interpolation_factor = 64

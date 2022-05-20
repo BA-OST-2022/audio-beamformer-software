@@ -297,18 +297,18 @@ Item{
                 anchors.top: ap_modulation_label_radio_label.bottom
                 anchors.topMargin: 5
                 RadioButton{
-                    id: ad_modulation_am
-                    text: qsTr("AM")
+                    id: ad_modulation_mam
+                    text: qsTr("MAM")
                     checked: true
                     onClicked:{
-                        backend.getModulationType(0)
+                        backend.getModulationType(1)
                     }
                 }
                 RadioButton{
-                    id: ad_modulation_mam
-                    text: qsTr("MAM")
+                    id: ad_modulation_am
+                    text: qsTr("AM")
                     onClicked:{
-                        backend.getModulationType(1)
+                        backend.getModulationType(0)
                     }
                 }
             }
@@ -389,6 +389,55 @@ Item{
             sourceSize.width: 1206
             sourceSize.height: 122
         }
+        Item{
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.leftMargin: 364
+            anchors.bottomMargin: 11
+            width: 176
+            height: 100
+            ChartView{
+                antialiasing: true
+                legend.visible: false
+                anchors.left:parent.left
+                anchors.top: parent.top
+                anchors.leftMargin: -25
+                anchors.topMargin: -22
+                width: 230
+                height: 150
+                backgroundColor: "#00000000"
+
+                 ValueAxis {
+                    id: axisX
+                    min: 0
+                    max: 5
+                    gridVisible:false
+                    color: "white"
+                    tickCount: 2
+                    
+                }
+
+                ValueAxis {
+                    id: axisY
+                    min: 0
+                    max: 5
+                    gridVisible:false
+                    color: "white"
+                    tickCount: 2
+                }
+                 LineSeries {
+                    axisX: axisX
+                    axisY: axisY
+                    XYPoint { x: 0; y: 0 }
+                    XYPoint { x: 1.1; y: 2.1 }
+                    XYPoint { x: 1.9; y: 3.3 }
+                    XYPoint { x: 2.1; y: 2.1 }
+                    XYPoint { x: 2.9; y: 4.9 }
+                    XYPoint { x: 3.4; y: 3.0 }
+                    XYPoint { x: 4.1; y: 3.3 }
+                }
+            }
+        }
         Image{
             anchors.right: parent.right
             visible: ad_modulation_am.checked
@@ -403,5 +452,20 @@ Item{
         }
        
     }
+    /*
+    ChartView{
+        title: "Bar series"
+        legend.alignment: Qt.AlignBottom
+        antialiasing: true
+
+        BarSeries {
+            id: mySeries
+            axisX: BarCategoryAxis { categories: ["2007", "2008", "2009", "2010", "2011", "2012" ] }
+            BarSet { label: "Bob"; values: [2, 2, 3, 4, 5, 6] }
+            BarSet { label: "Susan"; values: [5, 1, 2, 4, 1, 7] }
+            BarSet { label: "James"; values: [3, 5, 8, 13, 5, 8] }
+        }
+    }
+    */
 
 }
