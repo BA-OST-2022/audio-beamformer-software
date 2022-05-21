@@ -30,6 +30,7 @@
 # SOFTWARE.
 ###############################################################################
 
+from doctest import ELLIPSIS_MARKER
 import os
 import sys
 import datetime
@@ -380,6 +381,20 @@ class MainWindow(QObject):
         else:
             print(f"Max. volume: {value}")
 
+    # Beamfocusing
+    @pyqtSlot(float)
+    def getFocusDistance(self, distance):
+        if self._beamsteering:
+            self._beamsteering.setBeamfocusingRadius(10*distance)
+        else:
+            print(f"Focus distance: {10*distance}")
+
+    @pyqtSlot(bool)
+    def enableBeamfocusing(self, enable):
+        if self._beamsteering:
+            self._beamsteering.enableBeamfocusing(enable)
+        else:
+            print(f"Beamfocusing enable: {enable}")
     # Settings stats
     
     @pyqtProperty(str)

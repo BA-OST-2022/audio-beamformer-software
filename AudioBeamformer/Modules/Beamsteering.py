@@ -216,6 +216,8 @@ class Beamsteering():
             self._angleToSteer = self._activePattern[int(time.time()/self._PatternHoldTime % len(self._activePattern))]
     
     def calculateDelay(self):
+        # Check if delay allowed
+        maxDelay = self._fpga_controller.getMaxChannelDelay()
         # If angle below 1 degree set delay to zero
         if abs(self._angleToSteer) >= 1:
             delay = np.arange(self.__row_count) * (self.__distance / self.getSpeedOfSound()) * np.sin(self._angleToSteer/180*np.pi)
@@ -224,9 +226,15 @@ class Beamsteering():
                 delay = delay[::-1] * -1
         else:
             delay = np.zeros(self.__row_count)
-        
-        # Check if delay allowed
-        maxDelay = self._fpga_controller.getMaxChannelDelay()
+        if self._beamfocusing_enable:
+            focus_delay = self.__distance**2/(2*self.__beamfocusing_radius*self.getSpeedOfSound())(np.arange(self.__row_count) - 1 - (self.__row_count - 1)/2)**2
+            tot_delay = delay + focus_delay
+            tot_delay -= min(tot_delay)
+            if not np.any(np.max(tot_delay) >= maxDelay):
+                delay = tot_delay
+            else:
+                print(f"Beamfocusing was not applied")
+
         if np.any(delay >= maxDelay):
             print(f"Wrong angle: {delay}")
         
