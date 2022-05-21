@@ -65,6 +65,8 @@ class Beamsteering():
         self._angleToSteer = 0
         self._angleToSteer_faceTracking = 0
         self._angleToSteer_manual = 0
+        self._beamfocusing_enable = False
+        self._beamfocusing_radius = 3 # Beamfocusing radius is set to three 
         #   Pattern
         self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
         self._activePattern = np.linspace(-45,45,10)
@@ -118,6 +120,12 @@ class Beamsteering():
 
     def setBeamsteeringSource(self, source):
         self._currSteerSource = source
+
+    def enableBeamfocusing(self,enable):
+        self._beamfocusing_enable = enable
+
+    def setBeamfocusingRadius(self,radius):
+        self.__beamfocusing_radius = radius
 
     def setBeamsteeringAngle(self, angle):
         self._angleToSteer_manual = angle
