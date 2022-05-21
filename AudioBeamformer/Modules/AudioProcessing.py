@@ -62,16 +62,16 @@ class AudioProcessing:
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self._fpga_controller = fpgaControl
         # Device index
+        channels = self.getChannels()
         if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
-            channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._input_device = 0 #10
-            self._output_device = 2 #11
+            self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
+            self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
