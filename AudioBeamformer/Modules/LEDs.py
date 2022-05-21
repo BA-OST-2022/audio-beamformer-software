@@ -71,7 +71,7 @@ class LEDs():
     def __del__(self):
         self.end()
     
-    def begin(self, framerate = 30):
+    def begin(self, framerate = 20):
         if not self._initialized:
             self._initialized = True
             self._updateRate = framerate
@@ -89,6 +89,8 @@ class LEDs():
 
     
     def end(self):
+        self._enableChannels = False
+        self._enableCamera = False
         self._runThread = False
         if(self._initialized):
             self._initialized = False
@@ -117,6 +119,8 @@ class LEDs():
     def setChannelColors(self, colors):
         if(np.shape(colors) != (self._channelCount, 3)):
             raise ValueError("Channel color data format incorrect")
+        if np.any(colors > 1.0) or np.any(colors < 0.0):
+            raise ValueError("Color Value out of bound")
         self._channelColors = colors
     
     def setCameraAnimation(self, animation):
@@ -136,16 +140,16 @@ class LEDs():
                 speed = 20
                 grad = np.linspace(0, 1, self._ringCount)
                 grad = np.roll(grad, int(time() * speed))
-                self._ringColors[:,0] = grad * 0.0  # Red
-                self._ringColors[:,1] = grad * 1.0  # Greenroll
+                self._ringColors[:,0] = grad * 1.0  # Red
+                self._ringColors[:,1] = grad * 0.0  # Greenroll
                 self._ringColors[:,2] = grad * 1.0  # Blue
             elif(self._cameraAnimation == self.TRACKING):
                 speed = 7.5
                 val = np.abs((time() * 0.1 * speed) % 2 - 1) # Triangle
                 val = 0.3 + 0.7 * val                        # Offset
                 val = np.ones(self._ringCount) * val
-                self._ringColors[:,0] = val * 1.0   # Red
-                self._ringColors[:,1] = val * 0.0   # Green
+                self._ringColors[:,0] = val * 0.0   # Red
+                self._ringColors[:,1] = val * 1.0   # Green
                 self._ringColors[:,2] = val * 1.0   # Blue
                 
             

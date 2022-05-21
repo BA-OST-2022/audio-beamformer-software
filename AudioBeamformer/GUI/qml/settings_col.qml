@@ -63,7 +63,7 @@ Item{
                 anchors.topMargin: 5
                 anchors.top: se_led_switch.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Brightness: " + (se_leds_level_slider.value*100).toFixed(0) + "%"}
+                text: {"Brightness: " + (se_leds_level_slider.value*100).toFixed(0) + " %"}
             }
 
             Slider {
@@ -135,7 +135,7 @@ Item{
 
             Timer {
                 // Every 50ms
-                interval: 50
+                interval: 100
                 running: true
                 repeat: true
                  onTriggered: {
@@ -331,6 +331,7 @@ Item{
                 audio_processing_button.checked = false
                 channel_button.checked = false
                 setting_button.checked = false
+                backend.enableMagicMode(true)
              }
         }
     }
@@ -366,7 +367,7 @@ Item{
             }
         CheckBox{
             id: channel_1
-            checked: false
+            checked: true
             Label{
                 text: qsTr("1")
                 anchors.top: parent.top
@@ -376,7 +377,7 @@ Item{
         }
         CheckBox{
             id: channel_2
-            checked: false
+            checked: true
             Label{
                 text: qsTr("2")
                 anchors.top: parent.top
@@ -386,7 +387,7 @@ Item{
         }
         CheckBox{
             id: channel_3
-            checked: false
+            checked: true
             Label{
                 text: qsTr("3")
                 anchors.top: parent.top
@@ -396,7 +397,7 @@ Item{
         }
         CheckBox{
             id: channel_4
-            checked: false
+            checked: true
             Label{
                 text: qsTr("4")
                 anchors.top: parent.top
@@ -406,7 +407,7 @@ Item{
         }
         CheckBox{
             id: channel_5
-            checked: false
+            checked: true
             Label{
                 text: qsTr("5")
                  anchors.top: parent.top
@@ -416,7 +417,7 @@ Item{
         }
         CheckBox{
             id: channel_6
-            checked: false
+            checked: true
             Label{
                 text: qsTr("6")
                 anchors.top: parent.top
@@ -426,7 +427,7 @@ Item{
         }
         CheckBox{
             id: channel_7
-            checked: false
+            checked: true
             Label{
                 text: qsTr("7")
                 anchors.top: parent.top
@@ -436,7 +437,7 @@ Item{
         }
         CheckBox{
             id: channel_8
-            checked: false
+            checked: true
             Label{
                 text: qsTr("8")
                 anchors.top: parent.top
@@ -446,7 +447,7 @@ Item{
         }
         CheckBox{
             id: channel_9
-            checked: false
+            checked: true
             Label{
                 text: qsTr("9")
                 anchors.top: parent.top
@@ -456,7 +457,7 @@ Item{
         }
         CheckBox{
             id: channel_10
-            checked: false
+            checked: true
             Label{
                 text: qsTr("10")
                 anchors.top: parent.top
@@ -466,7 +467,7 @@ Item{
         }
         CheckBox{
             id: channel_11
-            checked: false
+            checked: true
             Label{
                 text: qsTr("11")
                 anchors.top: parent.top
@@ -476,7 +477,7 @@ Item{
         }
         CheckBox{
             id: channel_12
-            checked: false
+            checked: true
             Label{
                 text: qsTr("12")
                 anchors.top: parent.top
@@ -486,7 +487,7 @@ Item{
         }
         CheckBox{
             id: channel_13
-            checked: false
+            checked: true
             Label{
                 text: qsTr("13")
                 anchors.top: parent.top
@@ -496,7 +497,7 @@ Item{
         }
         CheckBox{
             id: channel_14
-            checked: false
+            checked: true
             Label{
                 text: qsTr("14")
                 anchors.top: parent.top
@@ -506,7 +507,7 @@ Item{
         }
         CheckBox{
             id: channel_15
-            checked: false
+            checked: true
             Label{
                 text: qsTr("15")
                 anchors.top: parent.top
@@ -516,7 +517,7 @@ Item{
         }
         CheckBox{
             id: channel_16
-            checked: false
+            checked: true
             Label{
                 text: qsTr("16")
                 anchors.top: parent.top
@@ -526,7 +527,7 @@ Item{
         }
         CheckBox{
             id: channel_17
-            checked: false
+            checked: true
             Label{
                 text: qsTr("17")
                 anchors.top: parent.top
@@ -536,7 +537,7 @@ Item{
         }
         CheckBox{
             id: channel_18
-            checked: false
+            checked: true
             Label{
                 text: qsTr("18")
                 anchors.top: parent.top
@@ -546,7 +547,7 @@ Item{
         }
         CheckBox{
             id: channel_19
-            checked: false
+            checked: true
             Label{
                 text: qsTr("19")
                 anchors.top: parent.top

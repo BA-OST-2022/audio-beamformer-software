@@ -38,7 +38,7 @@ import re, subprocess
 import numpy as np
 import psutil
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -64,10 +64,14 @@ class Sensors():
         self.COLOR_MUTE = np.array([1.0, 0.0, 0.0])        # Red
         self.COLOR_STANDBY = np.array([0.62, 0.62, 0.0])   # Yellow (dark)
         
+        self._updateRateTemp = 2                           # Update rate in Hz
+        self._updateRateLed = 10                           # Update rate in Hz
+        self._updateRateToF = 3                            # Update rate in Hz                
+        
         self._tempSensorAmbient = TempSensor(0x48)
         self._tempSensorSystem = TempSensor(0x49)
         self._hmi = HMI(0x62)
-        self._tofSensor = ToFSensor()
+        self._tofSensor = ToFSensor(self._updateRateToF)
         self._rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
         self._powerSupply = powerSupply
         self._leds = leds
@@ -84,10 +88,6 @@ class Sensors():
         self._enableMagic = False
         self._ledColor = np.zeros((1, 3))
         self._shutdownCallback  = None
-        self._shutDownEvent = False
-        
-        self._updateRateTemp = 2                # Update rate in Hz
-        self._updateRateLed = 20                # Update rate in Hz
         
         self._ambientTemp = float("NAN")
         self._systemTemp = float("NAN")
@@ -96,6 +96,7 @@ class Sensors():
         
         self._timeTemp = 0
         self._timeLed = 0
+        self._timeToF = 0
         
     
     def __del__(self):
@@ -111,19 +112,21 @@ class Sensors():
             threading.Timer(0, self.update).start()  
     
     
-    def end(self):
+    def end(self, shutdown=False):
         self._readyState = False
         self._runThread = False
         if(self._initialized):
-            self._initialized = False
-            if self._shutDownEvent:
+            if shutdown:
                 self._hmi.setButtonColor(self.COLOR_BOOT)
             else:
                 self._hmi.setButtonColor()
-            self._hmi.end()
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
             self._tofSensor.end()
+            if shutdown:
+                self._hmi.setButtonColor(self.COLOR_BOOT)
+            self._hmi.end(not shutdown)  # Turn off LED if not shutdown
+            self._initialized = False
         
     
     def update(self):
@@ -150,17 +153,17 @@ class Sensors():
             else:
                 return
             
-            if(self._tofSensor.update()):
-                self._distanceMap = self._tofSensor.getDistance()
-                event = self._checkDistanceMap(self._distanceMap)
-                if(event == self.EVENT_ALERT):
-                    self._alertState = True
-                if(event == self.EVENT_FREE):
-                    self._alertState = False
-                if DEBUG:
-                    print("Updated ToF Sensor Data")
-            
-            # self._alertState  = (time.time() * 1000) % 2000 > 1000
+            if(time.time() - self._timeToF > 1 / self._updateRateToF):            
+                if(self._tofSensor.update()):
+                    self._timeToF = time.time()
+                    self._distanceMap = self._tofSensor.getDistance()
+                    event = self._checkDistanceMap(self._distanceMap)
+                    if(event == self.EVENT_ALERT):
+                        self._alertState = True
+                    if(event == self.EVENT_FREE):
+                        self._alertState = False
+                    if DEBUG:
+                        print("Updated ToF Sensor Data")
                     
             
             mute = self.getMute() or self.getAlertState()
@@ -176,6 +179,13 @@ class Sensors():
                 self._ledColor = self.COLOR_RUN
             
             
+            if(time.time() - self._timeLed > 1 / self._updateRateLed):
+                self._timeLed = time.time()
+                if(self._enableMagic):
+                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
+                    self._ledColor = np.array([r, g, b])
+                self._hmi.setButtonColor(self._ledColor)
+                
             if(time.time() - self._timeTemp > 1 / self._updateRateTemp):
                 self._timeTemp = time.time()
                 self._ambientTemp = self._tempSensorAmbient.getTemperature()
@@ -184,14 +194,6 @@ class Sensors():
                 if not np.isnan(self._systemTemp):
                     fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
                     self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
-            
-            if(time.time() - self._timeLed > 1 / self._updateRateLed):
-                self._timeLed = time.time()
-                if(self._enableMagic):
-                    r, g, b = hsv_to_rgb(time.time() / 3, 1, 1)
-                    self._ledColor = np.array([r, g, b])
-                time.sleep(0.2)
-                self._hmi.setButtonColor(self._ledColor)
                 
             
     
@@ -265,7 +267,6 @@ class Sensors():
         if DEBUG:
             print("Shutdown Event occurred")
         if self._shutdownCallback:
-            self._shutDownEvent = True
             self._shutdownCallback(True)
     
     
@@ -310,5 +311,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(100)
+    time.sleep(10000)
     sensors.end()

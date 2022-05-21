@@ -35,7 +35,8 @@ import sys
 import datetime
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtQuick, QtQml
-from PyQt5.QtGui  import QGuiApplication
+#from PyQt5.QtGui  import QGuiApplication
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
@@ -48,13 +49,13 @@ sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
 os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-app = QGuiApplication.instance()
+app = QApplication.instance()
 if app == None:
-    app = QGuiApplication(sys.argv)
-if not QGuiApplication.instance():
-    app = QGuiApplication(sys.argv)
+    app = QApplication(sys.argv)
+if not QApplication.instance():
+    app = QApplication(sys.argv)
 else:
-    app = QGuiApplication.instance()
+    app = QApplication.instance()
 engine = QQmlApplicationEngine()
 
 # Important: Must be imported after creating Qt instance, this is a known bug.
@@ -82,8 +83,6 @@ class GUI:
         self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
-        
-        self._enableMagic = False    # TODO: Set this variable on event
         
     def run(self):
         PyCVQML.registerTypes()
@@ -129,7 +128,6 @@ class GUI:
         if LINUX:
             src = cv2.rotate(src, cv2.ROTATE_180)
         if self._faceTracking:
-            self._faceTracking.enableMagic(self._enableMagic)
             return self._faceTracking.runDetection(src)
         return src
 
@@ -160,9 +158,10 @@ class MainWindow(QObject):
         self.source_gain_value = 20
         self.beamsteering_pattern_list = []
         self.window_list = []
+        self._windowProfileIndex = 0
         self._gainSourceMax = 10
         self._maxAngleSlider = 45
-        self.__enableChannels = np.ones(19)
+        self.__enableChannels = np.zeros(19)
         self.__mutePath = Path("images") / "Mute_grey.png"
         self.__unmutePath = Path("images") / "Unmute_grey.png"
         self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.png"
@@ -174,6 +173,16 @@ class MainWindow(QObject):
         self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
+        self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
+        
+
+
+    @pyqtProperty(bool)
+    def readyState(self):
+        if self._sensors:
+            return self._sensors.getReadyState()    
+        else:
+            return True
 
     # Audio processing Source
     @pyqtProperty(list,constant=True)
@@ -311,22 +320,27 @@ class MainWindow(QObject):
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
         if not self._beamsteering == None:
-            self._beamsteering.setWindowProfile(0)
+            if enable:
+                self._beamsteering.setWindowProfile(self._windowProfileIndex)
+            else:
+                self._beamsteering.setWindowProfile(0)
         else:
             print(f"Window enable: {enable}")
 
     @pyqtSlot(int)
     def getWindowType(self, type):
+        self._windowProfileIndex = type
         if not self._beamsteering == None:
-            self._beamsteering.setWindowProfile(type)
+            self._beamsteering.setWindowProfile(self._windowProfileIndex)
         else:
-            print(f"Window type: {type}")
+            print(f"Window type: {self._windowProfileIndex}")
 
     # Settings LEDS
     @pyqtSlot(int)
     def getEnableLED(self, enable):
         if not self._leds == None:
             self._leds.enableChannels(enable)
+            self._leds.enableCamera(enable)
         else:
             print(f"LEDs enable: {enable}")
 
@@ -400,7 +414,7 @@ class MainWindow(QObject):
     @pyqtSlot(list)
     def getEnableChannels(self, list):
         if not all(i==u for i,u in zip(self.__enableChannels,list)):
-            if not self._beamsteering == None:
+            if self._beamsteering:
                 self._beamsteering.setChannelEnable(list)
             else:
                 print(f"Channel Gains: {list}")
@@ -480,12 +494,34 @@ class MainWindow(QObject):
     def amHolder(self):
         return str(self.__am_holder)
 
+    @pyqtProperty(str, constant=True)
+    def loadingImage(self):
+        return str(self.__loadingImage)
+
     @pyqtProperty(bool)
     def getAlertState(self):
         if self._sensors:
             return self._sensors.getAlertState() 
         else:
             return False
+
+    # Magic Mode
+    @pyqtSlot(bool)
+    def enableMagicMode(self, enable):
+        if self._audio_processing:
+            self._audio_processing.enableMagic(enable)
+
+        if self._faceTracking:
+            self._faceTracking.enableMagic(enable)
+
+        if self._leds:
+            self._leds.enableMagic(enable)
+
+        if self._sensors:
+            self._sensors.enableMagic(enable)
+
+        
+
 
 
 if __name__ == "__main__":

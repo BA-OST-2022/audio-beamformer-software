@@ -5,11 +5,16 @@ import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
 import QtCharts 2.15
+import PyCVQML 1.0
 
 Item{
     id: main_row
     anchors.fill: parent
-
+    
+    Component.onCompleted:{
+        backend.getEnableChannels([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+    }
+    
     // Buttons
     Column{
         id: menu_buttons
@@ -37,6 +42,9 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: {audio_processing_button.checked ? "#303030" :"#c8c8c8"}
             }
+            onClicked:{
+                backend.enableMagicMode(false)
+            }
             radius: 8
         }
 
@@ -56,6 +64,9 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: {channel_button.checked ? "#303030" :"#c8c8c8"}
             }
+            onClicked:{
+                backend.enableMagicMode(false)
+            }
         }
 
         RoundButton{
@@ -74,6 +85,9 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: {setting_button.checked ? "#303030" :"#c8c8c8"}
             }
+            onClicked:{
+                backend.enableMagicMode(false)
+            }
         }
     }
 
@@ -84,6 +98,16 @@ Item{
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 1200
+
+        CVCapture
+        {
+            id: capture
+            width: 400
+            height: 300
+            index: 0
+            Component.onCompleted: capture.start()
+            Component.onDestruction: capture.stop()
+        }
 
         Loader{
             anchors.fill: parent

@@ -44,7 +44,7 @@ import sys
 import numpy as np
 import ast
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__)) 
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
@@ -53,32 +53,33 @@ from AudioPlayer import AudioPlayer
 
 
 class AudioProcessing:
-    def __init__(self):
+    def __init__(self, fpgaControl = None):
         # Adjustable values
-        self._chunk_size = 4096
+        self._chunk_size = 8192
         self._samplerate = 44100
         self.equ_window_size = 123
         self.__black_list_input_device = ["pulse","loopin","default"]
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
+        self._fpga_controller = fpgaControl
         # Device index
+        channels = self.getChannels()
         if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
-            channels = self.getChannels()
             self._output_device = [i[1] for i in channels].index('snd_rpi_hifiberry_dac: HifiBerry DAC HiFi pcm5102a-hifi-0 (hw:0,0)')
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._input_device = 0 #10
-            self._output_device = 3 #11
+            self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
+            self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
-        self._equalizer_enable = False
-        self._modulation_index = 0
-        self._mam_gain = 1
-        self._enable_interpolation = False
-        self._interpolation_factor = 0
+        self._equalizer_enable = True
+        self._modulation_index = 1
+        self._mam_gain = 0.2
+        self._enable_interpolation = True
+        self._interpolation_factor = 64
         self._stream = None
         self.__previousWindow = np.zeros(self.equ_window_size - 1,dtype=np.float32)
         self.__current_source_level = 0
@@ -87,7 +88,7 @@ class AudioProcessing:
         self.__equalizerList = []
         self.__stream_running = False
         self._enableMagic = False
-        self._player = AudioPlayer(sampleRate=self._samplerate, blockSize=self._chunk_size)
+        self._player = None
         
         # Equalizer initialization
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
@@ -105,21 +106,20 @@ class AudioProcessing:
             self.startStream()
 
     def end(self):
-        self._stream.close()
+        self.endStream()
 
-    def setupStream(self): 
-        if LINUX or DEBUG:
-            if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
-                channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
-            else:
-                channel_input = 2
-                self._input_device = self.__sourceIndexList[0]
-            self._stream = sd.Stream(samplerate=self._samplerate,
-                                    blocksize=self._chunk_size,
-                                    device=(self._input_device , self._output_device), 
-                                    channels=(channel_input, 2),
-                                    dtype=np.int32,
-                                    callback=self.callback)
+    def setupStream(self):
+        if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
+            channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
+        else:
+            channel_input = 2
+            self._input_device = self.__sourceIndexList[0]
+        self._stream = sd.Stream(samplerate=self._samplerate,
+                                blocksize=self._chunk_size,
+                                device=(self._input_device , self._output_device), 
+                                channels=(channel_input, 2),
+                                dtype=np.int32,
+                                callback=self.callback)
 
 
 
@@ -148,13 +148,18 @@ class AudioProcessing:
         sd._terminate()
         sd._initialize()
         for p,i in enumerate(sd.query_devices()):
-            print(f"{p} Name: {i['name']},API: {i['hostapi']} ,In {i['max_input_channels']}, Out {i['max_output_channels']}") 
             channelInfo.append((p,
                                 i['name'],
                                 i['max_input_channels'],
                                 i['hostapi'],
                                 i['max_output_channels']))
         return channelInfo
+    
+    def printChannels(self):
+        for i, p in enumerate(self.getChannels()):
+            name = p[1].replace("\r\n", "")
+            print(f"{i:2} - API: {p[3]}, In: {p[2]}, Out: {p[4]}, Name: {name}")
+        print()
 
     def getSourceList(self): 
         if self.__stream_running:
@@ -179,6 +184,7 @@ class AudioProcessing:
         self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
+        
 
     def setSource(self, source_index):
         if self.__stream_running:
@@ -234,12 +240,6 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-        #fig, ax = plt.subplots()
-        #ax.stem(taps)
-        
-        #w,h = freqz(taps)
-        #fig, ax =plt.subplots()
-        #ax.plot(w / np.pi * self.sampling_rate / 2,20*np.log10(np.abs(h)))
         return taps
 
     def equalizerPlot(self):
@@ -250,24 +250,25 @@ class AudioProcessing:
         self._equalizer_filter = taps
 
     def enableInterpolation(self,enable):
-        # Call function from FPGA and enable interpolation
-        # FPGA.Interpolation(self._interpolation_factor)
-        self._enable_interpolation = enable
-        if enable:
-            #FPGA.enableInterpolation()
-            #FPGA.interpolationFactor(self._interpolation_factor)
-            pass
-        else:
-            #FPGA.disableInterpolation()
-            pass
-        pass
+        if self._fpga_controller:
+            if enable:
+                self._fpga_controller.setInterpolation(self._interpolation_factor)
+            else:
+                self._fpga_controller.setInterpolation(1)
+            self._fpga_controller.update()
 
     def setInterpolationFactor(self,factor):
         self._interpolation_factor = factor
 
-    def setModulationType(self, type):
-        print(type)
-        self._modulation_index = type
+    def setModulationType(self, modType):
+        self._modulation_index = modType
+        if self._fpga_controller:
+            if self._modulation_index == 0:     # AM
+                self._fpga_controller.setModulationType(self._fpga_controller.DSB)
+            elif self._modulation_index == 1:   # MAM
+                self._fpga_controller.setModulationType(self._fpga_controller.MAM)
+            self._fpga_controller.update()
+
     
     def setMAMMix(self,gain):
         self._mam_gain = gain
@@ -276,19 +277,26 @@ class AudioProcessing:
         return data
 
     def MAMModulation(self,data):
-        data = data / 2147483648
-        data_out = 1 - 1/2*data**2 - 1/8**data**4
-        return data_out * 2147483648  * self._mam_gain
+        data = data / np.iinfo(np.int32).max
+        data_out = 1 - 1/2*data**2 - 1/8*data**4
+        return data_out * np.iinfo(np.int32).max  * self._mam_gain
     
     def enableMagic(self, state):
         self._enableMagic = state
         if(state):
-            self._player.begin("files/magic.wav")
+            path = os.path.join(os.path.dirname(__file__), "Files/magic.wav")
+            self._player = AudioPlayer(sampleRate=self._samplerate,
+                                       blockSize=self._chunk_size)
+            self._player.begin(path)
         else:
-            self._player.end()
+            if self._player:
+                self._player.end()
+                self._player = None
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
+        if status:
+            print(status)
         self.setSourceLevel(indata_oneCh)
         indata_oneCh *= self._output_enable
         if self._equalizer_enable:
@@ -301,9 +309,14 @@ class AudioProcessing:
             outdata_oneCh = np.float32(outdata_oneCh)
         else:
             outdata_oneCh = indata[:,0]
-            
-        # if self._enableMagic:
-        #     outdata_oneCh = self._player.getData()[:,0]
+
+        if self._enableMagic:
+            data = self._player.getData()[:,0]
+            if np.shape(data) == np.shape(outdata_oneCh):
+                outdata_oneCh = data
+            else:
+                outdata_oneCh = 0
+                print("No data yet to play")
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
@@ -318,6 +331,7 @@ class AudioProcessing:
 if __name__ == '__main__':
     import time
     audio_processing = AudioProcessing()
+    audio_processing.printChannels()
     print(audio_processing.getSourceList())
     # audio_processing.enableMagic(True)
     

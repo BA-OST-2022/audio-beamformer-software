@@ -7,7 +7,9 @@ import QtQuick.Extras 1.4
 
 Item{
     anchors.fill: parent
+    /*
         Rectangle{
+        id: alert_rect
         visible: backend.getAlertState
         anchors.fill: parent
         color: "red"
@@ -18,20 +20,13 @@ Item{
         anchors.bottomMargin: -5
 
     }
-    Timer{
-        interval: 50
-        running: true
-        repeat: true
-        onTriggered: {
-            main_mute_button.checked = backend.muteEnable;
-            main_volume_slider.value = backend.mainGainValue;
-        }
-    }
+    */
+
     RoundButton{
             id: main_mute_button
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
-
+            checked: true
             text: qsTr("Mute")
             height: 80
             width: 100
@@ -67,16 +62,19 @@ Item{
             backend.getMainGain(main_volume_slider.value)
             }
     }
-     // Timer for Gauge
+     // Timer for Gauge and mute
             Timer {
                 // Every 50ms
-                interval: 50
+                interval: 100
                 running: true
                 repeat: true
                 onTriggered: {
-                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width  * main_volume_slider.value * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width * main_volume_slider.value  * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width * main_volume_slider.value  * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_base.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50, 0.68)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_middle.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.68,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_top.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.8,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    main_mute_button.checked = backend.muteEnable;
+                    main_volume_slider.value = backend.mainGainValue;
+                    //alert_rect.visible = backend.getAlertState;
                     }
             }
 
@@ -101,21 +99,21 @@ Item{
                 }
                 Rectangle{
                     id: ap_source_gauge_base
-                    height: parent.height*0.6
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_gauge_holder.bottom
                     color: "#38f56e"
                 }
                 Rectangle{
                     id: ap_source_gauge_middle
-                    height: parent.height*0.2
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_source_gauge_base.top
                     color: "#f59738"
                 }
                 Rectangle{
                     id: ap_source_gauge_top
-                    height: parent.height
+                    height: 0
                     width: parent.width
                     anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"

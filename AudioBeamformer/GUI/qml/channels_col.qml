@@ -45,7 +45,7 @@ Item{
 
             Switch{
                     id: ch_beamsteering_switch
-                    checked: true
+                    checked: false
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ch_enable_label.bottom
                     anchors.topMargin: 5
@@ -104,7 +104,7 @@ Item{
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
-                    text: {"Angle: " + (ch_beamsteering_angle_slider.value - 0.5).toFixed(2) +  "°"}
+                    text: {"Angle: " + (ch_beamsteering_angle_slider.value - 0.5).toFixed(2) +  " °"}
                     // Add max and min angle
                 }
 
@@ -124,6 +124,7 @@ Item{
         // Window
         Item{
             id: channel_window_item
+
             height: channel_settings_row.height
             width: channel_settings_row.width/4.5
             // Title
@@ -145,6 +146,7 @@ Item{
 
             Switch{
                 id: ch_window_switch
+                checked: true
                 anchors.top: ch_window_switch_label.bottom
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -192,16 +194,6 @@ Item{
         y: 10
         anchors.fill: parent
         image: capture.image
-    }
-    CVCapture
-    {
-        id: capture
-        width: 400
-        height: 300
-        index: 0
-        filters: capture_image
-        Component.onCompleted: capture.start()
-        Component.onDestruction: capture.stop()
     }
 
 
