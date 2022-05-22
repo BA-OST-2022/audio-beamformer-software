@@ -133,7 +133,8 @@ class AudioProcessing:
             self._stream.close()
             self.__stream_running = False
 
-    def generatePlots(self):
+    def getEqualizerList(self):
+        equalizer_list = []
         for key in self.__equalizer_profile_list.keys():
             y_val = []
             x_val = []
@@ -142,6 +143,9 @@ class AudioProcessing:
                 x_val.append(freq_band[1])
                 y_val.append(self.__equalizer_profile_list[key][freq_band]["band_gain"])
                 y_val.append(self.__equalizer_profile_list[key][freq_band]["band_gain"])
+            equalizer_list.append([x_val,y_val])
+        return equalizer_list
+
 
     def getChannels(self):
         channelInfo = []
@@ -334,7 +338,6 @@ if __name__ == '__main__':
     audio_processing.printChannels()
     print(audio_processing.getSourceList())
     # audio_processing.enableMagic(True)
-    
     audio_processing.begin()
     time.sleep(10)
     audio_processing.end()

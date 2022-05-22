@@ -394,6 +394,7 @@ Item{
             anchors.left: parent.left
             anchors.leftMargin: 364
             anchors.bottomMargin: 11
+            visible: ap_equalizer_switch.checked
             width: 176
             height: 100
             ChartView{
@@ -414,7 +415,6 @@ Item{
                     gridVisible:false
                     color: "white"
                     tickCount: 2
-                    
                 }
 
                 ValueAxis {
@@ -426,15 +426,15 @@ Item{
                     tickCount: 2
                 }
                  LineSeries {
+                    id: equalizer_plot
                     axisX: axisX
                     axisY: axisY
-                    XYPoint { x: 0; y: 0 }
-                    XYPoint { x: 1.1; y: 2.1 }
-                    XYPoint { x: 1.9; y: 3.3 }
-                    XYPoint { x: 2.1; y: 2.1 }
-                    XYPoint { x: 2.9; y: 4.9 }
-                    XYPoint { x: 3.4; y: 3.0 }
-                    XYPoint { x: 4.1; y: 3.3 }
+                     Component.onCompleted: {
+                            var list = backend.getEqualizerList
+                            for (let i = 0; i < list.length; i++) {
+                                equalizer_plot.append(list[i][0],list[i][1])
+                         }
+                    }
                 }
             }
         }
