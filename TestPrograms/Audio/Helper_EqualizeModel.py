@@ -39,13 +39,14 @@ def equalizeModell(model_is,
         ax.plot(model_is[:,0],model_is[:,1])
         ax.vlines(taps_pos,0,1,colors="red",linestyles="dashed")
 
+        
         fig, ax = plt.subplots()
         ax.plot(taps_pos, func_model_should(taps_pos)) 
         return gain_dict
 
 frq = np.linspace(200,20000)
 model_transducer = np.column_stack((frq.T,200**(2/3)/(frq.T)**(2/3)))
-fit_to_type = "1/w^2"
+fit_to_type = "1/w"
 bin_nr = 20
 spacing="lin"
 gain_dict = equalizeModell(model_transducer,
