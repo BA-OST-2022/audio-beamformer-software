@@ -30,6 +30,7 @@
 # SOFTWARE.
 ###############################################################################
 
+from doctest import ELLIPSIS_MARKER
 import os
 import sys
 import datetime
@@ -174,6 +175,9 @@ class MainWindow(QObject):
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
+        self.__equalizer_profile = 0
+        if self._audio_processing:
+            self.__equalizer_holder = self._audio_processing.getEqualizerList()
         
 
 
@@ -237,6 +241,7 @@ class MainWindow(QObject):
     @pyqtSlot(int)
     def getEqualizerProfile(self, profile):
         if not self._audio_processing == None:
+            self._equalizer_profile = profile
             self._audio_processing.setEqualizerProfile(profile)
         else:
             print(f"Equalizer Profile: {profile}")
@@ -380,6 +385,20 @@ class MainWindow(QObject):
         else:
             print(f"Max. volume: {value}")
 
+    # Beamfocusing
+    @pyqtSlot(float)
+    def getFocusDistance(self, distance):
+        if self._beamsteering:
+            self._beamsteering.setBeamfocusingRadius(10*distance)
+        else:
+            print(f"Focus distance: {10*distance}")
+
+    @pyqtSlot(bool)
+    def enableBeamfocusing(self, enable):
+        if self._beamsteering:
+            self._beamsteering.enableBeamfocusing(enable)
+        else:
+            print(f"Beamfocusing enable: {enable}")
     # Settings stats
     
     @pyqtProperty(str)
@@ -504,6 +523,14 @@ class MainWindow(QObject):
             return self._sensors.getAlertState() 
         else:
             return False
+
+    @pyqtProperty(list)
+    def getEqualizerList(self):
+        if self._audio_processing:
+            return self.__equalizer_holder[self.__equalizer_profile]
+        else:
+            return [[1,2],[2,3],[4,5],[6,7]]
+
 
     # Magic Mode
     @pyqtSlot(bool)

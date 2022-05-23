@@ -26,7 +26,7 @@ Item{
         Item{
             id: settings_led_item
             height: settings_row.height
-            width: settings_row.width/4
+            width: settings_row.width/5
             Label{
                 id: se_led_label
                 anchors.top: parent.top
@@ -83,7 +83,7 @@ Item{
          Item{
             id: settings_tof_item
             height: settings_row.height
-            width: settings_row.width/4
+            width: settings_row.width/5
             Label{
                 id: se_tof_label
                 anchors.top: parent.top
@@ -179,7 +179,7 @@ Item{
         Item{
             id: settings_volume_item
             height: settings_row.height
-            width: settings_row.width/4
+            width: settings_row.width/5
             Label{
                 id: se_volume_label
                 anchors.top: parent.top
@@ -202,11 +202,68 @@ Item{
 
         }
 
+        // Beamfocusing
+        Item{
+            id: settings_beamfocusing_item
+            height: settings_row.height
+            width: settings_row.width/5
+            Label{
+                id: se_bf_label
+                anchors.top: parent.top
+                anchors.topMargin: 8
+                font.pixelSize: 20  
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Beamfocusing")
+            }
+
+            Label{
+                    id: se_bf_switch_label
+                    anchors.topMargin: 8
+                    anchors.top: se_bf_label.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: qsTr("Enable")
+            }
+
+            Switch{
+                id: se_bf_switch
+                checked: false
+                anchors.topMargin: 5
+                anchors.top: se_bf_switch_label.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                onReleased: {
+                    backend.enableBeamfocusing(se_bf_switch.position)
+                }
+            }
+
+    
+
+            Label{
+                id: se_distance_level_slider_label
+                visible: se_bf_switch.checked
+                anchors.topMargin: 5
+                anchors.top: se_bf_switch.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {"Distance: " + (10*se_bf_level_slider.value).toFixed(1) + " m"}
+            }
+
+            Slider {
+                id: se_bf_level_slider
+                visible: se_bf_switch.checked
+                value: 0.3
+                anchors.topMargin: -2
+                anchors.top: se_distance_level_slider_label.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                onValueChanged: {
+                    backend.getFocusDistance(se_bf_level_slider.value)
+                }
+            }
+        }
+
         // Stats
         Item{
             id: settings_stats_item
             height: settings_row.height
-            width: settings_row.width/4
+            width: settings_row.width/5
             Label{
                 id: se_stats_label
                 anchors.top: parent.top
@@ -236,14 +293,15 @@ Item{
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.topMargin: 10     
-                anchors.leftMargin: 60  
+                anchors.leftMargin: 20  
                 Label{
                     anchors.left: parent.left
                     text: qsTr("Ambient Temp.")
                 }
                 Label{
                     id: se_ambient_temp
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 110
                 }
             }
 
@@ -254,14 +312,15 @@ Item{
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.topMargin: 20       
-                anchors.leftMargin: 60  
+                anchors.leftMargin: 20  
                 Label{
                     anchors.left: parent.left
                     text: qsTr("System Temp.")
                 }
                 Label{
                     id: se_system_temp
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 110
                 }
             }
 
@@ -272,14 +331,15 @@ Item{
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.topMargin: 20       
-                anchors.leftMargin: 60  
+                anchors.leftMargin: 20 
                 Label{
                     anchors.left: parent.left
                     text: qsTr("CPU Temp.")
                 }
                 Label{
                     id: se_cpu_temp
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 110
                 }
             }
 
@@ -290,14 +350,15 @@ Item{
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.topMargin: 20       
-                anchors.leftMargin: 60  
+                anchors.leftMargin: 20 
                 Label{
                     anchors.left: parent.left
                     text: qsTr("CPU Load")
                 }
                 Label{
                     id: se_cpu_load
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 110
                 }
             }
         }

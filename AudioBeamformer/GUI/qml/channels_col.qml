@@ -104,7 +104,7 @@ Item{
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
-                    text: {"Angle: " + (ch_beamsteering_angle_slider.value - 0.5).toFixed(2) +  " °"}
+                    text: {"Angle: " + (90*(ch_beamsteering_angle_slider.value - 0.5)).toFixed(0) +  " °"}
                     // Add max and min angle
                 }
 
@@ -195,6 +195,7 @@ Item{
         anchors.fill: parent
         image: capture.image
     }
+
 
 
 }
