@@ -236,7 +236,7 @@ class Beamsteering():
             delay = np.zeros(self.__row_count)
             
         if self._beamfocusing_enable:
-            focus_delay = self.__distance**2/(2*self.__beamfocusing_radius*self.getSpeedOfSound()) * (np.arange(self.__row_count) - 1 - (self.__row_count - 1)/2)**2
+            focus_delay = self.__distance**2/(2*self.__beamfocusing_radius*self.getSpeedOfSound()) * np.arange(self.__row_count) * (self.__row_count - np.arange(self.__row_count) - 1)
             tot_delay = delay + focus_delay
             tot_delay -= min(tot_delay)
             if not np.any(np.max(tot_delay) >= maxDelay):
