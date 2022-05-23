@@ -43,6 +43,7 @@ import os
 import sys
 import numpy as np
 import ast
+import matplotlib.pyplot as plt
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -63,6 +64,7 @@ class AudioProcessing:
         self._fpga_controller = fpgaControl
         # Device index
         channels = self.getChannels()
+        print(channels)
         if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
@@ -243,6 +245,10 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
+                
+        fig, ax = plt.subplots()
+        w,h = freqz(taps)
+        ax.loglog(w,np.abs(h))
         return taps
 
     def equalizerPlot(self):
@@ -338,6 +344,7 @@ if __name__ == '__main__':
     print(audio_processing.getSourceList())
     # audio_processing.enableMagic(True)
     audio_processing.begin()
+    audio_processing.setEqualizerProfile(1)
     time.sleep(10)
     audio_processing.end()
     
