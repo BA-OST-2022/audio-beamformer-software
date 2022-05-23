@@ -206,6 +206,17 @@ Item{
                     anchors.topMargin: 8
                     onCurrentIndexChanged: {
                         backend.getEqualizerProfile(ap_equalizer_combobox.currentIndex)
+                        var list = backend.getEqualizerList
+                        var xVal = list[0]
+                        var yVal = list[1]
+                        for (let i = 0; i < equalizer_plot.count; i++) {
+                            equalizer_plot.remove(i)
+                        
+                        }
+                        for (let i = 0; i < xVal.length; i++) {
+                            equalizer_plot.append(xVal[i],yVal[i])
+                         }
+
                     }
                 }
         }
@@ -411,7 +422,7 @@ Item{
                  ValueAxis {
                     id: axisX
                     min: 0
-                    max: 5
+                    max: 22500
                     gridVisible:false
                     color: "white"
                     tickCount: 2
@@ -420,7 +431,7 @@ Item{
                 ValueAxis {
                     id: axisY
                     min: 0
-                    max: 5
+                    max: 1
                     gridVisible:false
                     color: "white"
                     tickCount: 2
@@ -429,10 +440,12 @@ Item{
                     id: equalizer_plot
                     axisX: axisX
                     axisY: axisY
-                     Component.onCompleted: {
+                    Component.onCompleted: {
                             var list = backend.getEqualizerList
-                            for (let i = 0; i < list.length; i++) {
-                                equalizer_plot.append(list[i][0],list[i][1])
+                            var xVal = list[0]
+                            var yVal = list[1]
+                            for (let i = 0; i < xVal.length; i++) {
+                                equalizer_plot.append(xVal[i],yVal[i])
                          }
                     }
                 }

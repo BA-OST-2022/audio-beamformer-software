@@ -42,7 +42,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
@@ -389,7 +389,7 @@ class MainWindow(QObject):
     @pyqtSlot(float)
     def getFocusDistance(self, distance):
         if self._beamsteering:
-            self._beamsteering.setBeamfocusingRadius(10*distance)
+            self._beamsteering.setBeamfocusingRadius(1 + 9*distance)
         else:
             print(f"Focus distance: {10*distance}")
 

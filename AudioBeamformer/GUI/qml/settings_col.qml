@@ -243,7 +243,7 @@ Item{
                 anchors.topMargin: 5
                 anchors.top: se_bf_switch.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Distance: " + (10*se_bf_level_slider.value).toFixed(1) + " m"}
+                text: {"Distance: " + (1 + 9*se_bf_level_slider.value).toFixed(1) + " m"}
             }
 
             Slider {
