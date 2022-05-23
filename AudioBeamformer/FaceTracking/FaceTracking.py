@@ -165,7 +165,7 @@ class FaceTracking():
     def __init__(self, lifetime):
         self.fd = FaceDetector()
 
-        self.Ts = 1/5
+        self.Ts = 1/4
         self.R = 507
         self.Qp = 10
         self.Qv = 0.01
@@ -308,7 +308,7 @@ class FaceTracking():
         self._enableMagic = state
     
 
-faceTracking = FaceTracking(lifetime=15)
+faceTracking = FaceTracking(lifetime=5)
 
 if __name__ == "__main__": 
     VIDEO_FILE = "dance2.mp4"

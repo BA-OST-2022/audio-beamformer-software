@@ -29,6 +29,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ###############################################################################
+
+import os
+import ast
 import threading
 import numpy as np
 import time
@@ -77,8 +80,13 @@ class Beamsteering():
         self._beamfocusing_enable = False
         self.__beamfocusing_radius = 3 # Beamfocusing radius is set to three 
         #   Pattern
-        self._beamsteeringPattern = {"Pattern 1": (-45,45,10,1)}
-        self._activePattern = np.linspace(-45,45,10)
+        self._beamsteeringPattern = {}
+        self.__pattern_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/beamsteering_pattern.txt"
+        with open(self.__pattern_dict_path, encoding="utf-8") as f:
+            for line in f.readlines():
+                line_tupel = ast.literal_eval(line)
+                self._beamsteeringPattern[line_tupel[0]] = line_tupel[1:]
+        self.setBeamsteeringPattern(0)
         self._currentPattern = 0
         self._PatternHoldTime = 1
         
@@ -139,13 +147,13 @@ class Beamsteering():
     def setBeamsteeringAngle(self, angle):
         self._angleToSteer_manual = angle
 
-    def setBeamsteeringPattern(self, pattern):  
-        min_angle, max_angle, steps, time = self._beamsteeringPattern[self._beamsteeringPattern_list[pattern]]
+    def setBeamsteeringPattern(self, pattern):
+        name = list(self._beamsteeringPattern.keys())[pattern]
+        min_angle, max_angle, steps, time = self._beamsteeringPattern[name]
         self._activePattern = np.linspace(min_angle,max_angle, steps)
         self._PatternHoldTime = time
 
     def getBeamsteeringPattern(self):
-        self._beamsteeringPattern_list = list(self._beamsteeringPattern.keys())
         return list(self._beamsteeringPattern.keys())
 
     def setChannelEnable(self,list):
@@ -308,3 +316,7 @@ class Beamsteering():
         else:
             return np.cos(N*np.arccos(val))
         
+        
+if __name__ == '__main__':
+    beamsteering = Beamsteering()
+    
