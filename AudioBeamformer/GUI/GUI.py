@@ -175,6 +175,7 @@ class MainWindow(QObject):
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
+        self.__eq_path = Path("images") / "eq_1.png"  # TODO: Change this dynamically
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -512,6 +513,10 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant= True)
     def amHolder(self):
         return str(self.__am_holder)
+    
+    @pyqtProperty(str, constant= True)
+    def eqPath(self):
+        return str(self.__eq_path)
 
     @pyqtProperty(str, constant=True)
     def loadingImage(self):

@@ -400,56 +400,16 @@ Item{
             sourceSize.width: 1206
             sourceSize.height: 122
         }
-        Item{
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.leftMargin: 364
-            anchors.bottomMargin: 11
+        Image{
             visible: ap_equalizer_switch.checked
-            width: 176
-            height: 100
-            ChartView{
-                antialiasing: true
-                legend.visible: false
-                anchors.left:parent.left
-                anchors.top: parent.top
-                anchors.leftMargin: -25
-                anchors.topMargin: -22
-                width: 230
-                height: 150
-                backgroundColor: "#00000000"
-
-                 ValueAxis {
-                    id: axisX
-                    min: 0
-                    max: 22500
-                    gridVisible:false
-                    color: "white"
-                    tickCount: 2
-                }
-
-                ValueAxis {
-                    id: axisY
-                    min: 0
-                    max: 1
-                    gridVisible:false
-                    color: "white"
-                    tickCount: 2
-                }
-                 LineSeries {
-                    id: equalizer_plot
-                    axisX: axisX
-                    axisY: axisY
-                    Component.onCompleted: {
-                            var list = backend.getEqualizerList
-                            var xVal = list[0]
-                            var yVal = list[1]
-                            for (let i = 0; i < xVal.length; i++) {
-                                equalizer_plot.append(xVal[i],yVal[i])
-                         }
-                    }
-                }
-            }
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin:18
+            anchors.leftMargin: 368
+            fillMode: Image.PreserveAspectFit
+            source: backend.eqPath
+            width: 170
+            //height: 90            
         }
         Image{
             anchors.right: parent.right
@@ -465,20 +425,4 @@ Item{
         }
        
     }
-    /*
-    ChartView{
-        title: "Bar series"
-        legend.alignment: Qt.AlignBottom
-        antialiasing: true
-
-        BarSeries {
-            id: mySeries
-            axisX: BarCategoryAxis { categories: ["2007", "2008", "2009", "2010", "2011", "2012" ] }
-            BarSet { label: "Bob"; values: [2, 2, 3, 4, 5, 6] }
-            BarSet { label: "Susan"; values: [5, 1, 2, 4, 1, 7] }
-            BarSet { label: "James"; values: [3, 5, 8, 13, 5, 8] }
-        }
-    }
-    */
-
 }
