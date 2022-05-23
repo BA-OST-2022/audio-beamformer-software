@@ -1,1 +1,7 @@
-("-45_45_10_1",-45,45,10,1)
+("Sweep 10 Steps 45°",-45,45,10,1)
+("Left-Centre-Right 45°", -45, 45, 3, 3)
+("Left-Centre-Right 30°", -30, 30, 3, 3)
+("Left-Centre-Right 15°", -15, 15, 3, 3)
+("Left-Right 45°", -45, 45, 2, 5)
+("Left-Right 30°", -30, 30, 2, 5)
+("Left-Right 15°", -15, 15, 2, 5)

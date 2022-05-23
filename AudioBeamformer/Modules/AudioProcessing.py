@@ -98,7 +98,7 @@ class AudioProcessing:
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
         self._equalizer_filter = np.ones(self.equ_window_size)
-        self.generatePlots()
+        # self.generatePlots()
 
     def begin(self):
             self.getChannels()
