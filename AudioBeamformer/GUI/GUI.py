@@ -41,7 +41,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
