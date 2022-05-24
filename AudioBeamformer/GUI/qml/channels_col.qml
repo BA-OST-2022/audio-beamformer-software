@@ -173,6 +173,22 @@ Item{
                 width: ch_beamsteering_angle_slider.width
                 onCurrentIndexChanged: {
                     backend.getWindowType(ch_window_combobox.currentIndex)
+                    window_plot.source = backend.windowPath + ch_window_combobox.currentValue + ".svg"
+                }
+            }
+
+            Image{
+                id: window_plot
+                anchors.top: ch_window_combobox.bottom
+                anchors.topMargin: 10
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: ch_window_switch.checked
+                source: backend.windowPath + "Rectangle.svg"
+                fillMode: Image.PreserveAspectFit
+                Image{
+                    anchors.fill: parent
+                    source: backend.framePath
+                    fillMode: Image.PreserveAspectFit
                 }
             }
         }
