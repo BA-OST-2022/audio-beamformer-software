@@ -130,8 +130,8 @@ class Beamsteering():
                     self.calculateDelay()
 
     def generatePlot(self):
-        for elem in self.__window_types.keys():
-            path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/window_{elem}.svg"
+        for i,elem in enumerate(self.__window_types.keys()):
+            path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/window_{i}.svg"
             taps = self.__window_types[elem]
             self._plotter.generatePlot(taps,path)
 

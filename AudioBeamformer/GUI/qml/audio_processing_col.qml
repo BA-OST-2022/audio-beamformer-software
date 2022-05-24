@@ -265,7 +265,7 @@ Item{
                     model: [2,4,8,16,32,64]
                     currentIndex: 5
                     onCurrentIndexChanged: {
-                        backend.getInterpolationLevel(ap_interpolation_combobox.currentValue)
+                        backend.getInterpolationLevel(Math.pow(2,ap_interpolation_combobox.currentIndex + 1))
                         interpolation_plot.source = backend.interpolPath + (Math.pow(2,ap_interpolation_combobox.currentIndex + 1)).toString() + ".svg"
                     }
             }
