@@ -66,7 +66,6 @@ class AudioProcessing:
         self._fpga_controller = fpgaControl
         # Device index
         channels = self.getChannels()
-        print(channels)
         if LINUX:  
             # If system is linux then the loopback and the audio beamformer 
             # are the initial input/output devices
@@ -80,6 +79,7 @@ class AudioProcessing:
             except Exception:
                 self._output_device = None
                 self._input_device = None
+                print("No Input or Output Device detected")
                 
         # Start values
         self._tot_gain = 1
@@ -355,7 +355,7 @@ if __name__ == '__main__':
     # audio_processing.enableMagic(True)
     audio_processing.begin()
     audio_processing.setEqualizerProfile(1)
-    time.sleep(1)
+    time.sleep(10)
     audio_processing.end()
     
 

@@ -54,10 +54,8 @@ class EqualizerPlotter:
         H = np.clip(H, -50.1, 10.0)
         df = pd.DataFrame({"w":w, "H":H})
         df = df[df["H"] >= -50.0]
-        
         w = df["w"]
         H = df["H"]
-        print(df)
         
         layout = Layout(
             paper_bgcolor='rgba(0,0,0,0)',
