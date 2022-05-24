@@ -206,7 +206,7 @@ Item{
                     anchors.topMargin: 8
                     onCurrentIndexChanged: {
                         backend.getEqualizerProfile(ap_equalizer_combobox.currentIndex)
-                        equalizer_plot.source = backend.eqPath + ap_equalizer_combobox.currentIndex + ".png"
+                        equalizer_plot.source = backend.eqPath + ap_equalizer_combobox.currentIndex + ".svg"
                     }
                 }
         }
@@ -398,9 +398,26 @@ Item{
             anchors.topMargin:18
             anchors.leftMargin: 368
             fillMode: Image.PreserveAspectFit
-            source: {backend.eqPath + "0.png"}
+            source: {backend.eqPath + "0.svg"}
             width: 170
             //height: 90            
+        }
+        // MAM Label
+        Label{
+            visible: !ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 206
+            anchors.topMargin: 17
+            text: "Signal"
+        }
+        Label{
+            visible: !ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 195
+            anchors.topMargin: 92
+            text: "Distortion"
         }
         Image{
             anchors.right: parent.right
