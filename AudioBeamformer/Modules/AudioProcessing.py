@@ -52,7 +52,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
-from EqualizerPlotter import EqualizerPlotter
+from Plotter import EqualizerPlotter
 
 
 class AudioProcessing:
