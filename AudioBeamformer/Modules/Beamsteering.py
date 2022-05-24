@@ -36,7 +36,7 @@ import threading
 import numpy as np
 import time
 from pathlib import Path
-
+from Plotter import WindowPlotter
 DEBUG = False
 
 class Beamsteering():
@@ -100,7 +100,8 @@ class Beamsteering():
         self._activeWindow = "Rectangle"
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
-
+        self._plotter = WindowPlotter(250, int(250 * 0.517))
+        self.generatePlot()
 
     def begin(self):
          if not self._initialized:
@@ -127,6 +128,12 @@ class Beamsteering():
                 if(self._beamsteeringEnable or self._beamfocusing_enable):
                     
                     self.calculateDelay()
+
+    def generatePlot(self):
+        for i,elem in enumerate(self.__window_types.keys()):
+            path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/window_{i}.svg"
+            taps = self.__window_types[elem]
+            self._plotter.generatePlot(taps,path)
 
     def enableBeamsteering(self,value):
         self._beamsteeringEnable = value

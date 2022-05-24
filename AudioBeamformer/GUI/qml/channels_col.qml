@@ -173,7 +173,29 @@ Item{
                 width: ch_beamsteering_angle_slider.width
                 onCurrentIndexChanged: {
                     backend.getWindowType(ch_window_combobox.currentIndex)
+                    window_plot.source = backend.windowPath + ch_window_combobox.currentIndex + ".svg"
                 }
+            }
+
+            Image{
+                    visible: ch_window_switch.checked
+                    anchors.top: ch_window_combobox.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: backend.framePath
+                    fillMode: Image.PreserveAspectFit
+                    
+                    Image{
+                        id: window_plot
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.topMargin: 18
+                        anchors.leftMargin: 67
+                        visible: ch_window_switch.checked
+                        source: backend.windowPath + "Rectangle.svg"
+                        fillMode: Image.PreserveAspectFit
+                        width: 162
+                        //height: 90
+                    }
             }
         }
 

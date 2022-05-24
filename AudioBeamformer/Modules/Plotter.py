@@ -104,6 +104,73 @@ class EqualizerPlotter:
         fig.write_image(path)
         
         
+class WindowPlotter:
+    def __init__(self, width, height):
+        self._width = width
+        self._height = height
+        
+        self._COLOR_BLUE = "#80DEEA"
+        self._COLOR_GRAY = "#BEBEBE"
+        self._COLOR_TEXT = "#FFFFFF"
+        
+    def generatePlot(self, bins, path):
+        bins = np.clip(bins, 0, 1)
+        layout = Layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font_color=self._COLOR_TEXT,
+        )
+        fig = go.Figure(layout=layout)
+        n = len(bins)
+        fig.add_trace(go.Scatter(x=np.arange(n) - n // 2, y=bins,
+                                 mode="markers", marker_size=10,
+                                 line = dict(color=self._COLOR_BLUE, width=0)))
+        
+        for i in range(len(bins)):
+            fig.add_trace(go.Scatter(x=np.array([i - n // 2, i - n // 2]),
+                                     y=np.array([0, bins[i]]), mode='lines',
+                                     line = dict(color=self._COLOR_BLUE,width=4)))
+           
+            
+        fig.update_yaxes(ticks="outside", tickwidth=1,
+                          tickcolor=self._COLOR_GRAY, ticklen=0,
+                          showline=False,
+                          # linewidth=5, linecolor=self._COLOR_GRAY,
+                          gridwidth=0, gridcolor=self._COLOR_GRAY,
+                          tickfont=dict(size=15))
+        # fig.update_xaxes(ticks="outside", tickwidth=1,
+        #                   showticklabels=False,
+        #                   tickcolor=self._COLOR_GRAY, ticklen=5,
+        #                   linewidth=1, linecolor=self._COLOR_GRAY,
+        #                   gridwidth=1, gridcolor=self._COLOR_GRAY,
+        #                   tickfont=dict(size=15))
+        
+        fig.update_xaxes(showticklabels=False)
+        
+        
+        fig.update_layout(
+            xaxis = dict(
+                tickmode = 'array',
+                tickvals = np.linspace(-n // 2 + 1, n // 2, n),
+            ),
+            yaxis = dict(
+                tickmode = 'array',
+                tickvals = np.linspace(0, 1, 6)
+            )
+        )
+        
+        
+        fig['layout']['xaxis'].update(zeroline=False, range=[-n / 2 + 0.2, n / 2 - 0.2])
+        fig['layout']['yaxis'].update(zeroline=False, range=[-0.1, 1.1])
+        
+        fig.update_layout(width=self._width, height=self._height,
+                          margin=dict(l=0, r=0, b=0, t=0, pad=0),
+                          template="plotly_white", showlegend=False,
+                          autosize=False)
+        fig.write_image(path)
+        
+
+
 if __name__ == '__main__':
     # df = pd.read_csv('Files/demo.csv')
     # w = df["w"]
@@ -111,4 +178,7 @@ if __name__ == '__main__':
     # eq = EqualizerPlotter(250, 100, 44100)
     # eq.generatePlot(w, H, "demo.svg")
     
-    pass
+    bins = np.cos(np.linspace(-np.pi/2, np.pi/2, 19))
+    
+    plotter = WindowPlotter(500, 200)
+    plotter.generatePlot(bins, "demo.svg")

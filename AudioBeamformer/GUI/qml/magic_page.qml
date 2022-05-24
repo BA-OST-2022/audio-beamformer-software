@@ -18,7 +18,9 @@ Item{
     anchors.leftMargin: -10
     visible: !audio_processing_button.checked && !channel_button.checked && !setting_button.checked
 
-
+    Image{
+        source: backend.elvisionPath
+    }
     CVItem 
     {
         id: imageWriter
