@@ -132,7 +132,7 @@ class AudioProcessing:
                                     channels=(channel_input, 2),
                                     dtype=np.int32,
                                     callback=self.callback)
-        except TypeError:
+        except Exception:
             self._stream = None
 
 
