@@ -104,4 +104,4 @@ if __name__ == '__main__':
     H = df["H"]
     
     plotter = EqualizerPlotter(250, 100, 44100)
-    plotter.generatePlot(w, H, "Files/demo.csv")
+    plotter.generatePlot(w, H, "demo.svg")

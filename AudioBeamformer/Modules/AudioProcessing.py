@@ -256,7 +256,7 @@ class AudioProcessing:
 
     def createEqualizerPlot(self, profile, taps):
         w,h = freqz(taps)
-        path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/eq_{profile}.png"
+        path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/eq_{profile}.svg"
         self._plotter.generatePlot(w, np.abs(h), path)
 
     def setEqualizerProfile(self, profile):
