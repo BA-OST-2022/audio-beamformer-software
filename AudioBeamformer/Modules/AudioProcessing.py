@@ -79,7 +79,7 @@ class AudioProcessing:
             except Exception:
                 self._output_device = None
                 self._input_device = None
-                print("No Input or Output Device detected")
+                print("No Input or Output Device detected\n")
                 
         # Start values
         self._tot_gain = 1
@@ -120,7 +120,7 @@ class AudioProcessing:
         self.endStream()
 
     def setupStream(self):
-        if self._output_device and self._input_device:
+        try:
             if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
                 channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
             else:
@@ -132,6 +132,8 @@ class AudioProcessing:
                                     channels=(channel_input, 2),
                                     dtype=np.int32,
                                     callback=self.callback)
+        except TypeError:
+            self._stream = None
 
 
 
@@ -194,12 +196,10 @@ class AudioProcessing:
                             sourceList.append(default_val)
                         else:
                             sourceList.append(device["name"])
-        try:
+        if sourceList:
             ind = sourceList.index(default_val)
             sourceList.insert(0,sourceList.pop(ind))
             sourceIndexList.insert(0,sourceIndexList.pop(ind))
-        except ValueError:
-            pass
         self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
@@ -210,10 +210,14 @@ class AudioProcessing:
             # Stream terminate
             self.endStream()
         # Stream setup
-        if source_index < len(self.__sourceIndexList):
-            self._input_device = self.__sourceIndexList[source_index]
-        else:
-            self._input_device = self.__sourceIndexList[0]
+        try:
+            if source_index < len(self.__sourceIndexList):
+                self._input_device = self.__sourceIndexList[source_index]
+            else:
+                self._input_device = self.__sourceIndexList[0]
+        except IndexError:
+            print("Source is no more available")
+       
         # Stream start
         self.setupStream()
         self.startStream()
