@@ -100,7 +100,7 @@ class Beamsteering():
         self._activeWindow = "Rectangle"
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
-        self._plotter = WindowPlotter()
+        self._plotter = WindowPlotter(285, int(285 * 0.517))
         self.generatePlot()
 
     def begin(self):

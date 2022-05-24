@@ -179,7 +179,7 @@ class MainWindow(QObject):
         self.__window_path = Path("images") / "window_" 
         self.__interpol_path = Path("images") / "Interpolation_" 
         self.__elvision_path = Path("images") / "Elvision.jpg"
-        self.__frame_path = Path("images") / "Rahmen.jpg"
+        self.__frame_path = Path("images") / "Rahmen.svg"
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -533,6 +533,10 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant=True)
     def loadingImage(self):
         return str(self.__loadingImage)
+
+    @pyqtProperty(str, constant = True)
+    def framePath(self):
+        return str(self.__frame_path)
 
     @pyqtProperty(str, constant=True)
     def elvisionPath(self):
