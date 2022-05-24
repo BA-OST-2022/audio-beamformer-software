@@ -74,8 +74,13 @@ class AudioProcessing:
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
-            self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
+            try:
+                self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
+                self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
+            except Exception:
+                self._output_device = None
+                self._input_device = None
+                
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -115,17 +120,18 @@ class AudioProcessing:
         self.endStream()
 
     def setupStream(self):
-        if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
-            channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
-        else:
-            channel_input = 2
-            self._input_device = self.__sourceIndexList[0]
-        self._stream = sd.Stream(samplerate=self._samplerate,
-                                blocksize=self._chunk_size,
-                                device=(self._input_device , self._output_device), 
-                                channels=(channel_input, 2),
-                                dtype=np.int32,
-                                callback=self.callback)
+        if self._output_device and self._input_device:
+            if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
+                channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
+            else:
+                channel_input = 2
+                self._input_device = self.__sourceIndexList[0]
+            self._stream = sd.Stream(samplerate=self._samplerate,
+                                    blocksize=self._chunk_size,
+                                    device=(self._input_device , self._output_device), 
+                                    channels=(channel_input, 2),
+                                    dtype=np.int32,
+                                    callback=self.callback)
 
 
 
@@ -188,10 +194,12 @@ class AudioProcessing:
                             sourceList.append(default_val)
                         else:
                             sourceList.append(device["name"])
-
-        ind = sourceList.index(default_val)
-        sourceList.insert(0,sourceList.pop(ind))
-        sourceIndexList.insert(0,sourceIndexList.pop(ind))
+        try:
+            ind = sourceList.index(default_val)
+            sourceList.insert(0,sourceList.pop(ind))
+            sourceIndexList.insert(0,sourceIndexList.pop(ind))
+        except ValueError:
+            pass
         self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
@@ -255,7 +263,7 @@ class AudioProcessing:
         return taps
 
     def createEqualizerPlot(self, profile, taps):
-        w,h = freqz(taps)
+        w,h = freqz(taps, worN=10000)
         path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/eq_{profile}.svg"
         self._plotter.generatePlot(w, np.abs(h), path)
 

@@ -42,7 +42,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = True
+DEBUG = False
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
@@ -175,7 +175,11 @@ class MainWindow(QObject):
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
+<<<<<<< HEAD
         self.__eq_path = Path("images") / "eq_" 
+=======
+        self.__eq_path = Path("images") / "eq_"
+>>>>>>> 9a04bd4f420d79ea4adeb57b2275f600cc919a3f
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
