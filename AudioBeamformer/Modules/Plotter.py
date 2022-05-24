@@ -30,10 +30,11 @@
 # SOFTWARE.
 ###############################################################################
 
-import os
 import plotly.graph_objects as go
 from plotly.graph_objs import Layout
+import pandas as pd
 import numpy as np
+
 
 class EqualizerPlotter:
     def __init__(self, width, height, fs):
@@ -48,6 +49,15 @@ class EqualizerPlotter:
     def generatePlot(self, w, H, path):
         w = (w / np.pi) * (self._fs / 2)
         H = 20 * np.log10(H)
+        
+        w = np.clip(w, 20.0, self._fs / 2)
+        H = np.clip(H, -50.1, 10.0)
+        df = pd.DataFrame({"w":w, "H":H})
+        df = df[df["H"] >= -50.0]
+        
+        w = df["w"]
+        H = df["H"]
+        print(df)
         
         layout = Layout(
             paper_bgcolor='rgba(0,0,0,0)',
@@ -97,11 +107,10 @@ class EqualizerPlotter:
         
         
 if __name__ == '__main__':
-    import pandas as pd
+    # df = pd.read_csv('Files/demo.csv')
+    # w = df["w"]
+    # H = df["H"]
+    # eq = EqualizerPlotter(250, 100, 44100)
+    # eq.generatePlot(w, H, "demo.svg")
     
-    df = pd.read_csv('Files/demo.csv')
-    w = df["w"]
-    H = df["H"]
-    
-    plotter = EqualizerPlotter(250, 100, 44100)
-    plotter.generatePlot(w, H, "demo.svg")
+    pass

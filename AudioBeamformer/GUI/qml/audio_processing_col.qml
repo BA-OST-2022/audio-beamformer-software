@@ -206,7 +206,7 @@ Item{
                     anchors.topMargin: 8
                     onCurrentIndexChanged: {
                         backend.getEqualizerProfile(ap_equalizer_combobox.currentIndex)
-                        equalizer_plot.source = backend.eqPath + ap_equalizer_combobox.currentIndex + ".png"
+                        equalizer_plot.source = backend.eqPath + ap_equalizer_combobox.currentIndex + ".svg"
                     }
                 }
         }
