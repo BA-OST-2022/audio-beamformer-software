@@ -398,7 +398,7 @@ Item{
             anchors.topMargin:18
             anchors.leftMargin: 368
             fillMode: Image.PreserveAspectFit
-            source: {backend.eqPath + "0.png"}
+            source: {backend.eqPath + "0.svg"}
             width: 170
             //height: 90            
         }
