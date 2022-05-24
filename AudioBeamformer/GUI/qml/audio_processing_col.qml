@@ -252,7 +252,7 @@ Item{
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ap_interpolation_switch.bottom
                     anchors.topMargin: 10
-                    text: qsTr("Interpolation levels")
+                    text: qsTr("Interpolation Levels")
             }
 
             ComboBox {
@@ -266,6 +266,7 @@ Item{
                     currentIndex: 5
                     onCurrentIndexChanged: {
                         backend.getInterpolationLevel(ap_interpolation_combobox.currentValue)
+                        interpolation_plot.source = backend.interpolPath + (Math.pow(2,ap_interpolation_combobox.currentIndex + 1)).toString() + ".svg"
                     }
             }
 
@@ -290,7 +291,7 @@ Item{
                     anchors.top: ap_modulation_label.bottom
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Modulation type")
+                    text: qsTr("Modulation Type")
             }
             Row{
                 id: ap_interpolation_row_radio_button
@@ -413,9 +414,17 @@ Item{
             anchors.topMargin:18
             anchors.rightMargin: 365
             fillMode: Image.PreserveAspectFit
-            source: {backend.interpolPath + "8.svg"}
+            source: {backend.interpolPath + "64.svg"}
             width: 182
-            height: 90            
+            height: 90      
+            Label{
+                anchors.top: parent.top
+                visible: ap_interpolation_switch.checked && ap_interpolation_combobox.currentValue >= 32
+                anchors.left: parent.left
+                anchors.topMargin: 44
+                anchors.leftMargin: 68
+                text: "N = " + ap_interpolation_combobox.currentValue
+            }      
         }
         
         // MAM Label

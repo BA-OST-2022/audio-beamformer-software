@@ -424,7 +424,7 @@ Item{
         anchors.bottomMargin: 5
         Label{
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Channel enable")
+                    text: qsTr("Channel Enable")
             }
         CheckBox{
             id: channel_1
