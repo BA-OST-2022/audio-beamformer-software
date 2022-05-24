@@ -402,6 +402,23 @@ Item{
             width: 170
             //height: 90            
         }
+        // MAM Label
+        Label{
+            visible: !ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 206
+            anchors.topMargin: 17
+            text: "Signal"
+        }
+        Label{
+            visible: !ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 195
+            anchors.topMargin: 92
+            text: "Distortion"
+        }
         Image{
             anchors.right: parent.right
             visible: ad_modulation_am.checked
