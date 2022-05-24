@@ -252,7 +252,7 @@ Item{
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ap_interpolation_switch.bottom
                     anchors.topMargin: 10
-                    text: qsTr("Interpolation levels")
+                    text: qsTr("Interpolation Levels")
             }
 
             ComboBox {
@@ -290,7 +290,7 @@ Item{
                     anchors.top: ap_modulation_label.bottom
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Modulation type")
+                    text: qsTr("Modulation Type")
             }
             Row{
                 id: ap_interpolation_row_radio_button
