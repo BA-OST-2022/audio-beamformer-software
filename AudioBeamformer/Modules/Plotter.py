@@ -114,6 +114,7 @@ class WindowPlotter:
         self._COLOR_TEXT = "#FFFFFF"
         
     def generatePlot(self, bins, path):
+        bins = np.clip(bins, 0, 1)
         layout = Layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -129,23 +130,37 @@ class WindowPlotter:
             fig.add_trace(go.Scatter(x=np.array([i - n // 2, i - n // 2]),
                                      y=np.array([0, bins[i]]), mode='lines',
                                      line = dict(color=self._COLOR_BLUE,width=4)))
+           
             
+        fig.update_yaxes(ticks="outside", tickwidth=1,
+                          tickcolor=self._COLOR_GRAY, ticklen=0,
+                          showline=False,
+                          # linewidth=5, linecolor=self._COLOR_GRAY,
+                          gridwidth=0, gridcolor=self._COLOR_GRAY,
+                          tickfont=dict(size=15))
+        # fig.update_xaxes(ticks="outside", tickwidth=1,
+        #                   showticklabels=False,
+        #                   tickcolor=self._COLOR_GRAY, ticklen=5,
+        #                   linewidth=1, linecolor=self._COLOR_GRAY,
+        #                   gridwidth=1, gridcolor=self._COLOR_GRAY,
+        #                   tickfont=dict(size=15))
+        
+        fig.update_xaxes(showticklabels=False)
+        
         
         fig.update_layout(
             xaxis = dict(
                 tickmode = 'array',
-                tickvals = np.linspace(-n // 2 + 1, n // 2, n)
-                # ticktext = ['20', '50', '200', '1k', '5k', '20k']
+                tickvals = np.linspace(-n // 2 + 1, n // 2, n),
             ),
             yaxis = dict(
                 tickmode = 'array',
                 tickvals = np.linspace(0, 1, 6)
-                # ticktext = ['10', '0', '-10', '-20', '-30', '-40', '-50']
             )
         )
         
         
-        # fig['layout']['xaxis'].update(zeroline=False, range=[-n // 2, n // 2])
+        fig['layout']['xaxis'].update(zeroline=False, range=[-n / 2 + 0.2, n / 2 - 0.2])
         # fig['layout']['yaxis'].update(zeroline=False, range=[0, 1])
         
         fig.update_layout(width=self._width, height=self._height,
