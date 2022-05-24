@@ -192,8 +192,8 @@ class Sensors():
                 self._systemTemp = self._tempSensorSystem.getTemperature()
                 self._cpuTemp = self._getCpuTemperature()
                 if not np.isnan(self._systemTemp):
-                    fanSpeed = np.clip((self._systemTemp - 30) / 20, 0, 1)
-                    self._hmi.setFanSpeed(fanSpeed) # 30°C = 0% .. 50°C = 100%
+                    fanSpeed = np.clip((self._systemTemp - 40) / 20, 0, 1)
+                    self._hmi.setFanSpeed(fanSpeed) # 40°C = 0% .. 60°C = 100%
                 
             
     

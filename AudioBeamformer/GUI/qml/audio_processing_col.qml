@@ -390,6 +390,7 @@ Item{
             sourceSize.width: 1206
             sourceSize.height: 122
         }
+        // Equalizer
         Image{
             id: equalizer_plot
             visible: ap_equalizer_switch.checked
@@ -402,6 +403,21 @@ Item{
             width: 170
             //height: 90            
         }
+        
+        // Interpolation
+        Image{
+            id: interpolation_plot
+            visible: ap_interpolation_switch.checked
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin:18
+            anchors.rightMargin: 374
+            fillMode: Image.PreserveAspectFit
+            source: {backend.interpolPath + "2.svg"}
+            width: 160
+            height: 90            
+        }
+        
         // MAM Label
         Label{
             visible: !ad_modulation_am.checked
