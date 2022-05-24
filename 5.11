@@ -1,2 +1,0 @@
-Requirement already satisfied: pyqt5 in c:\users\thierry schwaller\anaconda3\lib\site-packages (5.12.3)
-Requirement already satisfied: PyQt5_sip<13,>=4.19.14 in c:\users\thierry schwaller\anaconda3\lib\site-packages (from pyqt5) (12.10.1)

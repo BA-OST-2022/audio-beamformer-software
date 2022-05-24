@@ -44,6 +44,7 @@ import sys
 import numpy as np
 import ast
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -51,6 +52,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
+from Plotter import EqualizerPlotter
 
 
 class AudioProcessing:
@@ -72,8 +74,13 @@ class AudioProcessing:
             inputDeviceName = [s for s in [i[1] for i in channels] if s.startswith('Loopback') and s.endswith(',1)')][0]
             self._input_device = [i[1] for i in channels].index(inputDeviceName)
         else:
-            self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
-            self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
+            try:
+                self._output_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Output')
+                self._input_device = [i[1] for i in channels].index('Microsoft Sound Mapper - Input')
+            except Exception:
+                self._output_device = None
+                self._input_device = None
+                
         # Start values
         self._tot_gain = 1
         self._output_enable = 1
@@ -88,17 +95,20 @@ class AudioProcessing:
         self.__source_dict = {}
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
+        self.__equalizer_tabs = []
         self.__stream_running = False
         self._enableMagic = False
         self._player = None
+        self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
         
         # Equalizer initialization
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
         with open(self.__equalier_dict_path) as f:
-            for line in f.readlines():
+            for i,line in enumerate(f.readlines()):
                 line_tupel = ast.literal_eval(line)
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
+                self.__equalizer_tabs.append(self.equalizer(line_tupel[1],i))
         self._equalizer_filter = np.ones(self.equ_window_size)
 
     def begin(self):
@@ -110,17 +120,18 @@ class AudioProcessing:
         self.endStream()
 
     def setupStream(self):
-        if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
-            channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
-        else:
-            channel_input = 2
-            self._input_device = self.__sourceIndexList[0]
-        self._stream = sd.Stream(samplerate=self._samplerate,
-                                blocksize=self._chunk_size,
-                                device=(self._input_device , self._output_device), 
-                                channels=(channel_input, 2),
-                                dtype=np.int32,
-                                callback=self.callback)
+        if self._output_device and self._input_device:
+            if sd.query_devices(self._input_device)['max_input_channels'] >= 1:
+                channel_input = 1 if sd.query_devices(self._input_device)['max_input_channels'] == 1 else 2
+            else:
+                channel_input = 2
+                self._input_device = self.__sourceIndexList[0]
+            self._stream = sd.Stream(samplerate=self._samplerate,
+                                    blocksize=self._chunk_size,
+                                    device=(self._input_device , self._output_device), 
+                                    channels=(channel_input, 2),
+                                    dtype=np.int32,
+                                    callback=self.callback)
 
 
 
@@ -178,14 +189,17 @@ class AudioProcessing:
                 if not any(bl == device["name"] for bl in self.__black_list_input_device):
                     if not (device["name"].startswith('Loopback') and device["name"].endswith(',0)')):
                         sourceIndexList.append(i)
-                        if (device["name"].startswith('Loopback') and device["name"].endswith(',1)')):
+                        if ((device["name"].startswith('Loopback') and device["name"].endswith(',1)'))
+                            or (device["name"] == "Microsoft Sound Mapper - Input")):
                             sourceList.append(default_val)
                         else:
                             sourceList.append(device["name"])
-        if LINUX:
+        try:
             ind = sourceList.index(default_val)
             sourceList.insert(0,sourceList.pop(ind))
             sourceIndexList.insert(0,sourceIndexList.pop(ind))
+        except ValueError:
+            pass
         self.__sourceIndexList = sourceIndexList
         # Filter source list
         return sourceList
@@ -232,7 +246,7 @@ class AudioProcessing:
     def getEqualizerProfileList(self):
         return list(self.__equalizer_profile_list.keys())
 
-    def equalizer(self, gain_dict):
+    def equalizer(self, gain_dict, profile):
         taps = np.zeros(self.equ_window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -245,18 +259,17 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-                
-        fig, ax = plt.subplots()
-        w,h = freqz(taps)
-        ax.loglog(w,np.abs(h))
+        self.createEqualizerPlot(profile, taps)
         return taps
 
-    def equalizerPlot(self):
-        pass
+    def createEqualizerPlot(self, profile, taps):
+        w,h = freqz(taps, worN=10000)
+        path = Path(os.path.dirname(__file__)).parents[0] / f"GUI/qml/images/eq_{profile}.svg"
+        self._plotter.generatePlot(w, np.abs(h), path)
 
-    def setEqualizerProfile(self,profile):
-        taps = self.equalizer(self.__equalizer_profile_list[self.__equalizerList[profile]])
-        self._equalizer_filter = taps
+    def setEqualizerProfile(self, profile):
+        self._equalizer_filter = self.__equalizer_tabs[profile]
+        #self.createEqualizerPlot(profile, self._equalizer_filter)
 
     def enableInterpolation(self,enable):
         if self._fpga_controller:
@@ -333,9 +346,6 @@ class AudioProcessing:
         outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
         self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
 
-    def createEqualizerPlots(self):
-        path = "../GUI/qml/images"
-
 
 if __name__ == '__main__':
     import time
@@ -345,7 +355,7 @@ if __name__ == '__main__':
     # audio_processing.enableMagic(True)
     audio_processing.begin()
     audio_processing.setEqualizerProfile(1)
-    time.sleep(10)
+    time.sleep(1)
     audio_processing.end()
     
 
