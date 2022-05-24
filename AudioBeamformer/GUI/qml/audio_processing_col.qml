@@ -411,10 +411,10 @@ Item{
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin:18
-            anchors.rightMargin: 374
+            anchors.rightMargin: 365
             fillMode: Image.PreserveAspectFit
-            source: {backend.interpolPath + "2.svg"}
-            width: 160
+            source: {backend.interpolPath + "8.svg"}
+            width: 182
             height: 90            
         }
         
