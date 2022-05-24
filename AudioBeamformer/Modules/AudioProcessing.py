@@ -90,6 +90,7 @@ class AudioProcessing:
         self.__source_dict = {}
         self.__equalizer_profile_list = {}
         self.__equalizerList = []
+        self.__equalizer_tabs = []
         self.__stream_running = False
         self._enableMagic = False
         self._player = None
@@ -98,10 +99,11 @@ class AudioProcessing:
         # Equalizer initialization
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
         with open(self.__equalier_dict_path) as f:
-            for line in f.readlines():
+            for i,line in enumerate(f.readlines()):
                 line_tupel = ast.literal_eval(line)
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
+                self.__equalizer_tabs.append(self.equalizer(line_tupel[1],i))
         self._equalizer_filter = np.ones(self.equ_window_size)
 
     def begin(self):
@@ -236,7 +238,7 @@ class AudioProcessing:
     def getEqualizerProfileList(self):
         return list(self.__equalizer_profile_list.keys())
 
-    def equalizer(self, gain_dict):
+    def equalizer(self, gain_dict, profile):
         taps = np.zeros(self.equ_window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -249,7 +251,7 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-        
+        self.createEqualizerPlot(profile, taps)
         return taps
 
     def createEqualizerPlot(self, profile, taps):
@@ -258,8 +260,8 @@ class AudioProcessing:
         self._plotter.generatePlot(w, np.abs(h), path)
 
     def setEqualizerProfile(self, profile):
-        self._equalizer_filter = self.equalizer(self.__equalizer_profile_list[self.__equalizerList[profile]])
-        self.createEqualizerPlot(profile, self._equalizer_filter)
+        self._equalizer_filter = self.__equalizer_tabs[profile]
+        #self.createEqualizerPlot(profile, self._equalizer_filter)
 
     def enableInterpolation(self,enable):
         if self._fpga_controller:

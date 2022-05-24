@@ -206,17 +206,7 @@ Item{
                     anchors.topMargin: 8
                     onCurrentIndexChanged: {
                         backend.getEqualizerProfile(ap_equalizer_combobox.currentIndex)
-                        var list = backend.getEqualizerList
-                        var xVal = list[0]
-                        var yVal = list[1]
-                        for (let i = 0; i < equalizer_plot.count; i++) {
-                            equalizer_plot.remove(i)
-                        
-                        }
-                        for (let i = 0; i < xVal.length; i++) {
-                            equalizer_plot.append(xVal[i],yVal[i])
-                         }
-
+                        equalizer_plot.source = backend.eqPath + ap_equalizer_combobox.currentIndex + ".png"
                     }
                 }
         }
@@ -401,13 +391,14 @@ Item{
             sourceSize.height: 122
         }
         Image{
+            id: equalizer_plot
             visible: ap_equalizer_switch.checked
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin:18
             anchors.leftMargin: 368
             fillMode: Image.PreserveAspectFit
-            source: backend.eqPath
+            source: {backend.eqPath + "0.png"}
             width: 170
             //height: 90            
         }

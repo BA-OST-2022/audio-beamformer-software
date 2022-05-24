@@ -169,13 +169,13 @@ class MainWindow(QObject):
         self.__eq_0_int_1_am_1 = Path("images") / "eq_0_int_1_AM.png"
         self.__eq_0_int_0_am_1 = Path("images") / "eq_0_int_0_AM.png"
         self.__eq_1_int_0_am_1 = Path("images") / "eq_1_int_0_AM.png"
-        self.__eq_1_int_1_am_0 = Path("images") / "All_active_MAM.png"
+        self.__eq_1_int_1_am_0 = Path("images") / "All_active_MAM.svg"
         self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.png"
         self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
         self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
         self.__am_holder = Path("images") / "AM_Holder.png"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
-        self.__eq_path = Path("images") / "eq_1.png"  # TODO: Change this dynamically
+        self.__eq_path = Path("images") / "eq_"  # TODO: Change this dynamically
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
