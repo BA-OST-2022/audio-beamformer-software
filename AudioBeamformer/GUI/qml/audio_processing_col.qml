@@ -435,6 +435,25 @@ Item{
             anchors.topMargin: 92
             text: "Distortion"
         }
+
+        // AM Label
+         Label{
+            visible: ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 220
+            anchors.topMargin: -18
+            text: "1"
+        }
+        Label{
+            visible: ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 124
+            anchors.topMargin: -18
+            text: "Carrier"
+        }
+
         Image{
             anchors.right: parent.right
             visible: ad_modulation_am.checked
