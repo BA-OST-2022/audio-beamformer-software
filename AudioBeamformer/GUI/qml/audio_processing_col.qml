@@ -252,7 +252,7 @@ Item{
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: ap_interpolation_switch.bottom
                     anchors.topMargin: 10
-                    text: qsTr("Interpolation levels")
+                    text: qsTr("Interpolation Levels")
             }
 
             ComboBox {
@@ -266,6 +266,7 @@ Item{
                     currentIndex: 5
                     onCurrentIndexChanged: {
                         backend.getInterpolationLevel(ap_interpolation_combobox.currentValue)
+                        interpolation_plot.source = backend.interpolPath + (Math.pow(2,ap_interpolation_combobox.currentIndex + 1)).toString() + ".svg"
                     }
             }
 
@@ -290,7 +291,7 @@ Item{
                     anchors.top: ap_modulation_label.bottom
                     anchors.topMargin: 8
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Modulation type")
+                    text: qsTr("Modulation Type")
             }
             Row{
                 id: ap_interpolation_row_radio_button
@@ -390,6 +391,7 @@ Item{
             sourceSize.width: 1206
             sourceSize.height: 122
         }
+        // Equalizer
         Image{
             id: equalizer_plot
             visible: ap_equalizer_switch.checked
@@ -402,6 +404,29 @@ Item{
             width: 170
             //height: 90            
         }
+        
+        // Interpolation
+        Image{
+            id: interpolation_plot
+            visible: ap_interpolation_switch.checked
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin:18
+            anchors.rightMargin: 365
+            fillMode: Image.PreserveAspectFit
+            source: {backend.interpolPath + "64.svg"}
+            width: 182
+            height: 90      
+            Label{
+                anchors.top: parent.top
+                visible: ap_interpolation_switch.checked && ap_interpolation_combobox.currentValue >= 32
+                anchors.left: parent.left
+                anchors.topMargin: 44
+                anchors.leftMargin: 68
+                text: "N = " + ap_interpolation_combobox.currentValue
+            }      
+        }
+        
         // MAM Label
         Label{
             visible: !ad_modulation_am.checked
@@ -419,6 +444,25 @@ Item{
             anchors.topMargin: 92
             text: "Distortion"
         }
+
+        // AM Label
+         Label{
+            visible: ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 220
+            anchors.topMargin: -18
+            text: "1"
+        }
+        Label{
+            visible: ad_modulation_am.checked
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 124
+            anchors.topMargin: -18
+            text: "Carrier"
+        }
+
         Image{
             anchors.right: parent.right
             visible: ad_modulation_am.checked

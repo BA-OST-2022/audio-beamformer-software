@@ -165,17 +165,18 @@ class MainWindow(QObject):
         self.__enableChannels = np.zeros(19)
         self.__mutePath = Path("images") / "Mute_grey.png"
         self.__unmutePath = Path("images") / "Unmute_grey.png"
-        self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.png"
-        self.__eq_0_int_1_am_1 = Path("images") / "eq_0_int_1_AM.png"
-        self.__eq_0_int_0_am_1 = Path("images") / "eq_0_int_0_AM.png"
-        self.__eq_1_int_0_am_1 = Path("images") / "eq_1_int_0_AM.png"
+        self.__eq_1_int_1_am_1 = Path("images") / "All_active_AM.svg"
+        self.__eq_0_int_1_am_1 = Path("images") / "eq_0_int_1_AM.svg"
+        self.__eq_0_int_0_am_1 = Path("images") / "eq_0_int_0_AM.svg"
+        self.__eq_1_int_0_am_1 = Path("images") / "eq_1_int_0_AM.svg"
         self.__eq_1_int_1_am_0 = Path("images") / "All_active_MAM.svg"
-        self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.png"
-        self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.png"
-        self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.png"
-        self.__am_holder = Path("images") / "AM_Holder.png"
+        self.__eq_0_int_1_am_0 = Path("images") / "eq_0_int_1_MAM.svg"
+        self.__eq_0_int_0_am_0 = Path("images") / "eq_0_int_0_MAM.svg"
+        self.__eq_1_int_0_am_0 = Path("images") / "eq_1_int_0_MAM.svg"
+        self.__am_holder = Path("images") / "AM_Holder.svg"
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
         self.__eq_path = Path("images") / "eq_" 
+        self.__interpol_path = Path("images") / "Interpolation_" 
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -517,6 +518,10 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant= True)
     def eqPath(self):
         return str(self.__eq_path)
+
+    @pyqtProperty(str, constant= True)
+    def interpolPath(self):
+        return str(self.__interpol_path)
 
     @pyqtProperty(str, constant=True)
     def loadingImage(self):

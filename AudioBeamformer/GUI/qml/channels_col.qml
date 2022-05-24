@@ -60,7 +60,7 @@ Item{
                     anchors.topMargin: 5
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: ch_beamsteering_switch.position
-                    text: qsTr("Angle source")
+                    text: qsTr("Angle Source")
             }
 
              ComboBox {
@@ -160,7 +160,7 @@ Item{
                     anchors.top: ch_window_switch.bottom
                     anchors.topMargin: 5
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Window type")
+                    text: qsTr("Window Type")
                 }
 
             ComboBox {
