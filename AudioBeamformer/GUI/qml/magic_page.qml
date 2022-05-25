@@ -18,9 +18,38 @@ Item{
     anchors.leftMargin: -10
     visible: !audio_processing_button.checked && !channel_button.checked && !setting_button.checked
 
-    Image{
-        source: backend.elvisionPath
+    Timer{
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            var red = Math.floor(Math.random()*255)
+            var green = Math.floor(Math.random()*255)
+            var blue = Math.floor(Math.random()*255)
+            nice_text.color = "#" +  red.toString(16) + green.toString(16) + blue.toString(16)
+        }
     }
+
+    Image{
+        id: elvis_image
+        source: backend.elvisionPath
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin: 50
+        anchors.topMargin: 15
+        fillMode: Image.PreserveAspectFit 
+        height: 300
+    }
+    Text {
+    id: nice_text
+    anchors.top: parent.top
+    anchors.left: elvis_image.right
+    anchors.leftMargin: 50
+    text: "WONDERLAND"
+    font.family: "Comic Sans MS"
+    font.pointSize: 24
+    color: "red"
+}
     CVItem 
     {
         id: imageWriter
