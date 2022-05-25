@@ -48,7 +48,7 @@ class EqualizerPlotter:
         
     def generatePlot(self, w, H, path):
         w = (w / np.pi) * (self._fs / 2)
-        H = 20 * np.log10(H)
+        H = 20 * np.log10(np.maximum(H, 1E-6))
         
         w = np.clip(w, 20.0, self._fs / 2)
         H = np.clip(H, -50.1, 10.0)
