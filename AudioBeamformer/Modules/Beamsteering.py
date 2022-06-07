@@ -35,6 +35,8 @@ import ast
 import threading
 import numpy as np
 import time
+import shutil
+import filecmp
 from pathlib import Path
 from Plotter import WindowPlotter
 DEBUG = False
@@ -79,6 +81,7 @@ class Beamsteering():
         self._angleToSteer_manual = 0
         self._beamfocusing_enable = False
         self.__beamfocusing_radius = 3 # Beamfocusing radius is set to three 
+        
         #   Pattern
         self._beamsteeringPattern = {}
         self.__pattern_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/beamsteering_pattern.txt"
@@ -86,22 +89,35 @@ class Beamsteering():
             for line in f.readlines():
                 line_tupel = ast.literal_eval(line)
                 self._beamsteeringPattern[line_tupel[0]] = line_tupel[1:]
+                
         self.setBeamsteeringPattern(0)
         self._currentPattern = 0
         self._PatternHoldTime = 1
         
         # Window
-        self.__window_types = {"Rectangle": self.rectWindow(),
-                             "Cosine": self.cosineWindow(),
-                             "Hann": self.hannWindow(),
-                             "Hamming": self.hammingWindow(),
-                             "Blackman": self.blackmanWindow(),
-                             "Dolph-Chebyshev": self.chebyWindow()}
-        self._activeWindow = "Rectangle"
+        self.__window_types = {"Dolph-Chebyshev": self.chebyWindow(),
+                               "Cosine": self.cosineWindow(),
+                               "Hann": self.hannWindow(),
+                               "Hamming": self.hammingWindow(),
+                               "Blackman": self.blackmanWindow(),
+                               "Rectangle": self.rectWindow()}
+        self._activeWindow = "Dolph-Chebyshev"
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
         self._plotter = WindowPlotter(250, int(250 * 0.517))
-        self.generatePlot()
+        
+        createPlots = False
+        tempPath = self.__pattern_dict_path.rsplit('.', 1)[0] + ".tmp"
+        if not Path(tempPath).is_file():  # Create initial backup file
+            createPlots = True
+            shutil.copyfile(self.__pattern_dict_path, tempPath)
+        if not filecmp.cmp(self.__pattern_dict_path, tempPath): # Check if temp file is diffrent to actual file
+            createPlots = True
+            shutil.copyfile(self.__pattern_dict_path, tempPath)
+        if createPlots:
+            self.generatePlot()
+            print("Create equalizer plots")
+        
 
     def begin(self):
          if not self._initialized:

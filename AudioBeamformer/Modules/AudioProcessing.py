@@ -45,6 +45,8 @@ import numpy as np
 import ast
 import matplotlib.pyplot as plt
 from pathlib import Path
+import shutil
+import filecmp
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -53,6 +55,8 @@ sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
 from Plotter import EqualizerPlotter
+
+
 
 
 class AudioProcessing:
@@ -102,13 +106,26 @@ class AudioProcessing:
         self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
         
         # Equalizer initialization
+        createPlots = False
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
+        tempPath = self.__equalier_dict_path.rsplit('.', 1)[0] + ".tmp"
+        if not Path(tempPath).is_file():  # Create initial backup file
+            createPlots = True
+            shutil.copyfile(self.__equalier_dict_path, tempPath)
+        if not filecmp.cmp(self.__equalier_dict_path, tempPath): # Check if temp file is diffrent to actual file
+            createPlots = True
+            shutil.copyfile(self.__equalier_dict_path, tempPath)
+       
         with open(self.__equalier_dict_path) as f:
             for i,line in enumerate(f.readlines()):
                 line_tupel = ast.literal_eval(line)
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
-                self.__equalizer_tabs.append(self.equalizer(line_tupel[1],i))
+                taps = self.equalizer(line_tupel[1])
+                if createPlots:
+                    self.createEqualizerPlot(i, taps)
+                self.__equalizer_tabs.append(taps)
+                
         self._equalizer_filter = np.ones(self.equ_window_size)
 
     def begin(self):
@@ -250,7 +267,7 @@ class AudioProcessing:
     def getEqualizerProfileList(self):
         return list(self.__equalizer_profile_list.keys())
 
-    def equalizer(self, gain_dict, profile):
+    def equalizer(self, gain_dict):
         taps = np.zeros(self.equ_window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -263,7 +280,6 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-        self.createEqualizerPlot(profile, taps)
         return taps
 
     def createEqualizerPlot(self, profile, taps):
