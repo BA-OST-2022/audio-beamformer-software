@@ -199,6 +199,59 @@ Item{
                         backend.getMaxVolume(se_volume_level_slider.value)
                 }
             }
+            
+            Label{
+                id: audio_player_label
+                anchors.top: se_volume_level_slider.bottom
+                anchors.topMargin: 1
+                font.pixelSize: 20  
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: {"Audio Player"}
+            }
+
+            
+             RoundButton{
+                 id: audio_player_enable
+                 checkable: true
+                 checked: false
+                 width: se_volume_level_slider.width / 2
+                 height: se_volume_level_slider.width / 4
+                 anchors.horizontalCenter: parent.horizontalCenter
+                 anchors.top: audio_player_label.bottom
+                  contentItem:Image{
+                      anchors.fill: parent
+                      anchors.topMargin: 10
+                      anchors.bottomMargin: 10
+                      anchors.leftMargin: 2
+                      anchors.rightMargin: 2
+                      sourceSize.width: 32
+                      sourceSize.height: 32
+                      source: {audio_player_enable.checked? backend.playPath:backend.pausePath}
+                      fillMode: Image.PreserveAspectFit
+                      width: 5
+                      height: 5
+                  }
+                Material.background: { audio_player_enable.checked?"#484848":"#484848"}
+             }
+            
+             Label{
+                     id: audio_player_combo_label
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     anchors.top: audio_player_enable.bottom
+                     anchors.topMargin: 10
+                     text: qsTr("Song List:")
+             }
+             ComboBox {
+                     id: audio_player_combo
+                     model: ["Test1","Test2","Test3","Test4"]
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     width: se_volume_level_slider.width
+                     anchors.top: audio_player_combo_label.bottom
+                     anchors.topMargin: 3
+                     onCurrentIndexChanged: {
+                         
+                     }
+                 }
 
         }
 

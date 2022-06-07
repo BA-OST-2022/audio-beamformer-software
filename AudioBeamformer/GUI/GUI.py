@@ -180,6 +180,8 @@ class MainWindow(QObject):
         self.__interpol_path = Path("images") / "Interpolation_" 
         self.__elvision_path = Path("images") / "Elvision.jpg"
         self.__frame_path = Path("images") / "Rahmen.svg"
+        self.__play_img = Path("images") / "play.svg"
+        self.__pause_img = Path("images") / "pause.svg"
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -538,6 +540,14 @@ class MainWindow(QObject):
     def elvisionPath(self):
         return str(self.__elvision_path)
 
+    @pyqtProperty(str, constant=True)
+    def pausePath(self):
+        return str(self.__pause_img)
+
+    @pyqtProperty(str, constant=True)
+    def playPath(self):
+         return str(self.__play_img)
+     
     @pyqtProperty(bool)
     def getAlertState(self):
         if self._sensors:
