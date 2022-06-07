@@ -34,6 +34,7 @@
 
 import os
 import sys
+import threading
 
 LINUX = (sys.platform == 'linux')
 
@@ -58,6 +59,11 @@ class AudioBeamformer():
                        self.sensors, leds)
     
     def begin(self):
+        threading.Thread(target=self.initializeModules).start()
+        self.gui.registerTerminateCallback(self.end)
+        self.gui.run()  # This functioncall is blocking and must be at the end
+        
+    def initializeModules(self):
         powerSupply.begin()
         fpgaControl.begin()
         leds.begin()
@@ -66,8 +72,7 @@ class AudioBeamformer():
         self.beamsteering.begin()
         self.audio_processing.printChannels()
         self.audio_processing.begin()
-        self.gui.registerTerminateCallback(self.end)
-        self.gui.run()  # This functioncall is blocking and must be at the end
+        print("Module Initialization done...")
         
     def end(self, shutdown=False):
         if not self.terminating:
