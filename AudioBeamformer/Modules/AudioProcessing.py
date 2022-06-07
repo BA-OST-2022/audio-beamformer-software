@@ -86,8 +86,7 @@ class AudioProcessing:
                 print("No Input or Output Device detected\n")
                 
         # Start values
-        self._tot_gain = 1
-        self._output_enable = 1
+        self._tot_gain = 1.0
         self._equalizer_enable = True
         self._modulation_index = 1
         self._mam_gain = 0.2
@@ -253,8 +252,6 @@ class AudioProcessing:
         else:
             self.__current_source_level = -50
 
-    def setOutputEnable(self,enable):
-        self._output_enable = enable
 
     def getSourceLevel(self):
         return self.__current_source_level
@@ -345,21 +342,23 @@ class AudioProcessing:
         
 
     def callback(self, indata, outdata, frames, time, status):
-        indata_oneCh = indata[:,0] * self._tot_gain 
         if status:
             print(status)
+            
+        print(np.type(indata), indata)
+        indata_oneCh = np.float32(indata[:,0]) * self._tot_gain 
         self.setSourceLevel(indata_oneCh)
-        indata_oneCh *= self._output_enable
+        print(np.type(indata_oneCh), indata_oneCh)
+        
+        outdata_oneCh = indata_oneCh
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.__previousWindow,
-                                    indata_oneCh))
+                                    indata_oneCh))  # This is longer than indata[:,0]
             
             outdata_oneCh = np.convolve(indata_oneCh,
                                         self._equalizer_filter,
                                         "valid")
             outdata_oneCh = np.float32(outdata_oneCh)
-        else:
-            outdata_oneCh = indata[:,0]
 
         if self._enableMagic:
             data = self._player.getData()[:,0]
@@ -373,11 +372,12 @@ class AudioProcessing:
         outdata_oneCh *= self._outputGain
         if self._enableMute:
             outdata_oneCh = np.zeros_like(indata[:,0])
+        print(outdata_oneCh)
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
-        outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
+        outdata[:] = np.int32(np.column_stack((outdata_oneCh, second_channel_data)))
         self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
 
 
