@@ -345,10 +345,8 @@ class AudioProcessing:
         if status:
             print(status)
             
-        print(np.type(indata), indata)
-        indata_oneCh = np.float32(indata[:,0]) * self._tot_gain 
+        indata_oneCh = indata[:,0].astype(np.float32) * self._tot_gain 
         self.setSourceLevel(indata_oneCh)
-        print(np.type(indata_oneCh), indata_oneCh)
         
         outdata_oneCh = indata_oneCh
         if self._equalizer_enable:
@@ -358,21 +356,20 @@ class AudioProcessing:
             outdata_oneCh = np.convolve(indata_oneCh,
                                         self._equalizer_filter,
                                         "valid")
-            outdata_oneCh = np.float32(outdata_oneCh)
+            outdata_oneCh = outdata_oneCh.astype(np.float32)
 
         if self._enableMagic:
             data = self._player.getData()[:,0]
             if np.shape(data) == np.shape(outdata_oneCh):
-                outdata_oneCh = data
+                outdata_oneCh = data.astype(np.float32)
             else:
-                outdata_oneCh = np.zeros_like(indata[:,0])
+                outdata_oneCh *= 0.0
                 print("No data yet to play")
                 
         
         outdata_oneCh *= self._outputGain
         if self._enableMute:
-            outdata_oneCh = np.zeros_like(indata[:,0])
-        print(outdata_oneCh)
+            outdata_oneCh *= 0.0
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
@@ -386,11 +383,11 @@ if __name__ == '__main__':
     audio_processing = AudioProcessing()
     audio_processing.printChannels()
     print(audio_processing.getSourceList())
-    # audio_processing.enableMagic(True)
+    audio_processing.enableMagic(True)
     audio_processing.begin()
     audio_processing.enableMute(False)
     audio_processing.setEqualizerProfile(1)
-    time.sleep(10)
+    time.sleep(2)
     audio_processing.end()
     
 
