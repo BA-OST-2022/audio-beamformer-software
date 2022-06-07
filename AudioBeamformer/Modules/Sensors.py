@@ -59,7 +59,7 @@ class Sensors():
         self.EVENT_ALERT = 0
         self.EVENT_FREE = 1
         
-        self.COLOR_BOOT = np.array([1.0, 1.0, 0.0])        # White
+        self.COLOR_BOOT = np.array([1.0, 1.0, 1.0])        # White
         self.COLOR_RUN = np.array([0.0, 1.0, 1.0])         # Cyan
         self.COLOR_MUTE = np.array([1.0, 0.0, 0.0])        # Red
         self.COLOR_STANDBY = np.array([0.62, 0.62, 0.0])   # Yellow (dark)
