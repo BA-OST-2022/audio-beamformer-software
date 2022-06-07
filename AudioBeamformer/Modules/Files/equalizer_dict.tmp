@@ -1,5 +1,4 @@
-("Main",{(0, 200): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,10000): {'band_gain': 1, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})
-("Low-Cut 300 Hz",{(0, 300): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,10000): {'band_gain': 1, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})
+("Main",{(0, 300): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,10000): {'band_gain': 1, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})
 ("Low-Cut 400 Hz",{(0, 400): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,10000): {'band_gain': 1, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})
 ("Sharp",{(0, 200): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,2500): {'band_gain': 1, 'f_type': ('kaiser', 5)},(2500,10000): {'band_gain': 1.414, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})
 ("Dampened",{(0, 200): {'band_gain': 0, 'f_type': ('kaiser', 5)}, (200,2500): {'band_gain': 1, 'f_type': ('kaiser', 5)},(2500,10000): {'band_gain': 0.707, 'f_type': ('kaiser', 5)},(10000,22000): {'band_gain': 0, 'f_type': ('kaiser', 5)}})

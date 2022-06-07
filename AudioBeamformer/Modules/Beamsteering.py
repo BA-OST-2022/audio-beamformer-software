@@ -102,6 +102,7 @@ class Beamsteering():
                                "Blackman": self.blackmanWindow(),
                                "Rectangle": self.rectWindow()}
         self._activeWindow = "Dolph-Chebyshev"
+        self._enableWindow = False
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
         self._plotter = WindowPlotter(250, int(250 * 0.517))
@@ -274,11 +275,14 @@ class Beamsteering():
         self._fpga_controller.update()
     
     def calculateGains(self):
-        self._gains = np.array(self.__window_types[self._activeWindow])
-        if not DEBUG:
-            self._fpga_controller.setChannelGain(self._gains)
-            self._fpga_controller.update()
+        if self._enableWindow:
+            self._gains = np.array(self.__window_types[self._activeWindow])
         else:
+            self._gains = self.rectWindow()
+        self._fpga_controller.setChannelGain(self._gains)
+        self._fpga_controller.update()
+        
+        if DEBUG:
             print(f"Gains: {np.array(self._gains)}")
 
     def getSpeedOfSound(self):
@@ -287,6 +291,10 @@ class Beamsteering():
             if not np.isnan(temp):
                 return 331.5 + 0.607 * temp
             return 343.3
+        
+    def enableWindow(self, state):
+        self._enableWindow = state
+        self.calculateGains()
 
     def setWindowProfile(self, profile):
         self._activeWindow = self.__window_list[profile]
@@ -299,7 +307,7 @@ class Beamsteering():
     # Window types
 
     def rectWindow(self):
-        gains = [1] * self.__row_count
+        gains = np.array([1] * self.__row_count)
         return gains
 
     def cosineWindow(self):

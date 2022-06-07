@@ -52,7 +52,7 @@ from colorsys import hsv_to_rgb
 
 
 class Sensors():
-    def __init__(self, powerSupply=None, leds=None):  
+    def __init__(self, powerSupply=None, audioProcessing=None, leds=None):  
         self.SRC_AMBIENT = 0
         self.SRC_SYSTEM = 1
         self.SRC_CPU = 2
@@ -74,6 +74,7 @@ class Sensors():
         self._tofSensor = ToFSensor(self._updateRateToF)
         self._rotaryEncoder = RotaryEncoder(pinA=16, pinB=12, pinS=20)
         self._powerSupply = powerSupply
+        self._audioProcessing = audioProcessing
         self._leds = leds
         
         self._initialized = False
@@ -169,6 +170,8 @@ class Sensors():
             mute = self.getMute() or self.getAlertState()
             if self._powerSupply:
                 self._powerSupply.enableOutput(not mute)
+            if self._audioProcessing:
+                self._audioProcessing.enableMute(mute)
                 
             if self._leds:
                 self._leds.enableAlert(self.getAlertState())
@@ -240,7 +243,10 @@ class Sensors():
             self._rotaryEncoder.setEncoderValue(volume)
         if self._powerSupply:
             self._powerSupply.setVolume(volume)
-    
+        if self._audioProcessing:
+            gain = np.clip(volume * 10, 0.0, 1.0)
+            self._audioProcessing.setOutputGain(gain)
+   
     
     def getVolume(self):
         return self._rotaryEncoder.getEncoderValue()
@@ -285,8 +291,8 @@ class Sensors():
     def _checkDistanceMap(self, distanceMap):
         row_size = 3
         column_size = 2
-        distance_foreground_on = 1200
-        distance_foreground_off = 1500
+        distance_foreground_on = 2000
+        distance_foreground_off = 2500
 
         sens = max(1,(1 - self._alertSensitivity) * row_size * column_size)
         mask = np.ones((row_size,column_size))
@@ -311,5 +317,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(10000)
+    time.sleep(10)
     sensors.end()

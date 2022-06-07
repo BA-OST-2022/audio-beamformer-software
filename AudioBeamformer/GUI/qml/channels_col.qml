@@ -112,6 +112,7 @@ Item{
                 id: ch_beamsteering_angle_slider
                 anchors.top: ch_beamsteering_angle_slider_button.bottom
                 value: 0.5
+                stepSize: 1/90
                 anchors.topMargin: -2
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
@@ -146,7 +147,7 @@ Item{
 
             Switch{
                 id: ch_window_switch
-                checked: true
+                checked: false
                 anchors.top: ch_window_switch_label.bottom
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter

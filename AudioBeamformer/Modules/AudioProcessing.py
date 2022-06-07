@@ -102,6 +102,8 @@ class AudioProcessing:
         self.__equalizer_tabs = []
         self.__stream_running = False
         self._enableMagic = False
+        self._enableMute = True
+        self._outputGain = 0.0
         self._player = None
         self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
         
@@ -334,6 +336,13 @@ class AudioProcessing:
             if self._player:
                 self._player.end()
                 self._player = None
+                
+    def enableMute(self, state):
+        self._enableMute = state
+        
+    def setOutputGain(self, gain):
+        self._outputGain = gain
+        
 
     def callback(self, indata, outdata, frames, time, status):
         indata_oneCh = indata[:,0] * self._tot_gain 
@@ -357,8 +366,13 @@ class AudioProcessing:
             if np.shape(data) == np.shape(outdata_oneCh):
                 outdata_oneCh = data
             else:
-                outdata_oneCh = 0
+                outdata_oneCh = np.zeros_like(indata[:,0])
                 print("No data yet to play")
+                
+        
+        outdata_oneCh *= self._outputGain
+        if self._enableMute:
+            outdata_oneCh = np.zeros_like(indata[:,0])
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
@@ -374,6 +388,7 @@ if __name__ == '__main__':
     print(audio_processing.getSourceList())
     # audio_processing.enableMagic(True)
     audio_processing.begin()
+    audio_processing.enableMute(False)
     audio_processing.setEqualizerProfile(1)
     time.sleep(10)
     audio_processing.end()

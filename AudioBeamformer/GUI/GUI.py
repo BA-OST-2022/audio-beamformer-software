@@ -329,11 +329,8 @@ class MainWindow(QObject):
 
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
-        if not self._beamsteering == None:
-            if enable:
-                self._beamsteering.setWindowProfile(self._windowProfileIndex)
-            else:
-                self._beamsteering.setWindowProfile(0)
+        if self._beamsteering:
+            self._beamsteering.enableWindow(enable)
         else:
             print(f"Window enable: {enable}")
 
