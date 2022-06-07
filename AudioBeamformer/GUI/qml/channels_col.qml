@@ -112,6 +112,7 @@ Item{
                 id: ch_beamsteering_angle_slider
                 anchors.top: ch_beamsteering_angle_slider_button.bottom
                 value: 0.5
+                stepSize: 1/90
                 anchors.topMargin: -2
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: ch_beamsteering_combobox.currentIndex == 1 & ch_beamsteering_switch.position
@@ -146,7 +147,7 @@ Item{
 
             Switch{
                 id: ch_window_switch
-                checked: true
+                checked: false
                 anchors.top: ch_window_switch_label.bottom
                 anchors.topMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -183,17 +184,18 @@ Item{
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: backend.framePath
                     fillMode: Image.PreserveAspectFit
-
+                    
                     Image{
-                    id: window_plot
-                    anchors.fill: parent
-                    anchors.topMargin: 10
-                    anchors.leftMargin: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: ch_window_switch.checked
-                    source: backend.windowPath + "Rectangle.svg"
-                    fillMode: Image.PreserveAspectFit
-                    width: 152
+                        id: window_plot
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.topMargin: 18
+                        anchors.leftMargin: 67
+                        visible: ch_window_switch.checked
+                        source: backend.windowPath + "Rectangle.svg"
+                        fillMode: Image.PreserveAspectFit
+                        width: 162
+                        //height: 90
                     }
             }
         }

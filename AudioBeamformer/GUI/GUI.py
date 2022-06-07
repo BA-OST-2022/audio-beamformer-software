@@ -42,7 +42,7 @@ from PyQt5.QtQml  import QQmlApplicationEngine
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, pyqtProperty
 from pathlib import Path
 
-DEBUG = False
+DEBUG = True
 LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
@@ -329,11 +329,8 @@ class MainWindow(QObject):
 
     @pyqtSlot(int)
     def getEnableWindow(self, enable):
-        if not self._beamsteering == None:
-            if enable:
-                self._beamsteering.setWindowProfile(self._windowProfileIndex)
-            else:
-                self._beamsteering.setWindowProfile(0)
+        if self._beamsteering:
+            self._beamsteering.enableWindow(enable)
         else:
             print(f"Window enable: {enable}")
 
@@ -470,7 +467,6 @@ class MainWindow(QObject):
     def getMuteEnable(self, enable):
         if not self._sensors == None:
             self._sensors.setMute(enable)
-            self._audio_processing.setOutputEnable(not enable)
         else:
             print(f"Mute enable: {enable}")
 

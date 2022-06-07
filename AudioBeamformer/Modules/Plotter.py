@@ -48,7 +48,7 @@ class EqualizerPlotter:
         
     def generatePlot(self, w, H, path):
         w = (w / np.pi) * (self._fs / 2)
-        H = 20 * np.log10(H)
+        H = 20 * np.log10(np.maximum(H, 1E-6))
         
         w = np.clip(w, 20.0, self._fs / 2)
         H = np.clip(H, -50.1, 10.0)
@@ -161,7 +161,7 @@ class WindowPlotter:
         
         
         fig['layout']['xaxis'].update(zeroline=False, range=[-n / 2 + 0.2, n / 2 - 0.2])
-        # fig['layout']['yaxis'].update(zeroline=False, range=[0, 1])
+        fig['layout']['yaxis'].update(zeroline=False, range=[-0.1, 1.1])
         
         fig.update_layout(width=self._width, height=self._height,
                           margin=dict(l=0, r=0, b=0, t=0, pad=0),

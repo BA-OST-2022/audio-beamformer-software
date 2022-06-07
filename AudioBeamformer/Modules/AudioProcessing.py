@@ -45,6 +45,8 @@ import numpy as np
 import ast
 import matplotlib.pyplot as plt
 from pathlib import Path
+import shutil
+import filecmp
 
 DEBUG = False
 LINUX = (sys.platform == 'linux')
@@ -53,6 +55,8 @@ sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
 from Plotter import EqualizerPlotter
+
+
 
 
 class AudioProcessing:
@@ -82,8 +86,7 @@ class AudioProcessing:
                 print("No Input or Output Device detected\n")
                 
         # Start values
-        self._tot_gain = 1
-        self._output_enable = 1
+        self._tot_gain = 1.0
         self._equalizer_enable = True
         self._modulation_index = 1
         self._mam_gain = 0.2
@@ -98,17 +101,32 @@ class AudioProcessing:
         self.__equalizer_tabs = []
         self.__stream_running = False
         self._enableMagic = False
+        self._enableMute = True
+        self._outputGain = 0.0
         self._player = None
         self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
         
         # Equalizer initialization
+        createPlots = False
         self.__equalier_dict_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_dict.txt"
+        tempPath = self.__equalier_dict_path.rsplit('.', 1)[0] + ".tmp"
+        if not Path(tempPath).is_file():  # Create initial backup file
+            createPlots = True
+            shutil.copyfile(self.__equalier_dict_path, tempPath)
+        if not filecmp.cmp(self.__equalier_dict_path, tempPath): # Check if temp file is diffrent to actual file
+            createPlots = True
+            shutil.copyfile(self.__equalier_dict_path, tempPath)
+       
         with open(self.__equalier_dict_path) as f:
             for i,line in enumerate(f.readlines()):
                 line_tupel = ast.literal_eval(line)
                 self.__equalizerList.append(line_tupel[0])
                 self.__equalizer_profile_list[line_tupel[0]] = line_tupel[1]
-                self.__equalizer_tabs.append(self.equalizer(line_tupel[1],i))
+                taps = self.equalizer(line_tupel[1])
+                if createPlots:
+                    self.createEqualizerPlot(i, taps)
+                self.__equalizer_tabs.append(taps)
+                
         self._equalizer_filter = np.ones(self.equ_window_size)
 
     def begin(self):
@@ -234,8 +252,6 @@ class AudioProcessing:
         else:
             self.__current_source_level = -50
 
-    def setOutputEnable(self,enable):
-        self._output_enable = enable
 
     def getSourceLevel(self):
         return self.__current_source_level
@@ -250,7 +266,7 @@ class AudioProcessing:
     def getEqualizerProfileList(self):
         return list(self.__equalizer_profile_list.keys())
 
-    def equalizer(self, gain_dict, profile):
+    def equalizer(self, gain_dict):
         taps = np.zeros(self.equ_window_size,dtype=np.float32)
         for freq in gain_dict:
             if freq[0] == 0:
@@ -263,7 +279,6 @@ class AudioProcessing:
                                [v/self._samplerate*2 for v in freq],
                                window=gain_dict[freq]["f_type"],
                                pass_zero=False) * gain_dict[freq]["band_gain"]
-        self.createEqualizerPlot(profile, taps)
         return taps
 
     def createEqualizerPlot(self, profile, taps):
@@ -318,36 +333,48 @@ class AudioProcessing:
             if self._player:
                 self._player.end()
                 self._player = None
+                
+    def enableMute(self, state):
+        self._enableMute = state
+        
+    def setOutputGain(self, gain):
+        self._outputGain = gain
+        
 
     def callback(self, indata, outdata, frames, time, status):
-        indata_oneCh = indata[:,0] * self._tot_gain 
         if status:
             print(status)
+            
+        indata_oneCh = indata[:,0].astype(np.float32) * self._tot_gain 
         self.setSourceLevel(indata_oneCh)
-        indata_oneCh *= self._output_enable
+        
+        outdata_oneCh = indata_oneCh
         if self._equalizer_enable:
             indata_oneCh = np.hstack((self.__previousWindow,
-                                    indata_oneCh))
+                                    indata_oneCh))  # This is longer than indata[:,0]
             
             outdata_oneCh = np.convolve(indata_oneCh,
                                         self._equalizer_filter,
                                         "valid")
-            outdata_oneCh = np.float32(outdata_oneCh)
-        else:
-            outdata_oneCh = indata[:,0]
+            outdata_oneCh = outdata_oneCh.astype(np.float32)
 
         if self._enableMagic:
             data = self._player.getData()[:,0]
             if np.shape(data) == np.shape(outdata_oneCh):
-                outdata_oneCh = data
+                outdata_oneCh = data.astype(np.float32)
             else:
-                outdata_oneCh = 0
+                outdata_oneCh *= 0.0
                 print("No data yet to play")
+                
+        
+        outdata_oneCh *= self._outputGain
+        if self._enableMute:
+            outdata_oneCh *= 0.0
             
         # Modulation
         second_channel_data = self.__modulation_dict[self._modulation_index](outdata_oneCh)
         # Stich output together
-        outdata[:] = np.column_stack((outdata_oneCh, second_channel_data))
+        outdata[:] = np.int32(np.column_stack((outdata_oneCh, second_channel_data)))
         self.__previousWindow = indata_oneCh[-self.equ_window_size+1:]
 
 
@@ -356,10 +383,11 @@ if __name__ == '__main__':
     audio_processing = AudioProcessing()
     audio_processing.printChannels()
     print(audio_processing.getSourceList())
-    # audio_processing.enableMagic(True)
+    audio_processing.enableMagic(True)
     audio_processing.begin()
+    audio_processing.enableMute(False)
     audio_processing.setEqualizerProfile(1)
-    time.sleep(10)
+    time.sleep(2)
     audio_processing.end()
     
 

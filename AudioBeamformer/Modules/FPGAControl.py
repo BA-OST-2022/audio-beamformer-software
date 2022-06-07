@@ -108,7 +108,7 @@ class FPGAControl():
             raise ValueError("Channel count does not match")
         if not any([-1 <= g <= 1 for g in gain]):
             raise ValueError("Gain between -1 and 1")
-        self._gain = gain
+        self._gain = np.array(gain)
     
     
     def setChannelDelay(self, delay):
@@ -116,7 +116,7 @@ class FPGAControl():
             raise ValueError("Channel count does not match")
         if not any([0 <= d <= self._tick_length * 2046 for d in delay]):
             raise ValueError(f"Delay between 0 and {self._tick_length*2046} s")
-        self._delay = delay
+        self._delay = np.array(delay)
         
     
     def getMaxChannelDelay(self):
