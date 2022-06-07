@@ -165,7 +165,7 @@ class FaceTracking():
     def __init__(self, lifetime):
         self.fd = FaceDetector()
 
-        self.Ts = 1/4
+        self.Ts = 1/2
         self.R = 507
         self.Qp = 10
         self.Qv = 0.01
@@ -208,7 +208,7 @@ class FaceTracking():
             z_k = np.asarray(centers[center_index])
             x_k = self.faces[face_index].get_position()
             
-            weight = 0.25
+            weight = 0.5
             box = np.array(boxes[center_index], dtype=np.float64)
             if len(self.faces[face_index].floatBox) == 0:
                 self.faces[face_index].floatBox = box
@@ -308,7 +308,7 @@ class FaceTracking():
         self._enableMagic = state
     
 
-faceTracking = FaceTracking(lifetime=5)
+faceTracking = FaceTracking(lifetime=3)
 
 if __name__ == "__main__": 
     VIDEO_FILE = "dance2.mp4"

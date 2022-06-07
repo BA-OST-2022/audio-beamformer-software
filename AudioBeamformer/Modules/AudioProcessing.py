@@ -101,9 +101,11 @@ class AudioProcessing:
         self.__equalizer_tabs = []
         self.__stream_running = False
         self._enableMagic = False
+        self._enablePlayer = False
         self._enableMute = True
         self._outputGain = 0.0
         self._player = None
+        self._audioFilesIndex = 0
         self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
         
         # Equalizer initialization
@@ -128,6 +130,10 @@ class AudioProcessing:
                 self.__equalizer_tabs.append(taps)
                 
         self._equalizer_filter = np.ones(self.equ_window_size)
+        
+        self.__audio_files_path = os.path.dirname(os.path.realpath(__file__)) + "/Demos/"
+        self._audioFiles = os.listdir(self.__audio_files_path)
+
 
     def begin(self):
             self.getChannels()
@@ -324,21 +330,38 @@ class AudioProcessing:
     
     def enableMagic(self, state):
         self._enableMagic = state
-        if(state):
+        if self._player:
+            self._player.end()
+            self._player = None        
+        if state:
             path = os.path.join(os.path.dirname(__file__), "Files/magic.wav")
             self._player = AudioPlayer(sampleRate=self._samplerate,
                                        blockSize=self._chunk_size)
             self._player.begin(path)
-        else:
-            if self._player:
-                self._player.end()
-                self._player = None
+            
+                
+    def enablePlayer(self, state):
+        self._enablePlayer = state
+        if self._player:
+            self._player.end()
+            self._player = None        
+        if state:
+            path = self.__audio_files_path + self._audioFiles[self._audioFilesIndex]
+            self._player = AudioPlayer(sampleRate=self._samplerate,
+                                       blockSize=self._chunk_size)
+            self._player.begin(path)
                 
     def enableMute(self, state):
         self._enableMute = state
         
     def setOutputGain(self, gain):
         self._outputGain = gain
+        
+    def getAudioFiles(self):
+        return self._audioFiles
+    
+    def setAudioFileIndex(self, index):
+        self._audioFilesIndex = index
         
 
     def callback(self, indata, outdata, frames, time, status):
@@ -358,7 +381,7 @@ class AudioProcessing:
                                         "valid")
             outdata_oneCh = outdata_oneCh.astype(np.float32)
 
-        if self._enableMagic:
+        if self._enableMagic or self._enablePlayer:
             data = self._player.getData()[:,0]
             if np.shape(data) == np.shape(outdata_oneCh):
                 outdata_oneCh = data.astype(np.float32)
@@ -383,7 +406,12 @@ if __name__ == '__main__':
     audio_processing = AudioProcessing()
     audio_processing.printChannels()
     print(audio_processing.getSourceList())
-    audio_processing.enableMagic(True)
+    print(audio_processing.getAudioFiles())
+    audio_processing.enableMute(False)
+    audio_processing.setOutputGain(1.0)
+    # audio_processing.enableMagic(True)
+    audio_processing.setAudioFileIndex(0)
+    audio_processing.enablePlayer(True)
     audio_processing.begin()
     audio_processing.enableMute(False)
     audio_processing.setEqualizerProfile(1)
