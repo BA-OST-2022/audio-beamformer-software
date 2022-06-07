@@ -52,7 +52,7 @@ class AudioBeamformer():
     def __init__(self):
         self.terminating = False
         self.audio_processing = AudioProcessing(fpgaControl)
-        self.sensors = Sensors(powerSupply, leds)
+        self.sensors = Sensors(powerSupply, self.audio_processing, leds)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
                                          fpgaControl, leds)
         self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,

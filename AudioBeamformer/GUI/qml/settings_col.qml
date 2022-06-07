@@ -249,7 +249,8 @@ Item{
             Slider {
                 id: se_bf_level_slider
                 visible: se_bf_switch.checked
-                value: 0.3
+                value: 1/18 * 8
+                stepSize: 1/18
                 anchors.topMargin: -2
                 anchors.top: se_distance_level_slider_label.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
