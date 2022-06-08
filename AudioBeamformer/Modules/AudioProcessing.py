@@ -381,14 +381,18 @@ class AudioProcessing:
         indata_oneCh = indata[:,0].astype(np.float32)
         
         if self._enableMagic or self._enablePlayer:
-            data = self._player.getData()[:,0]
-            if np.shape(data) == np.shape(indata_oneCh):
-                indata_oneCh = data.astype(np.float32)
-            else:
-                indata_oneCh *= 0.0
-                print("No data yet to play")
-                self.enableMagic(False)
-                self.enablePlayer(False)
+            try:
+                data = self._player.getData()[:,0]
+                if np.shape(data) == np.shape(indata_oneCh):
+                    indata_oneCh = data.astype(np.float32)
+                else:
+                    indata_oneCh *= 0.0
+                    print("No data yet to play")
+                    self.enableMagic(False)
+                    self.enablePlayer(False)
+            except Exception as e:
+                print(f"Audio Player Exception: {e}")
+            
                 
         indata_oneCh *= self._tot_gain
         self.setSourceLevel(indata_oneCh)
