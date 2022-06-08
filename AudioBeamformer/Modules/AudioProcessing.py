@@ -329,10 +329,10 @@ class AudioProcessing:
         return data_out * np.iinfo(np.int32).max  * self._mam_gain
     
     def enableMagic(self, state):
-        self._enableMagic = state
-        if self._player:
+        if self._player and self._enableMagic:
             self._player.end()
-            self._player = None        
+            self._player = None       
+        self._enableMagic = state
         if state:
             path = os.path.join(os.path.dirname(__file__), "Files/magic.wav")
             self._player = AudioPlayer(sampleRate=self._samplerate,
