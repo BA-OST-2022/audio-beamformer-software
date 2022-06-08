@@ -51,6 +51,7 @@ class Bluetooth():
         self._runThread = False
         self._isRunning = False
         self._audioReset = True
+        self._audioResetDoOnce = False
         self._connectionDelayTime = 2
         
         if LINUX:
@@ -98,9 +99,10 @@ class Bluetooth():
         
         if count != self._connectedDevicesCount:
             if self._audioReset:
-                self._audioReset= False
                 threading.Timer(self._connectionDelayTime, self.resetAudio).start()  
                 print(f"Bluetooth Devices Updated, reset audio sources in {self._connectionDelayTime} s")
+                if self._audioResetDoOnce:
+                    self._audioReset = False
             if DEBUG:
                 print("Devices updated")
             
