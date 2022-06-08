@@ -368,7 +368,17 @@ class AudioProcessing:
         if status:
             print(status)
             
-        indata_oneCh = indata[:,0].astype(np.float32) * self._tot_gain 
+        indata_oneCh = indata[:,0].astype(np.float32)
+        
+        if self._enableMagic or self._enablePlayer:
+            data = self._player.getData()[:,0]
+            if np.shape(data) == np.shape(indata_oneCh):
+                indata_oneCh = data.astype(np.float32)
+            else:
+                indata_oneCh *= 0.0
+                print("No data yet to play")
+                
+        indata_oneCh *= self._tot_gain
         self.setSourceLevel(indata_oneCh)
         
         outdata_oneCh = indata_oneCh
@@ -381,13 +391,7 @@ class AudioProcessing:
                                         "valid")
             outdata_oneCh = outdata_oneCh.astype(np.float32)
 
-        if self._enableMagic or self._enablePlayer:
-            data = self._player.getData()[:,0]
-            if np.shape(data) == np.shape(outdata_oneCh):
-                outdata_oneCh = data.astype(np.float32)
-            else:
-                outdata_oneCh *= 0.0
-                print("No data yet to play")
+        
                 
         
         outdata_oneCh *= self._outputGain
