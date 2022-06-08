@@ -227,7 +227,7 @@ Item{
                       anchors.rightMargin: 2
                       sourceSize.width: 32
                       sourceSize.height: 32
-                      source: {audio_player_enable.checked? backend.playPath:backend.pausePath}
+                      source: {audio_player_enable.checked? backend.pausePath:backend.playPath}
                       fillMode: Image.PreserveAspectFit
                       width: 5
                       height: 5
@@ -253,7 +253,7 @@ Item{
                      anchors.top: audio_player_combo_label.bottom
                      anchors.topMargin: 3
                      onCurrentIndexChanged: {
-                         backend.audioFileIndex(audio_player_combo.index)
+                         backend.audioFileIndex(audio_player_combo.currentIndex)
                      }
                  }
 

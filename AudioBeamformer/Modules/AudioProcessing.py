@@ -361,6 +361,9 @@ class AudioProcessing:
         return self._audioFiles
     
     def setAudioFileIndex(self, index):
+        if index != self._audioFilesIndex and self._enablePlayer:
+            self._audioFilesIndex = index
+            self.enablePlayer(True)
         self._audioFilesIndex = index
         
 
