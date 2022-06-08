@@ -338,7 +338,14 @@ class AudioProcessing:
             self._player = AudioPlayer(sampleRate=self._samplerate,
                                        blockSize=self._chunk_size)
             self._player.begin(path)
+    
+    def playPausePlayer(self):
+        self.enablePlayer(not self._enablePlayer)
             
+    
+    def getPlayerState(self):
+        return self._enablePlayer
+        
                 
     def enablePlayer(self, state):
         self._enablePlayer = state
@@ -380,6 +387,8 @@ class AudioProcessing:
             else:
                 indata_oneCh *= 0.0
                 print("No data yet to play")
+                self.enableMagic(False)
+                self.enablePlayer(False)
                 
         indata_oneCh *= self._tot_gain
         self.setSourceLevel(indata_oneCh)
@@ -418,7 +427,7 @@ if __name__ == '__main__':
     audio_processing.setOutputGain(1.0)
     # audio_processing.enableMagic(True)
     audio_processing.setAudioFileIndex(0)
-    audio_processing.enablePlayer(True)
+    audio_processing.playPausePlayer()
     audio_processing.begin()
     audio_processing.enableMute(False)
     audio_processing.setEqualizerProfile(1)
