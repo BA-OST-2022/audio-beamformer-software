@@ -41,6 +41,7 @@ LINUX = (sys.platform == 'linux')
 from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
 from Modules.AudioProcessing import AudioProcessing
+from Modules.Bluetooth import Bluetooth
 from Modules.Beamsteering import Beamsteering
 from Modules.Sensors import Sensors
 from Modules.FPGAControl import fpgaControl
@@ -52,6 +53,7 @@ class AudioBeamformer():
     def __init__(self):
         self.terminating = False
         self.audio_processing = AudioProcessing(fpgaControl)
+        self.bleutooth = Bluetooth(self.audio_processing)
         self.sensors = Sensors(powerSupply, self.audio_processing, leds)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
                                          fpgaControl, leds)
@@ -72,6 +74,7 @@ class AudioBeamformer():
         self.beamsteering.begin()
         self.audio_processing.printChannels()
         self.audio_processing.begin()
+        self.bleutooth.begin()
         print("Module Initialization done...")
         
     def end(self, shutdown=False):
@@ -83,6 +86,7 @@ class AudioBeamformer():
             self.beamsteering.end()
             self.sensors.end(shutdown)
             self.audio_processing.end()
+            self.bleutooth.end()
             print("Main Application terminated...")
             if shutdown:
                 print("Shut down system...")
