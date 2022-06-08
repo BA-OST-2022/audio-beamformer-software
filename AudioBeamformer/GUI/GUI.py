@@ -578,7 +578,28 @@ class MainWindow(QObject):
         if self._sensors:
             self._sensors.enableMagic(enable)
 
-        
+    # AudioPlayer
+    @pyqtSlot(bool)
+    def enablePlayer(self,enable):
+        if self._audio_processing:
+            self._audio_processing.enablePlayer(enable)
+        else:
+            print(f"Audio Player: {enable}")
+
+    @pyqtSlot(int)
+    def audioFileIndex(self,index):
+        if self._audio_processing:
+            self._audio_processing.setAudioFileIndex(index)
+        else:
+            print(f"Audio Player index: {index}")
+
+    @pyqtProperty(list)
+    def getAudioFiles(self):
+        if self._audio_processing:
+            return self._audio_processing.getAudioFiles()
+        else:
+            return ["Test 1","Test 2","Test 3"]
+
 
 
 
