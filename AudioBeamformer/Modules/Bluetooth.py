@@ -49,6 +49,9 @@ class Bluetooth():
         self._connectedDevices = []
         self._connectedDevicesCount = None
         self._runThread = False
+        self._isRunning = False
+        self._audioReset = True
+        self._connectionDelayTime = 2
         
         if LINUX:
             self.bus = pydbus.SystemBus()
@@ -58,7 +61,7 @@ class Bluetooth():
     def __del__(self):
         self.end()
     
-    def begin(self, updateRate=2):
+    def begin(self, updateRate=0.333):
         self._runThread = True
         self._updateRate = updateRate
         threading.Timer(0, self.update).start()  
@@ -67,41 +70,65 @@ class Bluetooth():
         self._runThread = False
     
     def update(self):
+        if self._isRunning:
+            return
+        self._isRunning = True
         if self._runThread :
             threading.Timer(1.0 / self._updateRate, self.update).start()            
         else:
             return
         
         if LINUX:
+            devices = []
             mngd_objs = self.mngr.GetManagedObjects()
             for path in mngd_objs:
                 con_state = mngd_objs[path].get('org.bluez.Device1', {}).get('Connected', False)
                 if con_state:
                     addr = mngd_objs[path].get('org.bluez.Device1', {}).get('Address')
                     name = mngd_objs[path].get('org.bluez.Device1', {}).get('Name')
-                    self._connectedDevices.append(name)
+                    devices.append(name)
                     if DEBUG:
                         print(f'Device {name} [{addr}] is connected')
+                        
+            self._connectedDevices = devices
         
         count = len(self._connectedDevices)
-        if not self._connectedDevicesCount:
+        if self._connectedDevicesCount is None:
             self._connectedDevicesCount = count
         
         if count != self._connectedDevicesCount:
-            if self.audioProcessing:
-                self.audioProcessing.getSourceList()
-            self._runThread = False
-            print("Bluetooth Devices Updated, terminating module...")
+            if self._audioReset:
+                self._audioReset= False
+                threading.Timer(self._connectionDelayTime, self.resetAudio).start()  
+                print(f"Bluetooth Devices Updated, reset audio sources in {self._connectionDelayTime} s")
+            if DEBUG:
+                print("Devices updated")
+            
+        
+        self._connectedDevicesCount = count
+        self._isRunning = False
         
             
     def getDevices(self):
         return self._connectedDevices
+    
+    def resetAudio(self):
+        if DEBUG:
+            print("Reset delay occured")
+        if self.audioProcessing:
+            print("Reset audio sources")
+            self.audioProcessing.getSourceList()
+            self.audioProcessing.setupStream()
+            self.audioProcessing.startStream()
 
 
 if __name__ == '__main__':
+    import time
+    
     bluetooth = Bluetooth()
     bluetooth.begin()
     print(f"Connected Devices: {bluetooth.getDevices()}")
+    time.sleep(30)
     bluetooth.end()
     
     # Device Florians iPhone [40:9C:28:5C:A6:90] is connected
