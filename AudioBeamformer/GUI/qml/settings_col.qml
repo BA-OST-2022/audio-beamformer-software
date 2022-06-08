@@ -341,6 +341,8 @@ Item{
                     se_system_temp.text = backend.SystemTemperature
                     se_cpu_temp.text = backend.CPUTemperature
                     se_cpu_load.text = backend.CPULoad
+                    blue_device_count.text = backend.deviceCount
+                    blue_device_list.text = backend.deviceList
                 }
             }
 
@@ -359,7 +361,7 @@ Item{
                 Label{
                     id: se_ambient_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 110
+                    anchors.leftMargin: 115
                 }
             }
 
@@ -378,7 +380,7 @@ Item{
                 Label{
                     id: se_system_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 110
+                    anchors.leftMargin: 115
                 }
             }
 
@@ -397,7 +399,7 @@ Item{
                 Label{
                     id: se_cpu_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 110
+                    anchors.leftMargin: 115
                 }
             }
 
@@ -416,8 +418,44 @@ Item{
                 Label{
                     id: se_cpu_load
                     anchors.left: parent.left
-                    anchors.leftMargin: 110
+                    anchors.leftMargin: 115
                 }
+            }
+
+            // Bluetooth Device Count
+            Item{
+                id: blue_device_count_row
+                anchors.top: se_cpu_load_row.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 20       
+                anchors.leftMargin: 20 
+                Label{
+                    anchors.left: parent.left
+                    text: qsTr("Bluetooth Devices")
+                }
+                Label{
+                    id: blue_device_count
+                    anchors.left: parent.left
+                    anchors.leftMargin: 115
+                }
+            }
+            // Bluetooth Device List
+            Item{
+                id: blue_device_list_row
+                anchors.top: blue_device_count_row.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.topMargin: 20       
+                anchors.leftMargin: 20 
+                Label{
+                    id: blue_device_list
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    text: backend.deviceList
+
+                }
+            
             }
         }
     }
