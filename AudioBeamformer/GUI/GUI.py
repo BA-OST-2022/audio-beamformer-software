@@ -70,7 +70,8 @@ class GUI:
                 beamsteering = None,
                 faceTracking = None,
                 sensors = None,
-                leds = None):
+                leds = None,
+                bluetooth = None):
         
         self.MODULE_AUDIO_PROCESSING = 0
         self.MODULE_BEAMSTEERING = 1
@@ -84,6 +85,7 @@ class GUI:
         self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
+        self._bluetooth = bluetooth
         
     def run(self):
         PyCVQML.registerTypes()
@@ -94,7 +96,8 @@ class GUI:
                         self._beamsteering,
                         self._faceTracking,
                         self._sensors,
-                        self._leds)
+                        self._leds,
+                        self._bluetooth)
         engine.rootContext().setContextProperty("backend", main)
         if LINUX and not DEBUG:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
@@ -145,7 +148,8 @@ class MainWindow(QObject):
                 beamsteering = None,
                 faceTracking = None,
                 sensors = None,
-                leds = None):
+                leds = None,
+                bluetooth = None):
 
         QObject.__init__(self)
         self._audio_processing = audio_processing
@@ -153,6 +157,7 @@ class MainWindow(QObject):
         self._faceTracking = faceTracking
         self._sensors = sensors
         self._leds = leds
+        self._bluetooth = bluetooth
 
         self.source_list = []
         self.equalizer_list = []
@@ -427,6 +432,21 @@ class MainWindow(QObject):
             return "None" 
 
     @pyqtProperty(str)
+    def deviceCount(self):
+        if self._bluetooth:
+            return str(len(self._bluetooth.getDevices()))
+        else:
+            return "None"
+
+    @pyqtProperty(str)
+    def deviceList(self):
+        if self._bluetooth:
+            return "\n".join(self._bluetooth.getDevices())
+        else:
+            return "Test 1 \nTest 2"
+
+
+    @pyqtProperty(str)
     def CPULoad(self):
         if not self._sensors == None:
             return f"{self._sensors.getCpuLoad():.1f} %"
@@ -599,6 +619,7 @@ class MainWindow(QObject):
             return self._audio_processing.getAudioFiles()
         else:
             return ["Test 1","Test 2","Test 3"]
+
 
 
 
