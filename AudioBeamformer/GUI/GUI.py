@@ -602,7 +602,7 @@ class MainWindow(QObject):
     @pyqtSlot(bool)
     def enablePlayer(self,enable):
         if self._audio_processing:
-            self._audio_processing.enablePlayer(enable)
+            self._audio_processing.playPausePlayer()
         else:
             print(f"Audio Player: {enable}")
 
@@ -620,7 +620,12 @@ class MainWindow(QObject):
         else:
             return ["Test 1","Test 2","Test 3"]
 
-
+    @pyqtProperty(bool)
+    def getPlayerState(self):
+        if self._audio_processing:
+            return self._audio_processing.getPlayerState()
+        else:
+            return False
 
 
 
