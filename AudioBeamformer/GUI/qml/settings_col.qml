@@ -140,6 +140,7 @@ Item{
                 repeat: true
                  onTriggered: {
                     se_source_gauge_base.height = backend.ToFDistanceLevel * se_gauge_background.width
+                    audio_player_enable.checked = backend.getPlayerState
                 }
             }
 
