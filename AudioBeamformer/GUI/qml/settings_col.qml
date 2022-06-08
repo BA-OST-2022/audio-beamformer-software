@@ -200,6 +200,7 @@ Item{
                 }
             }
             
+
             Label{
                 id: audio_player_label
                 anchors.top: se_volume_level_slider.bottom
@@ -226,12 +227,15 @@ Item{
                       anchors.rightMargin: 2
                       sourceSize.width: 32
                       sourceSize.height: 32
-                      source: {audio_player_enable.checked? backend.playPath:backend.pausePath}
+                      source: {audio_player_enable.checked? backend.pausePath:backend.playPath}
                       fillMode: Image.PreserveAspectFit
                       width: 5
                       height: 5
                   }
                 Material.background: { audio_player_enable.checked?"#484848":"#484848"}
+                 onClicked:{
+                     backend.enablePlayer(audio_player_enable.checked)
+                 }
              }
             
              Label{
@@ -243,13 +247,13 @@ Item{
              }
              ComboBox {
                      id: audio_player_combo
-                     model: ["Test1","Test2","Test3","Test4"]
+                     model: backend.getAudioFiles
                      anchors.horizontalCenter: parent.horizontalCenter
                      width: se_volume_level_slider.width
                      anchors.top: audio_player_combo_label.bottom
                      anchors.topMargin: 3
                      onCurrentIndexChanged: {
-                         
+                         backend.audioFileIndex(audio_player_combo.currentIndex)
                      }
                  }
 
@@ -446,6 +450,8 @@ Item{
                 audio_processing_button.checked = false
                 channel_button.checked = false
                 setting_button.checked = false
+                backend.enablePlayer(false)
+                audio_player_enable.checked = false
                 backend.enableMagicMode(true)
              }
         }
