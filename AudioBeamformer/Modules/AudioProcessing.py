@@ -391,7 +391,8 @@ class AudioProcessing:
                     self.enableMagic(False)
                     self.enablePlayer(False)
             except Exception as e:
-                print(f"Audio Player Exception: {e}")
+                if DEBUG:
+                    print(f"Audio Player Exception: {e}")
             
                 
         indata_oneCh *= self._tot_gain
