@@ -606,8 +606,8 @@ class MainWindow(QObject):
     # AudioPlayer
     @pyqtSlot(bool)
     def enablePlayer(self,enable):
-        if self._bluetooth:
-            self._bluetooth.playPausePlayer(enable)
+        if self._audio_processing:
+            self._audio_processing.playPausePlayer()
         else:
             print(f"Audio Player: {enable}")
 
@@ -627,8 +627,8 @@ class MainWindow(QObject):
 
     @pyqtProperty(bool)
     def getPlayerState(self):
-        if self._bluetooth:
-            return self._bluetooth.getPlayerState()
+        if self._audio_processing:
+            return self._audio_processing.getPlayerState()
         else:
             return False
 
