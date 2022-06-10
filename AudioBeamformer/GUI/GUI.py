@@ -187,6 +187,7 @@ class MainWindow(QObject):
         self.__frame_path = Path("images") / "Rahmen.svg"
         self.__play_img = Path("images") / "play.svg"
         self.__pause_img = Path("images") / "pause.svg"
+        self.__speech_bubble = Path("images") / "SpeechBubble.svg"
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -574,6 +575,10 @@ class MainWindow(QObject):
             return self._sensors.getAlertState() 
         else:
             return False
+
+    @pyqtProperty(str, constant=True)
+    def speechPath(self):
+        return str(self.__speech_bubble)
 
     @pyqtProperty(list)
     def getEqualizerList(self):

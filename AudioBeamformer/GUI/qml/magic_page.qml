@@ -35,11 +35,23 @@ Item{
         source: backend.elvisionPath
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin: 50
+        anchors.leftMargin: 200
         anchors.topMargin: 15
         fillMode: Image.PreserveAspectFit 
         height: 300
     }
+
+    Image{
+        id: speech_bubble
+        source: backend.speechPath
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin: 200
+        anchors.topMargin: 15
+        fillMode: Image.PreserveAspectFit 
+        height: 300
+    }
+
     Text {
     id: nice_text
     anchors.top: parent.top
