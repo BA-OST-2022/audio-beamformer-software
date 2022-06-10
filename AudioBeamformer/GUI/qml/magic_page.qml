@@ -46,8 +46,8 @@ Item{
         source: backend.speechPath
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin: 200
-        anchors.topMargin: 15
+        anchors.leftMargin: 400
+        anchors.topMargin: 150
         fillMode: Image.PreserveAspectFit 
         height: 300
     }
