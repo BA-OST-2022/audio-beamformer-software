@@ -30,7 +30,8 @@
 # SOFTWARE.
 ###############################################################################
 
-# Autostart: https://daviseford.com/blog/2020/05/28/run-script-on-raspberry-pi-gui-startup.html
+# Autostart: https://daviseford.com/blog/2020/05/28/run-script-on-raspberry-pi-gui-startup.html (change pacmanfm to pcmanfm)
+# Splashscreen: https://forums.raspberrypi.com/viewtopic.php?t=276545
 
 import os
 import sys
