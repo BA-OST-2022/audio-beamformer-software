@@ -188,6 +188,12 @@ class MainWindow(QObject):
         self.__play_img = Path("images") / "play.svg"
         self.__pause_img = Path("images") / "pause.svg"
         self.__speech_bubble = Path("images") / "SpeechBubble.svg"
+        self.__speech_bubble_flip = Path("images") / "SpeechBubble_Flipped.svg"
+        self.__quotes = Path(os.path.dirname(os.path.realpath(__file__))) / "qml" / "images" / "Quotes.txt"
+        self.__quote_list = []
+        with open(self.__quotes) as f:
+            for line in f.readlines():
+                self.__quote_list.append(line)
         self.__equalizer_profile = 0
         if self._audio_processing:
             self.__equalizer_holder = self._audio_processing.getEqualizerList()
@@ -632,7 +638,13 @@ class MainWindow(QObject):
         else:
             return False
 
+    @pyqtProperty(list)
+    def quoteList(self):
+        return self.__quote_list
 
+    @pyqtProperty(str, constant=True)
+    def speechFlipPath(self):
+        return str(self.__speech_bubble_flip)
 
 if __name__ == "__main__":
     gui = GUI()

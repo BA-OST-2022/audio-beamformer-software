@@ -40,16 +40,58 @@ Item{
         fillMode: Image.PreserveAspectFit 
         height: 300
     }
-
+    Timer{
+        interval: 10000
+        running: true
+        repeat: true
+        onTriggered: {
+           speech_bubble_thierry_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
+           speech_bubble_florian_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
+        }
+    }
     Image{
-        id: speech_bubble
+        id: speech_bubble_thierry
         source: backend.speechPath
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.leftMargin: 400
-        anchors.topMargin: 150
+        x: 390
+        y: 26
+        fillMode: Image.PreserveAspectFit
+        width: 130*2; height: 100*2
+        sourceSize.width: 130*2
+        sourceSize.height: 100*2
+        Text{
+            id: speech_bubble_thierry_text
+            text: "Welcome"
+            width: 145
+            height: 70   
+            x: 80
+            y: 68
+            wrapMode: Text.WordWrap
+            font.family: "Comic Sans MS"
+            font.pointSize: 10
+        }
+    }
+
+    
+    Image{
+        id: speech_bubble_florian
+        source: backend.speechFlipPath
+        x: 65
+        y: 37
         fillMode: Image.PreserveAspectFit 
-        height: 300
+        width: 130*2; height: 100*2
+        sourceSize.width: 130*2
+        sourceSize.height: 100*2
+        Text{
+            id: speech_bubble_florian_text
+            text: "Welcome"
+            width: 145
+            height: 70   
+            x: 15
+            y: 65
+            wrapMode: Text.WordWrap
+            font.family: "Comic Sans MS"
+            font.pointSize: 10
+        }
     }
 
     Text {
