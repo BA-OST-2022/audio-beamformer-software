@@ -99,13 +99,13 @@ Item{
             
             // Timer for Gauge
             Timer {
-                interval: 100
+                interval: 50
                 running: true
                 repeat: true
                 onTriggered: {
-                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 40) / 50, 0.68)* gauge_background.width
-                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 40) / 50-0.68,0.2)* gauge_background.width
-                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 40) / 50-0.8,0.2)* gauge_background.width
+                    ap_source_gauge_base.height = Math.min((backend.sourceGainValue + 50) / 60, 0.6333)* gauge_background.width
+                    ap_source_gauge_middle.height = Math.min((backend.sourceGainValue + 50) / 60-0.6333,0.8333-0.6333)* gauge_background.width
+                    ap_source_gauge_top.height = Math.min((backend.sourceGainValue + 50) / 60-0.8333,1-0.8333)* gauge_background.width
                     }
             }
 
@@ -150,6 +150,27 @@ Item{
                     width: parent.width
                     anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"
+                }
+                Image {
+                    anchors.top: ap_gauge_holder.top
+                    anchors.topMargin: -4
+                    anchors.leftMargin: 5
+                    anchors.left:ap_gauge_holder.right
+                    height: 0
+                    width: 0
+                    source: "images/gauge_scale.svg"
+                    fillMode: Image.PreserveAspectFit
+                    antialiasing: true
+                    smooth: true
+                    Image {
+                        id: se_gauge_scale_source_image
+                        source: parent.source
+                        height: gauge_background.width + 13
+                        anchors.top: ap_gauge_holder.top
+                        fillMode: Image.PreserveAspectFit
+                        antialiasing: true
+                        smooth: true
+                    }
                 }
             }
         

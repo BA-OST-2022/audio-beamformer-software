@@ -191,7 +191,7 @@ class MainWindow(QObject):
         self.__speech_bubble_flip = Path("images") / "SpeechBubble_Flipped.svg"
         self.__quotes = Path(os.path.dirname(os.path.realpath(__file__))) / "qml" / "images" / "Quotes.txt"
         self.__quote_list = []
-        with open(self.__quotes) as f:
+        with open(self.__quotes, encoding="utf-16-le") as f:
             for line in f.readlines():
                 self.__quote_list.append(line)
         self.__equalizer_profile = 0
@@ -377,7 +377,7 @@ class MainWindow(QObject):
     def ToFDistanceLevel(self):
         if not self._sensors == None:
             return self._sensors.getDistanceLevel()
-        return 1.0
+        return 0.5
 
     @pyqtSlot(int)
     def getEnableToF(self, enable):
@@ -645,6 +645,7 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant=True)
     def speechFlipPath(self):
         return str(self.__speech_bubble_flip)
+    
 
 if __name__ == "__main__":
     gui = GUI()

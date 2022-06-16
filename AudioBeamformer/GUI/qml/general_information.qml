@@ -4,6 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
+import QtCharts 2.15
 
 Item{
     anchors.fill: parent
@@ -69,9 +70,9 @@ Item{
                 running: true
                 repeat: true
                 onTriggered: {
-                    ap_source_gauge_base.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50, 0.68)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_middle.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.68,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
-                    ap_source_gauge_top.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 40) / 50-0.8,0.2)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_base.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 50) / 60, 0.6333)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_middle.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 50) / 60-0.6333,0.8333-0.6333)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
+                    ap_source_gauge_top.height = Math.min(((backend.sourceGainValue + 20*Math.log(main_volume_slider.value)/Math.log(10)) + 50) / 60-0.83333,1-0.8333)* gauge_background.width * (main_mute_button.checked? 0: 1) * (backend.getAlertState? 0:1)
                     main_mute_button.checked = backend.muteEnable;
                     main_volume_slider.value = backend.mainGainValue;
                     //alert_rect.visible = backend.getAlertState;
@@ -117,6 +118,27 @@ Item{
                     width: parent.width
                     anchors.bottom:ap_source_gauge_middle.top
                     color: "#f54b38"
+                }
+                Image {
+                    anchors.top: ap_gauge_holder.top
+                    anchors.topMargin: -1
+                    anchors.leftMargin: 5
+                    anchors.left: ap_gauge_holder.right
+                    height: 0
+                    width: 0
+                    source: "images/gauge_scale_large.svg"
+                    fillMode: Image.PreserveAspectFit
+                    antialiasing: true
+                    smooth: true
+                    Image {
+                        id: se_gauge_scale_large_image
+                        source: parent.source
+                        height: gauge_background.width + 4
+                        anchors.top: ap_gauge_holder.top
+                        fillMode: Image.PreserveAspectFit
+                        antialiasing: true
+                        smooth: true
+                    }
                 }
             }
 }
