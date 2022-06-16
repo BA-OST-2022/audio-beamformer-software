@@ -99,7 +99,6 @@ Item{
         anchors.bottom: parent.bottom
         width: 1200
         
-        /*
         CVCapture
         {
             id: capture
@@ -109,7 +108,6 @@ Item{
             Component.onCompleted: capture.start()
             Component.onDestruction: capture.stop()
         }
-        */
         
         Loader{
             anchors.fill: parent
