@@ -179,6 +179,7 @@ Item{
                     anchors.leftMargin: -9
                     anchors.left:se_gauge_background.left
                     width:se_gauge_background.width + 39
+                    sourceSize.width: se_gauge_background.width*2.3
                     source: "images/gauge_scale_percent.svg"
                     fillMode: Image.PreserveAspectFit
                     antialiasing: true
@@ -186,6 +187,7 @@ Item{
                     Image {
                         id: se_gauge_scale_image
                         source: parent.source
+                        sourceSize.width: se_gauge_background.width*2.3
                         width: 0
                         height: 0
                         antialiasing: true

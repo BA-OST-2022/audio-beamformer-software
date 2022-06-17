@@ -126,6 +126,7 @@ Item{
                     anchors.left: ap_gauge_holder.right
                     height: 0
                     width: 0
+                    sourceSize.height: gauge_background.width*2.3
                     source: "images/gauge_scale_large.svg"
                     fillMode: Image.PreserveAspectFit
                     antialiasing: true
@@ -134,6 +135,7 @@ Item{
                         id: se_gauge_scale_large_image
                         source: parent.source
                         height: gauge_background.width + 4
+                        sourceSize.height: gauge_background.width*2.3
                         anchors.top: ap_gauge_holder.top
                         fillMode: Image.PreserveAspectFit
                         antialiasing: true
