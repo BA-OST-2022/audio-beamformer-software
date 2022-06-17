@@ -45,15 +45,37 @@ Item{
         running: true
         repeat: true
         onTriggered: {
-           speech_bubble_thierry_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
-           speech_bubble_florian_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
+            if (Math.random() > 0.6)
+            {
+                speech_bubble_thierry.visible = true
+                speech_bubble_thierry_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
+            }
+            else{
+                speech_bubble_thierry.visible = false   
+            }
+            if (Math.random() > 0.6)
+            {
+                speech_bubble_florian.visible = true
+                speech_bubble_florian_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
+            }
+            else{
+                speech_bubble_florian.visible = false
+            }
+            if (Math.random() > 0.9)
+            {
+                speech_bubble_elvision.visible = true
+            }
+            else{
+                speech_bubble_elvision.visible = false
+            }
         }
     }
     Image{
         id: speech_bubble_thierry
         source: backend.speechPath
         x: 390
-        y: 26
+        y: 26   
+        visible: false
         fillMode: Image.PreserveAspectFit
         width: 130*2; height: 100*2
         sourceSize.width: 130*2
@@ -68,6 +90,8 @@ Item{
             wrapMode: Text.WordWrap
             font.family: "Comic Sans MS"
             font.pointSize: 10
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
         }
     }
 
@@ -75,6 +99,7 @@ Item{
     Image{
         id: speech_bubble_florian
         source: backend.speechFlipPath
+        visible: false
         x: 65
         y: 37
         fillMode: Image.PreserveAspectFit 
@@ -91,6 +116,31 @@ Item{
             wrapMode: Text.WordWrap
             font.family: "Comic Sans MS"
             font.pointSize: 10
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+        }
+    }
+
+    Image{
+        id: speech_bubble_elvision
+        source: "images/SpeechBubble_Small.svg"
+        height: 80
+        width: 100
+        visible: false
+        sourceSize.width: 160
+        sourceSize.height: 200
+        x: 310
+        y: 130
+        Text{
+            text: "Miau"
+            height: 30
+            width: 80
+            font.family: "Comic Sans MS"
+            font.pointSize: 10
+            y: 46
+            x: 10
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
         }
     }
 
