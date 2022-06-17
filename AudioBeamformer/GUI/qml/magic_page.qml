@@ -61,7 +61,7 @@ Item{
             else{
                 speech_bubble_florian.visible = false
             }
-            if (Math.random() > 0.9)
+            if (Math.random() > 0.95)
             {
                 speech_bubble_elvision.visible = true
             }
@@ -149,7 +149,7 @@ Item{
     anchors.top: parent.top
     anchors.left: elvis_image.right
     anchors.leftMargin: 50
-    text: "WONDERLAND"
+    text: "HSR-Town"
     font.family: "Comic Sans MS"
     font.pointSize: 24
     color: "red"
