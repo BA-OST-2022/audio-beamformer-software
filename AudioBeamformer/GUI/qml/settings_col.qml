@@ -139,7 +139,7 @@ Item{
                 running: true
                 repeat: true
                  onTriggered: {
-                    se_source_gauge_base.height = backend.ToFDistanceLevel * se_gauge_background.width
+                    se_source_gauge_base.width = backend.ToFDistanceLevel * se_gauge_background.width
                     audio_player_enable.checked = backend.getPlayerState
                 }
             }
@@ -147,18 +147,19 @@ Item{
             Item{
                 id: se_gauge_holder
                 visible: se_tof_switch.position
-                anchors.bottom: se_tof_level_slider.bottom
-                anchors.top: se_tof_switch_label.top
-                anchors.right: parent.right
-                width: 15
+                anchors.top: se_tof_level_slider.bottom
+                anchors.topMargin: 7
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: 15
+                width: se_tof_level_slider.width - se_tof_level_slider.implicitHandleWidth
                 // Background Rectangle
                 Rectangle{
                     id: se_gauge_background
-                    width: parent.height
-                    height: parent.width
+                    width: parent.width
+                    height: parent.height
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    rotation: 90
+                    rotation: 0
                     gradient: Gradient {
                         GradientStop { position: 0.0; color: "#424242" }
                         GradientStop { position: 1.0; color: "#595959" }
@@ -166,12 +167,31 @@ Item{
                 }
                 Rectangle{
                     id: se_source_gauge_base
-                    height: parent.height
-                    width: parent.width
-                    anchors.bottom:se_gauge_holder.bottom
+                    height: se_gauge_background.height
+                    width: se_gauge_background.width
+                    anchors.left:se_gauge_background.left
+                    anchors.verticalCenter:se_gauge_background.verticalCenter
                     color: "#80DEEA"
                 }
-
+                Image {
+                    anchors.top: se_gauge_background.bottom
+                    anchors.topMargin: 5
+                    anchors.leftMargin: -9
+                    anchors.left:se_gauge_background.left
+                    width:se_gauge_background.width + 39
+                    source: "images/gauge_scale_percent.svg"
+                    fillMode: Image.PreserveAspectFit
+                    antialiasing: true
+                    smooth: true
+                    Image {
+                        id: se_gauge_scale_image
+                        source: parent.source
+                        width: 0
+                        height: 0
+                        antialiasing: true
+                        smooth: true
+                    }
+                }
             }
 
         }
@@ -210,16 +230,34 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: {"Audio Player"}
             }
-
             
+             Label{
+                     id: audio_player_combo_label
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     anchors.top: audio_player_label.bottom
+                     anchors.topMargin: 10
+                     text: qsTr("Song List:")
+             }
+             ComboBox {
+                     id: audio_player_combo
+                     model: backend.getAudioFiles
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     width: se_volume_level_slider.width - se_volume_level_slider.implicitHandleWidth
+                     anchors.top: audio_player_combo_label.bottom
+                     anchors.topMargin: 3
+                     onCurrentIndexChanged: {
+                         backend.audioFileIndex(audio_player_combo.currentIndex)
+                     }
+             }
              RoundButton{
                  id: audio_player_enable
                  checkable: true
                  checked: false
-                 width: se_volume_level_slider.width / 2
+                 width: se_volume_level_slider.width
                  height: se_volume_level_slider.width / 4
                  anchors.horizontalCenter: parent.horizontalCenter
-                 anchors.top: audio_player_label.bottom
+                 anchors.top: audio_player_combo.bottom
+                 anchors.topMargin: 5
                   contentItem:Image{
                       anchors.fill: parent
                       anchors.topMargin: 10
@@ -238,25 +276,6 @@ Item{
                      backend.enablePlayer(audio_player_enable.checked)
                  }
              }
-            
-             Label{
-                     id: audio_player_combo_label
-                     anchors.horizontalCenter: parent.horizontalCenter
-                     anchors.top: audio_player_enable.bottom
-                     anchors.topMargin: 10
-                     text: qsTr("Song List:")
-             }
-             ComboBox {
-                     id: audio_player_combo
-                     model: backend.getAudioFiles
-                     anchors.horizontalCenter: parent.horizontalCenter
-                     width: se_volume_level_slider.width
-                     anchors.top: audio_player_combo_label.bottom
-                     anchors.topMargin: 3
-                     onCurrentIndexChanged: {
-                         backend.audioFileIndex(audio_player_combo.currentIndex)
-                     }
-                 }
 
         }
 
@@ -362,7 +381,7 @@ Item{
                 Label{
                     id: se_ambient_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 115
+                    anchors.leftMargin: 120
                 }
             }
 
@@ -381,7 +400,7 @@ Item{
                 Label{
                     id: se_system_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 115
+                    anchors.leftMargin: 120
                 }
             }
 
@@ -400,7 +419,7 @@ Item{
                 Label{
                     id: se_cpu_temp
                     anchors.left: parent.left
-                    anchors.leftMargin: 115
+                    anchors.leftMargin: 120
                 }
             }
 
@@ -419,7 +438,7 @@ Item{
                 Label{
                     id: se_cpu_load
                     anchors.left: parent.left
-                    anchors.leftMargin: 115
+                    anchors.leftMargin: 120
                 }
             }
 
@@ -438,7 +457,7 @@ Item{
                 Label{
                     id: blue_device_count
                     anchors.left: parent.left
-                    anchors.leftMargin: 115
+                    anchors.leftMargin: 120
                 }
             }
             // Bluetooth Device List

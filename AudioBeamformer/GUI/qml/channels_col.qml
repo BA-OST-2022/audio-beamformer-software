@@ -192,7 +192,7 @@ Item{
                         anchors.topMargin: 18
                         anchors.leftMargin: 67
                         visible: ch_window_switch.checked
-                        source: backend.windowPath + "window_0.svg"
+                        source: backend.windowPath + "0.svg"
                         fillMode: Image.PreserveAspectFit
                         width: 162
                         //height: 90

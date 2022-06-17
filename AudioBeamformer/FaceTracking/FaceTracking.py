@@ -314,13 +314,15 @@ if __name__ == "__main__":
     VIDEO_FILE = "dance2.mp4"
     USE_CAMERA = True
     
-    faceTracking.enableMagic(True)
+    # faceTracking.enableMagic(True)
     
     if USE_CAMERA:
         cap = cv2.VideoCapture(0)
     else:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         cap = cv2.VideoCapture(os.path.join(dir_path, "demos", VIDEO_FILE))
+        
+    out = cv2.VideoWriter('output.mp4', -1, 30.0, (640,480))
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -331,6 +333,7 @@ if __name__ == "__main__":
         img = faceTracking.runDetection(frame)
         # print(faceTracking.getDetectionCount(), faceTracking.getFocusLocation())
 
+        out.write(img)
         cv2.imshow("FaceTracking [ESC to quit]", img)
         key = cv2.waitKey(1)
         if key == ord('s'):
@@ -339,4 +342,5 @@ if __name__ == "__main__":
             break
     
     cap.release()
+    out.release()
     cv2.destroyAllWindows()
