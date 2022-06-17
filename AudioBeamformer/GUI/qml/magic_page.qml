@@ -41,11 +41,11 @@ Item{
         height: 300
     }
     Timer{
-        interval: 10000
+        interval: 8000
         running: true
         repeat: true
         onTriggered: {
-            if (Math.random() > 0.6)
+            if (Math.random() > 0.55)
             {
                 speech_bubble_thierry.visible = true
                 speech_bubble_thierry_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
@@ -53,7 +53,7 @@ Item{
             else{
                 speech_bubble_thierry.visible = false   
             }
-            if (Math.random() > 0.6)
+            if (Math.random() > 0.55)
             {
                 speech_bubble_florian.visible = true
                 speech_bubble_florian_text.text = backend.quoteList[parseInt(Math.random()*backend.quoteList.length)]
@@ -61,7 +61,7 @@ Item{
             else{
                 speech_bubble_florian.visible = false
             }
-            if (Math.random() > 0.95)
+            if (Math.random() > 0.9)
             {
                 speech_bubble_elvision.visible = true
             }
@@ -148,7 +148,7 @@ Item{
     id: nice_text
     anchors.top: parent.top
     anchors.left: elvis_image.right
-    anchors.leftMargin: 50
+    anchors.leftMargin: 53
     text: "HSR-Town"
     font.family: "Comic Sans MS"
     font.pointSize: 24
