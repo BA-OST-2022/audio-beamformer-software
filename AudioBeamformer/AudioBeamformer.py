@@ -39,6 +39,7 @@ import threading
 
 LINUX = (sys.platform == 'linux')
 
+from Modules.PacketInstaller import pckInstaller
 from Modules.PowerSupply import powerSupply
 from Modules.LEDs import leds
 from Modules.AudioProcessing import AudioProcessing

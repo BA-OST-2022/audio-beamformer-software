@@ -54,6 +54,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
+from WebRadio import WebRadio
 from Plotter import EqualizerPlotter
 
 
@@ -105,8 +106,11 @@ class AudioProcessing:
         self._enableMute = True
         self._outputGain = 0.0
         self._player = None
+        self._player_source = 0
         self._audioFilesIndex = 0
         self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
+        self._radio = WebRadio()
+        self._radio_channel_index = 2  # SRF 3
         
         # Equalizer initialization
         createPlots = False
@@ -142,6 +146,7 @@ class AudioProcessing:
 
     def end(self):
         self.endStream()
+        self._radio.stop()
 
     def setupStream(self):
         try:
@@ -338,6 +343,28 @@ class AudioProcessing:
             self._player = AudioPlayer(sampleRate=self._samplerate,
                                        blockSize=self._chunk_size)
             self._player.begin(path)
+            
+    def setPlayerSource(self, source):
+        self._player_source = source
+        if(self._player_source == 1):
+            self.enablePlayer(False)
+            url = self._radio.channels[self._radio_channel_index]["url"]
+            self._radio.play(url)
+        else:
+            self._radio.stop()
+            
+    def getRadioChannels(self):
+        return self._radio.getChannels()
+
+
+    def setRadioChannelIndex(self, index):
+        if self._player_source == 1:
+            self._radio_channel_index = index
+            self.setPlayerSource(1)
+            
+    def getRadioChannelIndex(self):
+        return self._radio_channel_index
+            
     
     def playPausePlayer(self):
         self.enablePlayer(not self._enablePlayer)

@@ -103,7 +103,8 @@ class GUI:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
         else:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Windows.qml"))
-        app.lastWindowClosed.connect(self.terminate)   
+        app.lastWindowClosed.connect(self.terminate)  
+        app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon.png"))
         sys.exit(app.exec())
     
     def registerTerminateCallback(self, callback):
@@ -415,8 +416,8 @@ class MainWindow(QObject):
             self._beamsteering.enableBeamfocusing(enable)
         else:
             print(f"Beamfocusing enable: {enable}")
+            
     # Settings stats
-    
     @pyqtProperty(str)
     def AmbientTemperature(self):
         if not self._sensors == None:
@@ -609,13 +610,41 @@ class MainWindow(QObject):
         if self._sensors:
             self._sensors.enableMagic(enable)
 
-    # AudioPlayer
+    # AudioPlayer 
+    @pyqtSlot(int)
+    def getPlayerSource(self, type):
+        if self._audio_processing:
+            self._audio_processing.setPlayerSource(type)
+        else:
+             print(f"Audio Player Source: {type}")
+    
     @pyqtSlot(bool)
     def enablePlayer(self,enable):
         if self._audio_processing:
             self._audio_processing.playPausePlayer()
         else:
             print(f"Audio Player: {enable}")
+            
+    @pyqtProperty(list)
+    def getRadioChannels(self):
+        if self._audio_processing:
+            return self._audio_processing.getRadioChannels()
+        else:
+            return ["Channel 1","Channel 2","Channel 3"]
+        
+    @pyqtSlot(int)
+    def radioChannelIndex(self,index):
+        if self._audio_processing:
+            self._audio_processing.setRadioChannelIndex(index)
+        else:
+            print(f"Radio Channel index: {index}")
+            
+    @pyqtProperty(int)
+    def getRadioChannelIndex(self):
+        if self._audio_processing:
+            return self._audio_processing.getRadioChannelIndex()
+        else:
+            return 0
 
     @pyqtSlot(int)
     def audioFileIndex(self,index):
@@ -629,7 +658,7 @@ class MainWindow(QObject):
         if self._audio_processing:
             return self._audio_processing.getAudioFiles()
         else:
-            return ["Test 1","Test 2","Test 3"]
+            return ["File 1","File 2","File 3"]
 
     @pyqtProperty(bool)
     def getPlayerState(self):

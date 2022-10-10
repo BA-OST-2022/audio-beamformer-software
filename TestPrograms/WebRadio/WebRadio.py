@@ -8,8 +8,8 @@ Created on Sat Jun 18 17:42:37 2022
 import requests
 import vlc
 from time import sleep
-urls = ['http://stream.srg-ssr.ch/drs3/mp3_128.m3u',
-        'http://stream.srg-ssr.ch/drsmw/mp3_128.m3u']
+urls = ['http://stream.srg-ssr.ch/drs3/mp3_128.m3u']#,
+        # 'http://stream.srg-ssr.ch/drsmw/mp3_128.m3u']
 
 # https://www.srf.ch/hilfe/hilfe-sendetechnik/sendetechnik-live-radio-im-internet
 
