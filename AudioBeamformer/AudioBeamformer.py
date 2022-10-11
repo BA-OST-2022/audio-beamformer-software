@@ -35,6 +35,7 @@
 
 import os
 import sys
+import uuid
 import threading
 
 LINUX = (sys.platform == 'linux')
@@ -53,14 +54,26 @@ from FaceTracking.FaceTracking import faceTracking
 
 class AudioBeamformer():
     def __init__(self):
+        THEME_COLOR_REGULAR = "#7FDEE8"
+        THEME_COLOR_OST = "#D72864"
+        self.theme = None
+        
+        mac = hex(uuid.getnode())
+        self.OST_THEME = (mac == '0x9cb6d09c47e0')   # TODO: Change to Raspberry Pi MAC
+        print(f"Your MAC Address is: {mac}")
+        if self.OST_THEME:
+            self.theme = THEME_COLOR_OST
+            GUI.setTheme(self.theme)
+            faceTracking.setActiveColor(self.theme)
+            
         self.terminating = False
-        self.audio_processing = AudioProcessing(fpgaControl)
+        self.audio_processing = AudioProcessing(fpgaControl, self.theme)
         self.bluetooth = Bluetooth(self.audio_processing)
         self.sensors = Sensors(powerSupply, self.audio_processing, leds)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
-                                         fpgaControl, leds)
+                                         fpgaControl, leds, self.theme)
         self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,
-                       self.sensors, leds, self.bluetooth )
+                       self.sensors, leds, self.bluetooth)
     
     def begin(self):
         threading.Thread(target=self.initializeModules).start()

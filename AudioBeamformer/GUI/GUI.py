@@ -47,6 +47,7 @@ LINUX = (sys.platform == 'linux')
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/PyCVQML")
 
+
 sys_argv = sys.argv
 sys_argv += ['--style', 'Material']
 os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -58,6 +59,8 @@ if not QApplication.instance():
 else:
     app = QApplication.instance()
 engine = QQmlApplicationEngine()
+
+ostTheme = None
 
 # Important: Must be imported after creating Qt instance, this is a known bug.
 import cv2
@@ -103,13 +106,19 @@ class GUI:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Linux.qml"))
         else:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Windows.qml"))
-        app.lastWindowClosed.connect(self.terminate)  
-        app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon.png"))
+        app.lastWindowClosed.connect(self.terminate)
+        if(ostTheme):
+            app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon_Pink.png"))
+        else:
+            app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon.png"))
         sys.exit(app.exec())
     
     def registerTerminateCallback(self, callback):
         self._callback = callback
         
+    def setTheme(theme):
+        global ostTheme 
+        ostTheme = theme
         
     def setModuleReference(self, module, reference):
         if(module == self.MODULE_AUDIO_PROCESSING):
@@ -183,7 +192,10 @@ class MainWindow(QObject):
         self.__loadingImage = Path("images") / "Audio-Beamformer_Gray.png"
         self.__eq_path = Path("images") / "eq_"
         self.__window_path = Path("images") / "window_" 
-        self.__interpol_path = Path("images") / "Interpolation_" 
+        if ostTheme:
+            self.__interpol_path = Path("images") / "Interpolation_P"
+        else:
+            self.__interpol_path = Path("images") / "Interpolation_"
         self.__elvision_path = Path("images") / "Elvision.jpg"
         self.__frame_path = Path("images") / "Rahmen.svg"
         self.__play_img = Path("images") / "play.svg"
@@ -674,6 +686,14 @@ class MainWindow(QObject):
     @pyqtProperty(str, constant=True)
     def speechFlipPath(self):
         return str(self.__speech_bubble_flip)
+    
+    
+    @pyqtProperty(bool)
+    def getThemeType(self):
+        if self._sensors:
+            return True if ostTheme else False
+        else:
+            return True
     
 
 if __name__ == "__main__":

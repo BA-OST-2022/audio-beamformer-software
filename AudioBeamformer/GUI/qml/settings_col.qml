@@ -195,7 +195,8 @@ Item{
                     width: se_gauge_background.width
                     anchors.left:se_gauge_background.left
                     anchors.verticalCenter:se_gauge_background.verticalCenter
-                    color: "#80DEEA"
+                    color: backend.getThemeType? themeColorOst : "#80DEEA"
+                    
                 }
                 Image {
                     anchors.top: se_gauge_background.bottom

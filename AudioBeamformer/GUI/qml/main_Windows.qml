@@ -7,12 +7,14 @@ import QtQuick.Extras 1.4
 import QtCharts 2.15
 
 ApplicationWindow{
+    property color themeColorOst: "#d72864"
+    
     id: window 
     width: 1480
     height: 320
     visible: true
     Material.theme: Material.Dark // Material.Dark
-    Material.accent: Material.Cyan // Material.LightBlue
+    Material.accent: backend.getThemeType? themeColorOst : Material.Cyan
     title: qsTr("Audio Beamformer")
     flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.CustomizeWindowHint | Qt.MSWindowsFixedSizeDialogHint | Qt.WindowTitleHint
     
