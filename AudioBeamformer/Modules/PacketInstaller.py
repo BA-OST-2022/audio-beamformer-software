@@ -34,6 +34,7 @@ import importlib
 import subprocess
 import sys
 
+LINUX = (sys.platform == 'linux')
 
 class PacketInstaller:
     def __init__(self):
@@ -66,4 +67,5 @@ class PacketInstaller:
 
 pckInstaller = PacketInstaller()
 pckInstaller.check()
-pckInstaller.install("PyQtChart")
+if not LINUX:
+    pckInstaller.install("PyQtChart")
