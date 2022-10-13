@@ -1,8 +1,0 @@
-("Left-Centre-Right 35°", -35, 35, 3, 3)
-("Left-Centre-Right 25°", -25, 25, 3, 3)
-("Left-Centre-Right 15°", -15, 15, 3, 3)
-("Left-Right 35°", -35, 35, 2, 5)
-("Left-Right 25°", -25, 25, 2, 5)
-("Left-Right 15°", -15, 15, 2, 5)
-("Sweep 10 Steps 45°", -45, 45, 10, 1)
-("Sweep Slow 35°", -35, 35, 5, 3)

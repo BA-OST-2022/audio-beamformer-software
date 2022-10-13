@@ -39,6 +39,7 @@ import shutil
 import filecmp
 from pathlib import Path
 from Plotter import WindowPlotter
+
 DEBUG = False
 
 class Beamsteering():
@@ -46,12 +47,16 @@ class Beamsteering():
                  sensors = None,
                  facetracking = None,
                  fpgaControl = None,
-                 leds=None):
+                 leds=None,
+                 theme=None):
         # Module init
         self._fpga_controller = fpgaControl
         self._sensors = sensors
         self._facetracking = facetracking
         self._leds = leds
+        
+        # Theme
+        self.__theme = theme
         
         # Constants
         self.__distance = 0.01475
@@ -95,6 +100,7 @@ class Beamsteering():
         self._PatternHoldTime = 1
         
         # Window
+        self.__window_theme_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/window_theme.txt"
         self.__window_types = {"Dolph-Chebyshev": self.chebyWindow(),
                                "Cosine": self.cosineWindow(),
                                "Hann": self.hannWindow(),
@@ -105,19 +111,20 @@ class Beamsteering():
         self._enableWindow = False
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
-        self._plotter = WindowPlotter(250, int(250 * 0.517))
+        self._plotter = WindowPlotter(250, int(250 * 0.517), self.__theme if self.__theme else "#7FDEE8")
         
         createPlots = False
-        tempPath = self.__pattern_dict_path.rsplit('.', 1)[0] + ".tmp"
-        if not Path(tempPath).is_file():  # Create initial backup file
+        currentTheme = "Pink" if self.__theme else "Regular"
+        if not Path(self.__window_theme_path).is_file():  # Create initial backup file
             createPlots = True
-            shutil.copyfile(self.__pattern_dict_path, tempPath)
-        if not filecmp.cmp(self.__pattern_dict_path, tempPath): # Check if temp file is diffrent to actual file
-            createPlots = True
-            shutil.copyfile(self.__pattern_dict_path, tempPath)
+        else:   
+            with open(self.__window_theme_path, encoding="utf-8") as f:
+                createPlots = (f.readline() != currentTheme)                
+        with open(self.__window_theme_path, "w", encoding="utf-8") as f:
+            f.write(currentTheme)
         if createPlots:
             self.generatePlot()
-            print("Create equalizer plots")
+            print("Create window plots")
         
 
     def begin(self):

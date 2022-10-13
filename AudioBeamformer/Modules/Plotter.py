@@ -37,12 +37,12 @@ import numpy as np
 
 
 class EqualizerPlotter:
-    def __init__(self, width, height, fs):
+    def __init__(self, width, height, fs, color="#80DEEA"):
         self._width = width
         self._height = height
         self._fs = fs
         
-        self._COLOR_BLUE = "#80DEEA"
+        self._COLOR_ACTIVE = color
         self._COLOR_GRAY = "#BEBEBE"
         self._COLOR_TEXT = "#FFFFFF"
         
@@ -63,7 +63,7 @@ class EqualizerPlotter:
             font_color=self._COLOR_TEXT,
         )
         fig = go.Figure(layout=layout)      
-        fig.add_trace(go.Scatter(x=w, y=H, line = dict(color=self._COLOR_BLUE,
+        fig.add_trace(go.Scatter(x=w, y=H, line = dict(color=self._COLOR_ACTIVE,
                                                        width=4, dash='solid')))
         
         
@@ -105,11 +105,11 @@ class EqualizerPlotter:
         
         
 class WindowPlotter:
-    def __init__(self, width, height):
+    def __init__(self, width, height, color="#80DEEA"):
         self._width = width
         self._height = height
         
-        self._COLOR_BLUE = "#80DEEA"
+        self._COLOR_ACTIVE = color
         self._COLOR_GRAY = "#BEBEBE"
         self._COLOR_TEXT = "#FFFFFF"
         
@@ -124,12 +124,12 @@ class WindowPlotter:
         n = len(bins)
         fig.add_trace(go.Scatter(x=np.arange(n) - n // 2, y=bins,
                                  mode="markers", marker_size=10,
-                                 line = dict(color=self._COLOR_BLUE, width=0)))
+                                 line = dict(color=self._COLOR_ACTIVE, width=0)))
         
         for i in range(len(bins)):
             fig.add_trace(go.Scatter(x=np.array([i - n // 2, i - n // 2]),
                                      y=np.array([0, bins[i]]), mode='lines',
-                                     line = dict(color=self._COLOR_BLUE,width=4)))
+                                     line = dict(color=self._COLOR_ACTIVE,width=4)))
            
             
         fig.update_yaxes(ticks="outside", tickwidth=1,

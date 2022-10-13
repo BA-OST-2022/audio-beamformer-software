@@ -54,13 +54,12 @@ sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/Modules")
 
 from AudioPlayer import AudioPlayer
+from WebRadio import WebRadio
 from Plotter import EqualizerPlotter
 
 
-
-
 class AudioProcessing:
-    def __init__(self, fpgaControl = None):
+    def __init__(self, fpgaControl = None, theme=None):
         # Adjustable values
         self._chunk_size = 8192
         self._samplerate = 44100
@@ -68,6 +67,9 @@ class AudioProcessing:
         self.__black_list_input_device = ["pulse","loopin","default"]
         self.__modulation_dict = {0: self.AMModulation, 1: self.MAMModulation}
         self._fpga_controller = fpgaControl
+        
+        self.__theme = theme
+        
         # Device index
         channels = self.getChannels()
         if LINUX:  
@@ -105,8 +107,11 @@ class AudioProcessing:
         self._enableMute = True
         self._outputGain = 0.0
         self._player = None
+        self._player_source = 0
         self._audioFilesIndex = 0
-        self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate)
+        self._plotter = EqualizerPlotter(285, int(285 * 0.517), self._samplerate, self.__theme if self.__theme else "#7FDEE8")
+        self._radio = WebRadio()
+        self._radio_channel_index = 2  # SRF 3
         
         # Equalizer initialization
         createPlots = False
@@ -118,6 +123,16 @@ class AudioProcessing:
         if not filecmp.cmp(self.__equalier_dict_path, tempPath): # Check if temp file is diffrent to actual file
             createPlots = True
             shutil.copyfile(self.__equalier_dict_path, tempPath)
+            
+        self.__equalier_theme_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/equalizer_theme.txt"
+        currentTheme = "Pink" if self.__theme else "Regular"
+        if not Path(self.__equalier_theme_path).is_file():  # Create initial backup file
+            createPlots = True
+        else:   
+            with open(self.__equalier_theme_path, encoding="utf-8") as f:
+                createPlots = (f.readline() != currentTheme)                
+        with open(self.__equalier_theme_path, "w", encoding="utf-8") as f:
+            f.write(currentTheme)
        
         with open(self.__equalier_dict_path) as f:
             for i,line in enumerate(f.readlines()):
@@ -142,6 +157,7 @@ class AudioProcessing:
 
     def end(self):
         self.endStream()
+        self._radio.stop()
 
     def setupStream(self):
         try:
@@ -338,6 +354,28 @@ class AudioProcessing:
             self._player = AudioPlayer(sampleRate=self._samplerate,
                                        blockSize=self._chunk_size)
             self._player.begin(path)
+            
+    def setPlayerSource(self, source):
+        self._player_source = source
+        if(self._player_source == 1):
+            self.enablePlayer(False)
+            url = self._radio.channels[self._radio_channel_index]["url"]
+            self._radio.play(url)
+        else:
+            self._radio.stop()
+            
+    def getRadioChannels(self):
+        return self._radio.getChannels()
+
+
+    def setRadioChannelIndex(self, index):
+        if self._player_source == 1:
+            self._radio_channel_index = index
+            self.setPlayerSource(1)
+            
+    def getRadioChannelIndex(self):
+        return self._radio_channel_index
+            
     
     def playPausePlayer(self):
         self.enablePlayer(not self._enablePlayer)

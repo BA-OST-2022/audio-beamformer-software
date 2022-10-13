@@ -15,6 +15,9 @@ Item{
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     visible: setting_button.checked
+    Component.onCompleted:{
+        audio_player_radio_channel_combo.currentIndex = backend.getRadioChannelIndex
+    }
 
     Row{
         id: settings_row
@@ -77,6 +80,27 @@ Item{
                     backend.getLEDBrightness(se_leds_level_slider.value)
                 }
             }
+            
+            Label{
+                id: se_volume_label
+                anchors.top: se_leds_level_slider.bottom
+                anchors.topMargin: 4
+                anchors.leftMargin: 34
+                font.pixelSize: 20  
+                anchors.left: parent.left
+                text: {"Max. Volume: " + (se_volume_level_slider.value * 100).toFixed(0) + " %"}
+            }
+    
+            Slider {
+                id: se_volume_level_slider
+                anchors.horizontalCenter: parent.horizontalCenter
+                value: 1
+                anchors.top: se_volume_label.bottom
+                anchors.topMargin: -2
+                onValueChanged: {
+                        backend.getMaxVolume(se_volume_level_slider.value)
+                }
+            }
         }
 
         // ToF Sensor
@@ -126,7 +150,7 @@ Item{
                 value: 0.5
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: se_tof_level_slider_label.bottom
-                anchors.topMargin: -2
+                anchors.topMargin: 0
                 visible: se_tof_switch.checked
                 onValueChanged: {
                     backend.getToFDistance(se_tof_level_slider.value)
@@ -171,7 +195,8 @@ Item{
                     width: se_gauge_background.width
                     anchors.left:se_gauge_background.left
                     anchors.verticalCenter:se_gauge_background.verticalCenter
-                    color: "#80DEEA"
+                    color: backend.getThemeType? themeColorOst : "#80DEEA"
+                    
                 }
                 Image {
                     anchors.top: se_gauge_background.bottom
@@ -197,51 +222,64 @@ Item{
             }
 
         }
-
-        // Max. Vol
+        
+        // Audio Player
         Item{
-            id: settings_volume_item
+            id: settings_audio_player_item
             height: settings_row.height
             width: settings_row.width/5
-            Label{
-                id: se_volume_label
-                anchors.top: parent.top
-                anchors.topMargin: 8
-                font.pixelSize: 20  
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: {"Max. Volume: " + (se_volume_level_slider.value * 100).toFixed(0) + " %"}
-            }
-
-            Slider {
-                id: se_volume_level_slider
-                anchors.horizontalCenter: parent.horizontalCenter
-                value: 1
-                anchors.top: se_volume_label.bottom
-                anchors.topMargin: -2
-                onValueChanged: {
-                        backend.getMaxVolume(se_volume_level_slider.value)
-                }
-            }
             
-
             Label{
                 id: audio_player_label
-                anchors.top: se_volume_level_slider.bottom
-                anchors.topMargin: 1
+                anchors.top: parent.top
+                anchors.topMargin: 8
                 font.pixelSize: 20  
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: {"Audio Player"}
             }
             
              Label{
-                     id: audio_player_combo_label
+                     id: audio_player_radio_button_label
                      anchors.horizontalCenter: parent.horizontalCenter
                      anchors.top: audio_player_label.bottom
-                     anchors.topMargin: 10
-                     text: qsTr("Song List:")
+                     anchors.topMargin: 8
+                     text: qsTr("Audio Source")
              }
+             
+             Row{
+                 id: ap_audio_player_row_radio_button
+                 anchors.horizontalCenter: parent.horizontalCenter
+                 anchors.top: audio_player_radio_button_label.bottom
+                 anchors.topMargin: 5
+                 RadioButton{
+                     id: ad_audio_source_player
+                     text: qsTr("Player")
+                     checked: true
+                     onClicked:{
+                         backend.getPlayerSource(0)
+                     }
+                 }
+                 RadioButton{
+                     id: ad_audio_source_radio
+                     text: qsTr("Web-Radio")
+                     onClicked:{
+                         backend.getPlayerSource(1)
+                     }
+                 }
+             }
+             
+             Label{
+                     id: audio_player_combo_label
+                     visible: ad_audio_source_player.checked
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     anchors.top: ap_audio_player_row_radio_button.bottom
+                     anchors.topMargin: 5
+                     text: qsTr("Song List")
+             }
+             
              ComboBox {
                      id: audio_player_combo
+                     visible: ad_audio_source_player.checked
                      model: backend.getAudioFiles
                      anchors.horizontalCenter: parent.horizontalCenter
                      width: se_volume_level_slider.width - se_volume_level_slider.implicitHandleWidth
@@ -253,6 +291,7 @@ Item{
              }
              RoundButton{
                  id: audio_player_enable
+                 visible: ad_audio_source_player.checked
                  checkable: true
                  checked: false
                  width: se_volume_level_slider.width
@@ -278,14 +317,38 @@ Item{
                      backend.enablePlayer(audio_player_enable.checked)
                  }
              }
+             
+             Label{
+                     id: audio_player_radio_combo_label
+                     visible: ad_audio_source_radio.checked
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     anchors.top: ap_audio_player_row_radio_button.bottom
+                     anchors.topMargin: 5
+                     text: qsTr("Radio Channel")
+             }
+             
+             ComboBox {
+                     id: audio_player_radio_channel_combo
+                     visible: ad_audio_source_radio.checked
+                     model: backend.getRadioChannels
+                     anchors.horizontalCenter: parent.horizontalCenter
+                     width: se_volume_level_slider.width - se_volume_level_slider.implicitHandleWidth
+                     anchors.top: audio_player_radio_combo_label.bottom
+                     anchors.topMargin: 3
+                     onCurrentIndexChanged: {
+                         backend.radioChannelIndex(audio_player_radio_channel_combo.currentIndex)
+                     }
+             }
+             
 
         }
-
+        
         // Beamfocusing
         Item{
-            id: settings_beamfocusing_item
+            id: settings_volume_item
             height: settings_row.height
             width: settings_row.width/5
+                    
             Label{
                 id: se_bf_label
                 anchors.top: parent.top
@@ -314,8 +377,6 @@ Item{
                 }
             }
 
-    
-
             Label{
                 id: se_distance_level_slider_label
                 visible: se_bf_switch.checked
@@ -338,6 +399,7 @@ Item{
                 }
             }
         }
+                
 
         // Stats
         Item{
