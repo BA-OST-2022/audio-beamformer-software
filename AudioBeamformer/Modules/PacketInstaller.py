@@ -43,7 +43,8 @@ class PacketInstaller:
             {"pip": "opencv-python", "import": "cv2"},
             {"pip": "MNN", "import": "MNN"},
             {"pip": "torch", "import": "torch"},
-            {"pip": "python-vlc", "import": "vlc"},]
+            {"pip": "python-vlc", "import": "vlc"},
+            {"pip": "kaleido", "import": "kaleido"}]
         
     
     def check(self):
@@ -61,7 +62,7 @@ class PacketInstaller:
                 
 
     def install(self, pck):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pck])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-U", pck])
 
 pckInstaller = PacketInstaller()
 pckInstaller.check()

@@ -108,9 +108,9 @@ class GUI:
             engine.load(os.path.join(os.path.dirname(__file__), "qml/main_Windows.qml"))
         app.lastWindowClosed.connect(self.terminate)
         if(ostTheme):
-            app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon_Pink.png"))
+            app.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(__file__), "qml/images/Audio-Beamformer_Icon_Pink.png")))
         else:
-            app.setWindowIcon(QtGui.QIcon("qml/images/Audio-Beamformer_Icon.png"))
+            app.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(__file__), "qml/images/Audio-Beamformer_Icon.png")))
         sys.exit(app.exec())
     
     def registerTerminateCallback(self, callback):
