@@ -103,9 +103,9 @@ class LEDs():
     def setTheme(self, theme):
         if theme:
             self._color_tracking = (0, 255, 255)
-            self._color_searching = (255, 0, 255)
+            self._color_searching = (215, 40, 100)
         else:
-            self._color_tracking = (255, 0, 255)
+            self._color_tracking = (215, 40, 100)
             self._color_searching = (0, 255, 255)
     
     def enableCamera(self, state):
