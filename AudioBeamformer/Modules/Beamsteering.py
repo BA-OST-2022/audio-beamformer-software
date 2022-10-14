@@ -63,7 +63,7 @@ class Beamsteering():
         self.__row_count = 19
         
         #   LED 
-        self.setTheme(True if theme)
+        self.setTheme(True if theme else False)
         
         #   Camera angle in degree
         self.__max_angle_camera = 40
