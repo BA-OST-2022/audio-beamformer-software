@@ -136,12 +136,12 @@ class Beamsteering():
         
     def setTheme(self, theme):
         if theme:
-            self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
-            self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
+            self._COLOR_GRAD_PEAK = np.array([0.50, 0.87, 0.92])
+            self._COLOR_GRAD_LOW  = np.array([0.84, 0.15, 0.39])
             self._COLOR_DEAFULT   = np.array([0.84, 0.15, 0.39])  # Pink
         else:
-            self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
-            self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
+            self._COLOR_GRAD_PEAK = np.array([0.84, 0.15, 0.39])
+            self._COLOR_GRAD_LOW  = np.array([0.50, 0.87, 0.92])
             self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
 
     def update(self):
@@ -242,13 +242,13 @@ class Beamsteering():
 
         self._leds.setChannelColors(leds_display)            
         
-        if self._currSteerSource != 0:  # Turn off LEDs if not in camera mode
-            self._leds.setCameraAnimation(self._leds.OFF)
-        else:
+        if self._currSteerSource == 0 and self._beamsteeringEnable:
             if self._facetracking.getDetectionCount() == 0:
                 self._leds.setCameraAnimation(self._leds.SEARCHING)
             else:
                 self._leds.setCameraAnimation(self._leds.TRACKING)
+        else:
+            self._leds.setCameraAnimation(self._leds.OFF)  # Turn off LEDs if not in camera mode
     
 
     def setAngle(self):
