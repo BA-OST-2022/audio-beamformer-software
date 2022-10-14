@@ -63,9 +63,7 @@ class Beamsteering():
         self.__row_count = 19
         
         #   LED 
-        self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
-        self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
-        self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
+        self.setTheme(True if theme)
         
         #   Camera angle in degree
         self.__max_angle_camera = 40
@@ -135,6 +133,16 @@ class Beamsteering():
 
     def end(self):
         self._runThread = False
+        
+    def setTheme(self, theme):
+        if theme:
+            self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
+            self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
+            self._COLOR_DEAFULT   = np.array([0.84, 0.15, 0.39])  # Pink
+        else:
+            self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
+            self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
+            self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
 
     def update(self):
         if(self._initialized):
