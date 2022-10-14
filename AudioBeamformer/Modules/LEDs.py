@@ -67,6 +67,8 @@ class LEDs():
         self._cameraAnimation = self.OFF
         self._GAMMA_CORRECT_FACTOR = 2.8
         self._strip = None
+        
+        self.setTheme(False)
     
     def __del__(self):
         self.end()
@@ -98,6 +100,13 @@ class LEDs():
                 self._strip.clear_strip()
                 self._strip.cleanup()
         
+    def setTheme(self, theme):
+        if theme:
+            self._color_tracking = (0, 255, 255)
+            self._color_searching = (255, 0, 255)
+        else:
+            self._color_tracking = (255, 0, 255)
+            self._color_searching = (0, 255, 255)
     
     def enableCamera(self, state):
         self._enableCamera = state
@@ -140,17 +149,17 @@ class LEDs():
                 speed = 20
                 grad = np.linspace(1, 0, self._ringCount)
                 grad = np.roll(grad, -int(time() * speed))
-                self._ringColors[:,0] = grad * 1.0  # Red
-                self._ringColors[:,1] = grad * 0.0  # Greenroll
-                self._ringColors[:,2] = grad * 1.0  # Blue
+                self._ringColors[:,0] = grad * (self._color_searching[0] / 255)  # Red
+                self._ringColors[:,1] = grad * (self._color_searching[1] / 255)  # Green
+                self._ringColors[:,2] = grad * (self._color_searching[2] / 255)  # Blue
             elif(self._cameraAnimation == self.TRACKING):
                 speed = 7.5
                 val = np.abs((time() * 0.1 * speed) % 2 - 1) # Triangle
                 val = 0.3 + 0.7 * val                        # Offset
                 val = np.ones(self._ringCount) * val
-                self._ringColors[:,0] = val * 0.0   # Red
-                self._ringColors[:,1] = val * 1.0   # Green
-                self._ringColors[:,2] = val * 1.0   # Blue
+                self._ringColors[:,0] = val * (self._color_tracking[0] / 255)   # Red
+                self._ringColors[:,1] = val * (self._color_tracking[1] / 255)   # Green
+                self._ringColors[:,2] = val * (self._color_tracking[2] / 255)   # Blue
                 
             
             if LINUX:
