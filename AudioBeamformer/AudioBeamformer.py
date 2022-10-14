@@ -70,7 +70,7 @@ class AudioBeamformer():
         self.terminating = False
         self.audio_processing = AudioProcessing(fpgaControl, self.theme)
         self.bluetooth = Bluetooth(self.audio_processing)
-        self.sensors = Sensors(powerSupply, self.audio_processing, leds)
+        self.sensors = Sensors(powerSupply, self.audio_processing, leds, self.theme)
         self.beamsteering = Beamsteering(self.sensors, faceTracking,
                                          fpgaControl, leds, self.theme)
         self.gui = GUI(self.audio_processing, self.beamsteering, faceTracking,
