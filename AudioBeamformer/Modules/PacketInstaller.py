@@ -41,7 +41,7 @@ class PacketInstaller:
         self.packetList = [
             {"pip": "sounddevice", "import": "sounddevice"},
             {"pip": "soundfile", "import": "soundfile"},
-            {"pip": "opencv-python", "import": "cv2"},
+            #{"pip": "opencv-python", "import": "cv2"}, # Do not import befor PyQt
             {"pip": "MNN", "import": "MNN"},
             {"pip": "torch", "import": "torch"},
             {"pip": "python-vlc", "import": "vlc"},

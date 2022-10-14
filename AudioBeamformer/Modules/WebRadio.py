@@ -49,7 +49,10 @@ urls = ['http://stream.srg-ssr.ch/drs3/mp3_128.m3u'],
 
 class WebRadio:
     def __init__(self):
-        self.instance = vlc.Instance()
+        if LINUX:
+            self.instance = vlc.Instance("--aout=alsa", "--alsa-audio-device=dmix:CARD=Loopback,DEV=0")
+        else:
+            self.instance = vlc.Instance()
         self.playlists = set(['pls','m3u'])
         self.playState = False
         
@@ -90,6 +93,8 @@ class WebRadio:
                 if DEBUG:
                     print('Start Web-Radio Stream')
                 self.player = self.instance.media_player_new()
+                if LINUX:
+                    pass#self.player.audio_output_device("Loopback", 0)
                 Media = self.instance.media_new(url)
                 Media_list = self.instance.media_list_new([url])
                 Media.get_mrl()
