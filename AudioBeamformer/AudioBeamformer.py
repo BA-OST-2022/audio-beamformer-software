@@ -65,6 +65,7 @@ class AudioBeamformer():
             self.theme = THEME_COLOR_OST
             GUI.setTheme(self.theme)
             faceTracking.setActiveColor(self.theme)
+            leds.setTheme(True)
             
         self.terminating = False
         self.audio_processing = AudioProcessing(fpgaControl, self.theme)
