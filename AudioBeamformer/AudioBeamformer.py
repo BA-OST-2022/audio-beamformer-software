@@ -59,7 +59,7 @@ class AudioBeamformer():
         self.theme = None
         
         mac = hex(uuid.getnode())
-        self.OST_THEME = (mac == '0xe45f0192d061')   # TODO: Change to Raspberry Pi MAC
+        self.OST_THEME = (mac == '0xe45f01c90b4c')   # TODO: Change to Raspberry Pi MAC
         print(f"Your MAC Address is: {mac}")
         if self.OST_THEME:
             self.theme = THEME_COLOR_OST
