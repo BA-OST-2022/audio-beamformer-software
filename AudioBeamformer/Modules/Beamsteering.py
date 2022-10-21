@@ -39,6 +39,7 @@ import shutil
 import filecmp
 from pathlib import Path
 from Plotter import WindowPlotter
+
 DEBUG = False
 
 class Beamsteering():
@@ -46,21 +47,23 @@ class Beamsteering():
                  sensors = None,
                  facetracking = None,
                  fpgaControl = None,
-                 leds=None):
+                 leds=None,
+                 theme=None):
         # Module init
         self._fpga_controller = fpgaControl
         self._sensors = sensors
         self._facetracking = facetracking
         self._leds = leds
         
+        # Theme
+        self.__theme = theme
+        
         # Constants
         self.__distance = 0.01475
         self.__row_count = 19
         
         #   LED 
-        self._COLOR_GRAD_PEAK = np.array([1.00, 0.40, 0.00])
-        self._COLOR_GRAD_LOW  = np.array([0.05, 0.20, 0.95])
-        self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
+        self.setTheme(True if theme else False)
         
         #   Camera angle in degree
         self.__max_angle_camera = 40
@@ -95,6 +98,7 @@ class Beamsteering():
         self._PatternHoldTime = 1
         
         # Window
+        self.__window_theme_path = os.path.dirname(os.path.realpath(__file__)) + "/Files/window_theme.txt"
         self.__window_types = {"Dolph-Chebyshev": self.chebyWindow(),
                                "Cosine": self.cosineWindow(),
                                "Hann": self.hannWindow(),
@@ -105,19 +109,20 @@ class Beamsteering():
         self._enableWindow = False
         self._enableChannel = np.ones(self.__row_count)
         self._gains = np.ones(self.__row_count)
-        self._plotter = WindowPlotter(250, int(250 * 0.517))
+        self._plotter = WindowPlotter(250, int(250 * 0.517), self.__theme if self.__theme else "#7FDEE8")
         
         createPlots = False
-        tempPath = self.__pattern_dict_path.rsplit('.', 1)[0] + ".tmp"
-        if not Path(tempPath).is_file():  # Create initial backup file
+        currentTheme = "Pink" if self.__theme else "Regular"
+        if not Path(self.__window_theme_path).is_file():  # Create initial backup file
             createPlots = True
-            shutil.copyfile(self.__pattern_dict_path, tempPath)
-        if not filecmp.cmp(self.__pattern_dict_path, tempPath): # Check if temp file is diffrent to actual file
-            createPlots = True
-            shutil.copyfile(self.__pattern_dict_path, tempPath)
+        else:   
+            with open(self.__window_theme_path, encoding="utf-8") as f:
+                createPlots = (f.readline() != currentTheme)                
+        with open(self.__window_theme_path, "w", encoding="utf-8") as f:
+            f.write(currentTheme)
         if createPlots:
             self.generatePlot()
-            print("Create equalizer plots")
+            print("Create window plots")
         
 
     def begin(self):
@@ -128,6 +133,16 @@ class Beamsteering():
 
     def end(self):
         self._runThread = False
+        
+    def setTheme(self, theme):
+        if theme:
+            self._COLOR_GRAD_PEAK = np.array([0.50, 0.87, 0.92])
+            self._COLOR_GRAD_LOW  = np.array([0.84, 0.15, 0.39])
+            self._COLOR_DEAFULT   = np.array([0.84, 0.15, 0.39])  # Pink
+        else:
+            self._COLOR_GRAD_PEAK = np.array([0.84, 0.15, 0.39])
+            self._COLOR_GRAD_LOW  = np.array([0.50, 0.87, 0.92])
+            self._COLOR_DEAFULT   = np.array([0.50, 0.87, 0.92])
 
     def update(self):
         if(self._initialized):
@@ -227,13 +242,13 @@ class Beamsteering():
 
         self._leds.setChannelColors(leds_display)            
         
-        if self._currSteerSource != 0:  # Turn off LEDs if not in camera mode
-            self._leds.setCameraAnimation(self._leds.OFF)
-        else:
+        if self._currSteerSource == 0 and self._beamsteeringEnable:
             if self._facetracking.getDetectionCount() == 0:
                 self._leds.setCameraAnimation(self._leds.SEARCHING)
             else:
                 self._leds.setCameraAnimation(self._leds.TRACKING)
+        else:
+            self._leds.setCameraAnimation(self._leds.OFF)  # Turn off LEDs if not in camera mode
     
 
     def setAngle(self):

@@ -11,6 +11,8 @@ Item{
     id: main_row
     anchors.fill: parent
     
+    //property color themeColorOst: "#d72864"
+    
     Component.onCompleted:{
         backend.getEnableChannels([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
     }

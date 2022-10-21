@@ -36,6 +36,8 @@ import numpy as np
 import os
 import time
 
+DEBUG = False
+
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.dirname(__file__) + "/FaceTracking")
 
@@ -162,7 +164,7 @@ def overlay_transparent(background, overlay, x, y):
 
 
 class FaceTracking():
-    def __init__(self, lifetime):
+    def __init__(self, lifetime, activeColor=(0xEA, 0xDE, 0x80), inactiveColor=(0x60, 0x60, 0x60)):
         self.fd = FaceDetector()
 
         self.Ts = 1/2
@@ -173,8 +175,8 @@ class FaceTracking():
         self.faces = []
         self.lifetime = lifetime
         
-        self.colorActive = (0xEA, 0xDE, 0x80)
-        self.colorInactive = (0x60, 0x60, 0x60)
+        self.colorActive = activeColor
+        self.colorInactive = inactiveColor
 
         self._focus = 0
         self._showDot = False
@@ -306,6 +308,11 @@ class FaceTracking():
         
     def enableMagic (self, state):
         self._enableMagic = state
+        
+    def setActiveColor(self, color):
+        self.colorActive = tuple(int(color[i+1:i+3], 16) for i in (0, 2, 4))[::-1]
+        if DEBUG:
+            print(f"Active color set to {self.colorActive}")
     
 
 faceTracking = FaceTracking(lifetime=3)
