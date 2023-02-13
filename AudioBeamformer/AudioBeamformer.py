@@ -55,9 +55,9 @@ from FaceTracking.FaceTracking import faceTracking
 def isNewVersion():
     try:
         netifaces.interfaces()
-        netifaces.ifaddresses('eth0')[netifaces.AF_LINK]
+        macAddress = netifaces.ifaddresses('eth0')[netifaces.AF_LINK][0]["addr"].upper()
         print(f"Your MAC Address is: {macAddress}")
-        return macAddress == "E4-5F-01-C9-0B-4C"
+        return macAddress == "E4:5F:01:C9:0B:4B"
     except:
         return False
 
