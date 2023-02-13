@@ -35,7 +35,7 @@
 
 import os
 import sys
-import psutil
+import netifaces
 import threading
 
 LINUX = (sys.platform == 'linux')
@@ -53,12 +53,13 @@ from FaceTracking.FaceTracking import faceTracking
 
 
 def isNewVersion():
-    for interface in psutil.net_if_addrs():
-        if psutil.net_if_addrs()[interface][0].address:
-            macAddress = psutil.net_if_addrs()[interface][0].address
-            break
-    print(f"Your MAC Address is: {macAddress}")
-    return macAddress == "E4-5F-01-C9-0B-4C"
+    try:
+        netifaces.interfaces()
+        netifaces.ifaddresses('eth0')[netifaces.AF_LINK]
+        print(f"Your MAC Address is: {macAddress}")
+        return macAddress == "E4-5F-01-C9-0B-4C"
+    except:
+        return False
 
 
 class AudioBeamformer():

@@ -45,7 +45,9 @@ class PacketInstaller:
             {"pip": "MNN", "import": "MNN"},
             {"pip": "torch", "import": "torch"},
             {"pip": "python-vlc", "import": "vlc"},
+            {"pip": "netifaces", "import": "netifaces"},
             {"pip": "kaleido", "import": "kaleido"}]
+            
         
     
     def check(self):
