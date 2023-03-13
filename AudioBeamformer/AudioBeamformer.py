@@ -35,7 +35,7 @@
 
 import os
 import sys
-import uuid
+import netifaces
 import threading
 
 LINUX = (sys.platform == 'linux')
@@ -52,15 +52,22 @@ from GUI.GUI import GUI
 from FaceTracking.FaceTracking import faceTracking
 
 
+def isNewVersion():
+    try:
+        netifaces.interfaces()
+        macAddress = netifaces.ifaddresses('eth0')[netifaces.AF_LINK][0]["addr"].upper()
+        print(f"Your MAC Address is: {macAddress}")
+        return macAddress == "E4:5F:01:C9:0B:4B"
+    except:
+        return False
+
+
 class AudioBeamformer():
     def __init__(self):
         THEME_COLOR_REGULAR = "#7FDEE8"
         THEME_COLOR_OST = "#D72864"
         self.theme = None
-        
-        mac = hex(uuid.getnode())
-        self.OST_THEME = (mac == '0xe45f0192d061')   # TODO: Change to Raspberry Pi MAC
-        print(f"Your MAC Address is: {mac}")
+        self.OST_THEME = isNewVersion()
         if self.OST_THEME:
             self.theme = THEME_COLOR_OST
             GUI.setTheme(self.theme)

@@ -45,7 +45,9 @@ class PacketInstaller:
             {"pip": "MNN", "import": "MNN"},
             {"pip": "torch", "import": "torch"},
             {"pip": "python-vlc", "import": "vlc"},
+            {"pip": "netifaces", "import": "netifaces"},
             {"pip": "kaleido", "import": "kaleido"}]
+            
         
     
     def check(self):
@@ -59,6 +61,7 @@ class PacketInstaller:
                     importlib.import_module(i["import"], package=None)
                 except ModuleNotFoundError as e:
                     print(f"Could not install module, error: {e}")
+        print("All necessary modules are installed")
                     
                 
 

@@ -191,9 +191,19 @@ class HMI():
             buf = []
             for reg in regs:
                 buf.append(self._i2c_msg.write(self._deviceAddress, [reg, regs[reg]]))
-            with SMBus(self._i2cBusID) as bus:
-                bus.i2c_rdwr(*buf)
-
+            retryCount = 10
+            while True:
+                try:
+                    with SMBus(self._i2cBusID) as bus:
+                        bus.i2c_rdwr(*buf)
+                    break
+                except:
+                    print("HMI: Error occured on I2C Bus -> Try again")
+                    import time
+                    time.sleep(0.5)
+                    retryCount -= 1
+                    if(retryCount == 0):
+                        raise Exception("HMI I2C Bus Error")
    
     def _gamma(self, val):
         return np.clip(np.power(val, self._GAMMA_CORRECT_FACTOR), 0.0, 1.0)
@@ -213,10 +223,10 @@ if __name__ == '__main__':
     hmi.begin()
     hmi.setButtonColor(np.array([1.0, 0.5, 0.0]))  # R, G, B
     hmi.setFanSpeed(1.0)
-    time.sleep(5)
+    time.sleep(1)
     hmi.setButtonColor(np.array([0.0, 1.0, 1.0]))  # R, G, B
     hmi.setFanSpeed(0.5)
-    time.sleep(5)
+    time.sleep(1)
     
     hmi.setButtonColor()                       # No argument means off
     hmi.end()

@@ -66,7 +66,7 @@ class Sensors():
             self.COLOR_RUN = np.array([0.0, 1.0, 1.0])     # Cyan
             self.COLOR_MUTE = np.array([1.0, 0.0, 0.0])    # Red
         self.COLOR_BOOT = np.array([1.0, 1.0, 1.0])        # White
-        self.COLOR_STANDBY = np.array([0.62, 0.62, 0.0])   # Yellow (dark)
+        self.COLOR_STANDBY = np.array([0.3, 0.3, 0.3])     # White (dark)
         
         self._updateRateTemp = 2                           # Update rate in Hz
         self._updateRateLed = 10                           # Update rate in Hz
@@ -122,14 +122,12 @@ class Sensors():
         self._runThread = False
         if(self._initialized):
             if shutdown:
-                self._hmi.setButtonColor(self.COLOR_BOOT)
+                self._hmi.setButtonColor(self.COLOR_STANDBY)
             else:
                 self._hmi.setButtonColor()
             self._tempSensorAmbient.end()
             self._tempSensorSystem.end()
             self._tofSensor.end()
-            if shutdown:
-                self._hmi.setButtonColor(self.COLOR_BOOT)
             self._hmi.end(not shutdown)  # Turn off LED if not shutdown
             self._initialized = False
         
@@ -321,5 +319,5 @@ if __name__ == '__main__':
     sensors = Sensors()
     sensors.begin()
 
-    time.sleep(10)
-    sensors.end()
+    time.sleep(7)
+    sensors.end(shutdown=True)
