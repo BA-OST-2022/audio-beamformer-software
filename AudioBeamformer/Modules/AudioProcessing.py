@@ -403,7 +403,7 @@ class AudioProcessing:
         self._outputGain = gain
         
     def getAudioFiles(self):
-        return self._audioFiles
+        return [f.rsplit('.', maxsplit=1)[0] for f in self._audioFiles]
     
     def setAudioFileIndex(self, index):
         if index != self._audioFilesIndex and self._enablePlayer:
