@@ -16,6 +16,21 @@ Item{
     Component.onCompleted:{
         backend.getEnableChannels([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
     }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        onClicked: {
+            contextMenu.popup()
+        }
+        Menu {
+        id: contextMenu
+            MenuItem {
+                text: "Exit"
+                onTriggered: window.close()
+            }
+        }
+    }
     
     // Buttons
     Column{
