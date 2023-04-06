@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AudioBeamformer
+Path=/home/pi/audio-beamformer-software/AudioBeamformer/
+Icon=/home/pi/audio-beamformer-software/AudioBeamformer/GUI/qml/images/Audio-Beamformer_Icon.ico
+Exec=python /home/pi/audio-beamformer-software/AudioBeamformer/AudioBeamformer.py
+
+Terminal=false
+Categories=Utility;Application;
